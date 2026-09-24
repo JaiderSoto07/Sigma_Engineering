@@ -1,12 +1,8 @@
 package co.edu.co.pizzeriauco.dao.factoria;
 
 import co.edu.co.pizzeriauco.dao.datos.entidad.AdministradorDAO;
-import co.edu.co.pizzeriauco.dao.datos.entidad.BarrioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.CambioDAO;
-import co.edu.co.pizzeriauco.dao.datos.entidad.CiudadDAO;
-import co.edu.co.pizzeriauco.dao.datos.entidad.ClienteDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.CompraDAO;
-import co.edu.co.pizzeriauco.dao.datos.entidad.DepartamentoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.DetalleCompraDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.DetalleRecetaDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.DetalleVentaDAO;
@@ -15,15 +11,12 @@ import co.edu.co.pizzeriauco.dao.datos.entidad.InventarioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.LoteDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.MovimientoInventarioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.OrigenDAO;
-import co.edu.co.pizzeriauco.dao.datos.entidad.PaisDAO;
-import co.edu.co.pizzeriauco.dao.datos.entidad.PizzeriaDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.ProductoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.ProductoInternoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.ProveedorDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.TamanoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.TipoMovimientoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.TipoProductoDAO;
-import co.edu.co.pizzeriauco.dao.datos.entidad.UbicacionDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.UnidadMedidaDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.VentaDAO;
 
@@ -64,14 +57,6 @@ public abstract class DAOFactory {
         // Tarea: ¿Como se cancela una transaccion de forma segura?
     }
 
-    public abstract PaisDAO obtenerPaisDAO();
-
-    public abstract DepartamentoDAO obtenerDepartamentoDAO();
-
-    public abstract CiudadDAO obtenerCiudadDAO();
-
-    public abstract BarrioDAO obtenerBarrioDAO();
-
     public abstract OrigenDAO obtenerOrigenDAO();
 
     public abstract TipoMovimientoDAO obtenerTipoMovimientoDAO();
@@ -81,14 +66,6 @@ public abstract class DAOFactory {
     public abstract TamanoDAO obtenerTamanoDAO();
 
     public abstract UnidadMedidaDAO obtenerUnidadMedidaDAO();
-
-    public abstract UbicacionDAO obtenerUbicacionDAO();
-
-    public abstract PizzeriaDAO obtenerPizzeriaDAO();
-
-    public abstract AdministradorDAO obtenerAdministradorDAO();
-
-    public abstract ClienteDAO obtenerClienteDAO();
 
     public abstract ProveedorDAO obtenerProveedorDAO();
 

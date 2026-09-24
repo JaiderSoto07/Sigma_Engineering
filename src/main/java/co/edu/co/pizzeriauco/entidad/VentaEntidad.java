@@ -15,7 +15,7 @@ public class VentaEntidad {
     private UUID id;
     private LocalDate fecha;
     private LocalTime hora;
-    private ClienteEntidad cliente;
+    private String cliente;
     private BigDecimal total;
 
     private VentaEntidad(Builder builder) {
@@ -38,7 +38,7 @@ public class VentaEntidad {
         return hora;
     }
 
-    public ClienteEntidad getCliente() {
+    public String getCliente() {
         return cliente;
     }
 
@@ -51,14 +51,14 @@ public class VentaEntidad {
         private UUID id;
         private LocalDate fecha;
         private LocalTime hora;
-        private ClienteEntidad cliente;
+        private String cliente;
         private BigDecimal total;
 
         public Builder() {
             id = UtilId.valorDefecto(id);
             fecha = UtilFecha.ValorPorDefecto(1, 1, 1000);
             hora = LocalTime.MIN;
-            cliente = new ClienteEntidad.Builder().build();
+            cliente = "";
             total = BigDecimal.ZERO;
         }
 
@@ -85,11 +85,11 @@ public class VentaEntidad {
             return this;
         }
 
-        public Builder cliente(ClienteEntidad cliente) {
+        public Builder cliente(String cliente) {
             this.cliente = UtilObjeto
                     .obtenerValorDefectoSiValorOriginalEsNulo(
                             cliente,
-                            new ClienteEntidad.Builder().build()
+                            ""
                     );
             return this;
         }

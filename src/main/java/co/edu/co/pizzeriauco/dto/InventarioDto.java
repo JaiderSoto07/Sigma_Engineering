@@ -14,7 +14,6 @@ public class InventarioDto {
     private ProductoInternoDto productoInterno;
     private UnidadMedidaDto unidadMedidaInventario;
     private BigDecimal stockMinimo;
-    private PizzeriaDto pizzeria;
 
     public InventarioDto() {
         setId(id);
@@ -22,7 +21,6 @@ public class InventarioDto {
         setProductoInterno(new ProductoInternoDto());
         setUnidadMedidaInventario(new UnidadMedidaDto());
         setStockMinimo(BigDecimal.ZERO);
-        setPizzeria(new PizzeriaDto());
     }
 
     public UUID getId() {
@@ -65,13 +63,5 @@ public class InventarioDto {
     public void setStockMinimo(BigDecimal stockMinimo) {
         var stockMinimoSaneado = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(stockMinimo, BigDecimal.ZERO);
         this.stockMinimo = UtilNumero.menorQue(stockMinimoSaneado, BigDecimal.ZERO) ? BigDecimal.ZERO : stockMinimoSaneado;
-    }
-
-    public PizzeriaDto getPizzeria() {
-        return pizzeria;
-    }
-
-    public void setPizzeria(PizzeriaDto pizzeria) {
-        this.pizzeria = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(pizzeria, new PizzeriaDto());
     }
 }

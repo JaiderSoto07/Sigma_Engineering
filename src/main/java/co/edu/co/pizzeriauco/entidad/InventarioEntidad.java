@@ -14,7 +14,6 @@ public class InventarioEntidad {
     private ProductoInternoEntidad productoInterno;
     private UnidadMedidaEntidad unidadMedidaInventario;
     private BigDecimal stockMinimo;
-    private PizzeriaEntidad pizzeria;
 
     private InventarioEntidad(Builder builder) {
         this.id = builder.id;
@@ -22,7 +21,6 @@ public class InventarioEntidad {
         this.productoInterno = builder.productoInterno;
         this.unidadMedidaInventario = builder.unidadMedidaInventario;
         this.stockMinimo = builder.stockMinimo;
-        this.pizzeria = builder.pizzeria;
     }
 
     public UUID getId() {
@@ -45,9 +43,6 @@ public class InventarioEntidad {
         return stockMinimo;
     }
 
-    public PizzeriaEntidad getPizzeria() {
-        return pizzeria;
-    }
 
     public static class Builder {
 
@@ -56,7 +51,6 @@ public class InventarioEntidad {
         private ProductoInternoEntidad productoInterno;
         private UnidadMedidaEntidad unidadMedidaInventario;
         private BigDecimal stockMinimo;
-        private PizzeriaEntidad pizzeria;
 
         public Builder() {
             id = UtilId.valorDefecto(id);
@@ -66,8 +60,6 @@ public class InventarioEntidad {
             unidadMedidaInventario =
                     new UnidadMedidaEntidad.Builder().build();
             stockMinimo = BigDecimal.ZERO;
-            pizzeria =
-                    new PizzeriaEntidad.Builder().build();
         }
 
         public Builder id(UUID id) {
@@ -121,14 +113,6 @@ public class InventarioEntidad {
             return this;
         }
 
-        public Builder pizzeria(PizzeriaEntidad pizzeria) {
-            this.pizzeria = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            pizzeria,
-                            new PizzeriaEntidad.Builder().build()
-                    );
-            return this;
-        }
 
         public InventarioEntidad build() {
             return new InventarioEntidad(this);

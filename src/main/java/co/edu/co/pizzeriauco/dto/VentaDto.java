@@ -15,14 +15,14 @@ public class VentaDto {
     private UUID id;
     private LocalDate fecha;
     private LocalTime hora;
-    private ClienteDto cliente;
+    private String cliente;
     private BigDecimal total;
 
     public VentaDto() {
         setId(id);
         setFecha(UtilFecha.ValorPorDefecto(1, 1, 1000));
         setHora(LocalTime.MIN);
-        setCliente(new ClienteDto());
+        setCliente("");
         setTotal(BigDecimal.ZERO);
     }
 
@@ -50,12 +50,12 @@ public class VentaDto {
         this.hora = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(hora, LocalTime.MIN);
     }
 
-    public ClienteDto getCliente() {
+    public String getCliente() {
         return cliente;
     }
 
-    public void setCliente(ClienteDto cliente) {
-        this.cliente = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(cliente, new ClienteDto());
+    public void setCliente(String cliente) {
+        this.cliente = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(cliente, "");
     }
 
     public BigDecimal getTotal() {

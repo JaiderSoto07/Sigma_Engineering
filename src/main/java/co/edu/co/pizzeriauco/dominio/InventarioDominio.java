@@ -14,7 +14,6 @@ public class InventarioDominio {
     private ProductoInternoDominio productoInterno;
     private UnidadMedidaDominio unidadMedidaInventario;
     private BigDecimal stockMinimo;
-    private PizzeriaDominio pizzeria;
 
     private InventarioDominio(Builder builder) {
         this.id = builder.id;
@@ -22,7 +21,6 @@ public class InventarioDominio {
         this.productoInterno = builder.productoInterno;
         this.unidadMedidaInventario = builder.unidadMedidaInventario;
         this.stockMinimo = builder.stockMinimo;
-        this.pizzeria = builder.pizzeria;
     }
 
     public UUID getId() {
@@ -45,9 +43,6 @@ public class InventarioDominio {
         return stockMinimo;
     }
 
-    public PizzeriaDominio getPizzeria() {
-        return pizzeria;
-    }
 
     public static class Builder {
 
@@ -56,7 +51,6 @@ public class InventarioDominio {
         private ProductoInternoDominio productoInterno;
         private UnidadMedidaDominio unidadMedidaInventario;
         private BigDecimal stockMinimo;
-        private PizzeriaDominio pizzeria;
 
         public Builder() {
             id = UtilId.valorDefecto(id);
@@ -66,8 +60,6 @@ public class InventarioDominio {
             unidadMedidaInventario =
                     new UnidadMedidaDominio.Builder().build();
             stockMinimo = BigDecimal.ZERO;
-            pizzeria =
-                    new PizzeriaDominio.Builder().build();
         }
 
         public Builder id(UUID id) {
@@ -118,15 +110,6 @@ public class InventarioDominio {
             this.stockMinimo = UtilNumero.menorQue(stockMinimoSaneado, BigDecimal.ZERO)
                     ? BigDecimal.ZERO
                     : stockMinimoSaneado;
-            return this;
-        }
-
-        public Builder pizzeria(PizzeriaDominio pizzeria) {
-            this.pizzeria = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            pizzeria,
-                            new PizzeriaDominio.Builder().build()
-                    );
             return this;
         }
 

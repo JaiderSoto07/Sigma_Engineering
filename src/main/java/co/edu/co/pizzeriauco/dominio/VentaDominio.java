@@ -15,7 +15,7 @@ public class VentaDominio {
     private UUID id;
     private LocalDate fecha;
     private LocalTime hora;
-    private ClienteDominio cliente;
+    private String cliente;
     private BigDecimal total;
 
     private VentaDominio(Builder builder) {
@@ -38,7 +38,7 @@ public class VentaDominio {
         return hora;
     }
 
-    public ClienteDominio getCliente() {
+    public String getCliente() {
         return cliente;
     }
 
@@ -51,14 +51,14 @@ public class VentaDominio {
         private UUID id;
         private LocalDate fecha;
         private LocalTime hora;
-        private ClienteDominio cliente;
+        private String cliente;
         private BigDecimal total;
 
         public Builder() {
             id = UtilId.valorDefecto(id);
             fecha = UtilFecha.ValorPorDefecto(1, 1, 1000);
             hora = LocalTime.MIN;
-            cliente = new ClienteDominio.Builder().build();
+            cliente = "";
             total = BigDecimal.ZERO;
         }
 
@@ -85,11 +85,11 @@ public class VentaDominio {
             return this;
         }
 
-        public Builder cliente(ClienteDominio cliente) {
+        public Builder cliente(String cliente) {
             this.cliente = UtilObjeto
                     .obtenerValorDefectoSiValorOriginalEsNulo(
                             cliente,
-                            new ClienteDominio.Builder().build()
+                            ""
                     );
             return this;
         }
