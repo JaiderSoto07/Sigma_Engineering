@@ -4,6 +4,7 @@ import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilFecha;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,19 +15,26 @@ public class MovimientoInventarioEntidad {
     private UUID id;
     private TipoMovimientoEntidad tipoMovimiento;
     private OrigenEntidad origen;
+    //codigo de la operacion que causo el movimiento (compra, venta o cambio)
+    private String codigoOperacion;
     private ProductoInternoEntidad productoInterno;
     private BigDecimal cantidad;
     private UnidadMedidaEntidad unidadMedida;
     private LocalDate fechaMovimiento;
+    //solo el id del lote afectado: el Lote ya guarda su movimiento de entrada como objeto
+    //y si los dos se guardaran como objeto, cada uno crearia al otro sin fin
+    private UUID idLote;
 
     private MovimientoInventarioEntidad(Builder builder) {
         this.id = builder.id;
         this.tipoMovimiento = builder.tipoMovimiento;
         this.origen = builder.origen;
+        this.codigoOperacion = builder.codigoOperacion;
         this.productoInterno = builder.productoInterno;
         this.cantidad = builder.cantidad;
         this.unidadMedida = builder.unidadMedida;
         this.fechaMovimiento = builder.fechaMovimiento;
+        this.idLote = builder.idLote;
     }
 
     public UUID getId() {
@@ -39,6 +47,10 @@ public class MovimientoInventarioEntidad {
 
     public OrigenEntidad getOrigen() {
         return origen;
+    }
+
+    public String getCodigoOperacion() {
+        return codigoOperacion;
     }
 
     public ProductoInternoEntidad getProductoInterno() {
@@ -57,24 +69,32 @@ public class MovimientoInventarioEntidad {
         return fechaMovimiento;
     }
 
+    public UUID getIdLote() {
+        return idLote;
+    }
+
     public static class Builder {
 
         private UUID id;
         private TipoMovimientoEntidad tipoMovimiento;
         private OrigenEntidad origen;
+        private String codigoOperacion;
         private ProductoInternoEntidad productoInterno;
         private BigDecimal cantidad;
         private UnidadMedidaEntidad unidadMedida;
         private LocalDate fechaMovimiento;
+        private UUID idLote;
 
         public Builder() {
             id = UtilId.valorDefecto(id);
             tipoMovimiento = new TipoMovimientoEntidad.Builder().build();
             origen = new OrigenEntidad.Builder().build();
+            codigoOperacion = UtilTexto.vacia;
             productoInterno = new ProductoInternoEntidad.Builder().build();
             cantidad = BigDecimal.ZERO;
             unidadMedida = new UnidadMedidaEntidad.Builder().build();
-            fechaMovimiento = UtilFecha.ValorPorDefecto(1, 1, 1000);
+            fechaMovimiento = UtilFecha.FECHA_POR_DEFECTO;
+            idLote = UtilId.valorDefecto(idLote);
         }
 
         public Builder id(UUID id) {
@@ -104,6 +124,12 @@ public class MovimientoInventarioEntidad {
             return this;
         }
 
+        public Builder codigoOperacion(String codigoOperacion) {
+            this.codigoOperacion = UtilTexto.getUtilTexto()
+                    .quitarEspaciosEnBlanco(codigoOperacion);
+            return this;
+        }
+
         public Builder productoInterno(
                 ProductoInternoEntidad productoInterno) {
 
@@ -117,15 +143,7 @@ public class MovimientoInventarioEntidad {
         }
 
         public Builder cantidad(BigDecimal cantidad) {
-            var cantidadSaneada = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            cantidad,
-                            BigDecimal.ZERO
-                    );
-
-            this.cantidad = UtilNumero.menorQue(cantidadSaneada, BigDecimal.ZERO)
-                    ? BigDecimal.ZERO
-                    : cantidadSaneada;
+            this.cantidad = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(cantidad, BigDecimal.ZERO);
 
             return this;
         }
@@ -143,12 +161,13 @@ public class MovimientoInventarioEntidad {
         }
 
         public Builder fechaMovimiento(LocalDate fechaMovimiento) {
-            this.fechaMovimiento = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            fechaMovimiento,
-                            UtilFecha.ValorPorDefecto(1, 1, 1000)
-                    );
+            this.fechaMovimiento = UtilFecha.valorDefecto(fechaMovimiento);
 
+            return this;
+        }
+
+        public Builder idLote(UUID idLote) {
+            this.idLote = UtilId.valorDefecto(idLote);
             return this;
         }
 

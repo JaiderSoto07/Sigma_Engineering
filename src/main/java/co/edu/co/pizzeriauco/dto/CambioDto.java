@@ -23,8 +23,8 @@ public class CambioDto {
         setProductoCambio(new ProductoInternoDto());
         setCantidad(BigDecimal.ZERO);
         setUnidadMedida(new UnidadMedidaDto());
-        setFechaVencimiento(UtilFecha.ValorPorDefecto(1, 1, 1000));
-        setFechaCambio(UtilFecha.ValorPorDefecto(1, 1, 1000));
+        setFechaVencimiento(UtilFecha.FECHA_POR_DEFECTO);
+        setFechaCambio(UtilFecha.FECHA_POR_DEFECTO);
     }
 
     public UUID getId() {
@@ -48,8 +48,7 @@ public class CambioDto {
     }
 
     public void setCantidad(BigDecimal cantidad) {
-        var cantidadSaneada = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(cantidad, BigDecimal.ZERO);
-        this.cantidad = UtilNumero.menorQue(cantidadSaneada, BigDecimal.ZERO) ? BigDecimal.ZERO : cantidadSaneada;
+        this.cantidad = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(cantidad, BigDecimal.ZERO);
     }
 
     public UnidadMedidaDto getUnidadMedida() {
@@ -65,7 +64,7 @@ public class CambioDto {
     }
 
     public void setFechaVencimiento(LocalDate fechaVencimiento) {
-        this.fechaVencimiento = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(fechaVencimiento, UtilFecha.ValorPorDefecto(1, 1, 1000));
+        this.fechaVencimiento = UtilFecha.valorDefecto(fechaVencimiento);
     }
 
     public LocalDate getFechaCambio() {
@@ -73,6 +72,6 @@ public class CambioDto {
     }
 
     public void setFechaCambio(LocalDate fechaCambio) {
-        this.fechaCambio = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(fechaCambio, UtilFecha.ValorPorDefecto(1, 1, 1000));
+        this.fechaCambio = UtilFecha.valorDefecto(fechaCambio);
     }
 }

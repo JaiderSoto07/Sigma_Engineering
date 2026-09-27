@@ -82,7 +82,7 @@ public class DetalleVentaDominio {
         }
 
         public Builder cantidad(int cantidad) {
-            this.cantidad = UtilNumero.menorQue(cantidad, 0) ? 0 : cantidad;
+            this.cantidad = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(cantidad, UtilNumero.cero);
             return this;
         }
 
@@ -96,26 +96,12 @@ public class DetalleVentaDominio {
         }
 
         public Builder precioProducto(BigDecimal precioProducto) {
-            var precioProductoSaneado = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            precioProducto,
-                            BigDecimal.ZERO
-                    );
-            this.precioProducto = UtilNumero.menorQue(precioProductoSaneado, BigDecimal.ZERO)
-                    ? BigDecimal.ZERO
-                    : precioProductoSaneado;
+            this.precioProducto = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(precioProducto, BigDecimal.ZERO);
             return this;
         }
 
         public Builder subtotal(BigDecimal subtotal) {
-            var subtotalSaneado = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            subtotal,
-                            BigDecimal.ZERO
-                    );
-            this.subtotal = UtilNumero.menorQue(subtotalSaneado, BigDecimal.ZERO)
-                    ? BigDecimal.ZERO
-                    : subtotalSaneado;
+            this.subtotal = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(subtotal, BigDecimal.ZERO);
             return this;
         }
 

@@ -51,91 +51,91 @@ public class SqlServerDAOFactory extends DAOFactory {
 
     @Override
     public OrigenDAO obtenerOrigenDAO() {
-        return new OrigenSqlServerDAO();
+        return new OrigenSqlServerDAO(getConexion());
     }
 
     @Override
     public TipoMovimientoDAO obtenerTipoMovimientoDAO() {
-        return new TipoMovimientoSqlServerDAO();
+        return new TipoMovimientoSqlServerDAO(getConexion());
     }
 
     @Override
     public TipoProductoDAO obtenerTipoProductoDAO() {
-        return new TipoProductoSqlServerDAO();
+        return new TipoProductoSqlServerDAO(getConexion());
     }
 
     @Override
     public TamanoDAO obtenerTamanoDAO() {
-        return new TamanoSqlServerDAO();
+        return new TamanoSqlServerDAO(getConexion());
     }
 
     @Override
     public UnidadMedidaDAO obtenerUnidadMedidaDAO() {
-        return new UnidadMedidaSqlServerDAO();
+        return new UnidadMedidaSqlServerDAO(getConexion());
     }
 
     @Override
     public ProveedorDAO obtenerProveedorDAO() {
-        return new ProveedorSqlServerDAO();
+        return new ProveedorSqlServerDAO(getConexion());
     }
 
     @Override
     public ProductoInternoDAO obtenerProductoInternoDAO() {
-        return new ProductoInternoSqlServerDAO();
+        return new ProductoInternoSqlServerDAO(getConexion());
     }
 
     @Override
     public ProductoDAO obtenerProductoDAO() {
-        return new ProductoSqlServerDAO();
+        return new ProductoSqlServerDAO(getConexion());
     }
 
     @Override
     public DetalleRecetaDAO obtenerDetalleRecetaDAO() {
-        return new DetalleRecetaSqlServerDAO();
+        return new DetalleRecetaSqlServerDAO(getConexion());
     }
 
     @Override
     public CompraDAO obtenerCompraDAO() {
-        return new CompraSqlServerDAO();
+        return new CompraSqlServerDAO(getConexion());
     }
 
     @Override
     public LoteDAO obtenerLoteDAO() {
-        return new LoteSqlServerDAO();
+        return new LoteSqlServerDAO(getConexion());
     }
 
     @Override
     public InventarioDAO obtenerInventarioDAO() {
-        return new InventarioSqlServerDAO();
+        return new InventarioSqlServerDAO(getConexion());
     }
 
     @Override
     public HistoricoPrecioDAO obtenerHistoricoPrecioDAO() {
-        return new HistoricoPrecioSqlServerDAO();
+        return new HistoricoPrecioSqlServerDAO(getConexion());
     }
 
     @Override
     public DetalleCompraDAO obtenerDetalleCompraDAO() {
-        return new DetalleCompraSqlServerDAO();
+        return new DetalleCompraSqlServerDAO(getConexion());
     }
 
     @Override
     public MovimientoInventarioDAO obtenerMovimientoInventarioDAO() {
-        return new MovimientoInventarioSqlServerDAO();
+        return new MovimientoInventarioSqlServerDAO(getConexion());
     }
 
     @Override
     public CambioDAO obtenerCambioDAO() {
-        return new CambioSqlServerDAO();
+        return new CambioSqlServerDAO(getConexion());
     }
 
     @Override
     public VentaDAO obtenerVentaDAO() {
-        return new VentaSqlServerDAO();
+        return new VentaSqlServerDAO(getConexion());
     }
 
     @Override
     public DetalleVentaDAO obtenerDetalleVentaDAO() {
-        return new DetalleVentaSqlServerDAO();
+        return new DetalleVentaSqlServerDAO(getConexion());
     }
 }

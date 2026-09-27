@@ -11,7 +11,10 @@ public class UtilTexto {
 
     //puedo acceder a esta variable desde otras clases , hay un solo valor por vacio (por eso el static)
     //y es de tipo string
-    public static String vacia = "";
+    public static final String vacia = "";
+
+    //cliente por defecto de la venta cuando no me dicen quien compro (10 digitos, como en el Excel)
+    public static final String CLIENTE_POR_DEFECTO = "2222222222";
 
     //Solo la propia clase puede llamar este constructor , es el que dice creemos un objeto de tipo UtilTexto
     private UtilTexto() {
@@ -39,11 +42,9 @@ public class UtilTexto {
         return UtilObjeto.esNulo(texto);
     }
 
+    //un texto con solo espacios tambien se considera vacio
     public boolean esVacia(String texto) {
-        if(esNula(texto)){
-            texto= vacia;
-        }
-        return vacia.equals(texto);
+        return vacia.equals(quitarEspaciosEnBlanco(texto));
     }
 
     public boolean esCorreoValido(String correo) {

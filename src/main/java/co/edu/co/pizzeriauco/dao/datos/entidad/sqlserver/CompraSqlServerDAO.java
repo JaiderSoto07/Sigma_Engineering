@@ -1,12 +1,18 @@
 package co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver;
 
 import co.edu.co.pizzeriauco.dao.datos.entidad.CompraDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.CompraEntidad;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
 
-public class CompraSqlServerDAO implements CompraDAO {
+public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
+
+    public CompraSqlServerDAO(Connection conexion) {
+        super(conexion);
+    }
 
     @Override
     public void crear(CompraEntidad entidad) {
@@ -33,6 +39,11 @@ public class CompraSqlServerDAO implements CompraDAO {
 
     @Override
     public void actualizar(UUID id, CompraEntidad entidad) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void eliminar(UUID id) {
         // TODO Auto-generated method stub
     }
 }

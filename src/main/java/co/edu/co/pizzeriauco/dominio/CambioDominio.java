@@ -66,8 +66,8 @@ public class CambioDominio {
             productoCambio = new ProductoInternoDominio.Builder().build();
             cantidad = BigDecimal.ZERO;
             unidadMedida = new UnidadMedidaDominio.Builder().build();
-            fechaVencimiento = UtilFecha.ValorPorDefecto(1, 1, 1000);
-            fechaCambio = UtilFecha.ValorPorDefecto(1, 1, 1000);
+            fechaVencimiento = UtilFecha.FECHA_POR_DEFECTO;
+            fechaCambio = UtilFecha.FECHA_POR_DEFECTO;
         }
 
         public Builder id(UUID id) {
@@ -85,14 +85,7 @@ public class CambioDominio {
         }
 
         public Builder cantidad(BigDecimal cantidad) {
-            var cantidadSaneada = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            cantidad,
-                            BigDecimal.ZERO
-                    );
-            this.cantidad = UtilNumero.menorQue(cantidadSaneada, BigDecimal.ZERO)
-                    ? BigDecimal.ZERO
-                    : cantidadSaneada;
+            this.cantidad = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(cantidad, BigDecimal.ZERO);
             return this;
         }
 
@@ -106,20 +99,12 @@ public class CambioDominio {
         }
 
         public Builder fechaVencimiento(LocalDate fechaVencimiento) {
-            this.fechaVencimiento = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            fechaVencimiento,
-                            UtilFecha.ValorPorDefecto(1, 1, 1000)
-                    );
+            this.fechaVencimiento = UtilFecha.valorDefecto(fechaVencimiento);
             return this;
         }
 
         public Builder fechaCambio(LocalDate fechaCambio) {
-            this.fechaCambio = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            fechaCambio,
-                            UtilFecha.ValorPorDefecto(1, 1, 1000)
-                    );
+            this.fechaCambio = UtilFecha.valorDefecto(fechaCambio);
             return this;
         }
 

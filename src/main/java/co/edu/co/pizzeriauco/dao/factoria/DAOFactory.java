@@ -1,6 +1,6 @@
 package co.edu.co.pizzeriauco.dao.factoria;
 
-import co.edu.co.pizzeriauco.dao.datos.entidad.AdministradorDAO;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilSql;
 import co.edu.co.pizzeriauco.dao.datos.entidad.CambioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.CompraDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.DetalleCompraDAO;
@@ -34,28 +34,32 @@ public abstract class DAOFactory {
         return conexion;
     }
 
+    //antes de guardar la conexion me aseguro de que exista y este abierta
     protected void setConexion(Connection conexion) {
-        // Tarea: Asegurar que la conexion este abierta y sea valida
+        UtilSql.asegurarConexionAbierta(conexion);
         this.conexion = conexion;
     }
 
+    //abstract para que cada base de datos la implemente de forma diferente
     protected abstract void abrirConexion();
 
     public void cerrarConexion() {
-        // Tarea: ¿Como se cierra la conexion de forma segura?
+        UtilSql.cerrarConexion(conexion);
     }
 
     public void iniciarTransaccion() {
-        // Tarea: ¿Como se inicia una transaccion de forma segura?
+        UtilSql.iniciarTransaccion(conexion);
     }
 
     public void confirmarTransaccion() {
-        // Tarea: ¿Como se confirma una transaccion de forma segura?
+        UtilSql.confirmarTransaccion(conexion);
     }
 
     public void cancelarTransaccion() {
-        // Tarea: ¿Como se cancela una transaccion de forma segura?
+        UtilSql.cancelarTransaccion(conexion);
     }
+
+    //va a fabricar los DAO de las entidades
 
     public abstract OrigenDAO obtenerOrigenDAO();
 

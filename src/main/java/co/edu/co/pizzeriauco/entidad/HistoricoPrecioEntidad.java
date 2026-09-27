@@ -57,8 +57,8 @@ public class HistoricoPrecioEntidad {
             id = UtilId.valorDefecto(id);
             producto = new ProductoEntidad.Builder().build();
             precio = BigDecimal.ZERO;
-            fechaInicio = UtilFecha.ValorPorDefecto(1, 1, 1000);
-            fechaFin = UtilFecha.ValorPorDefecto(1, 1, 1000);
+            fechaInicio = UtilFecha.FECHA_POR_DEFECTO;
+            fechaFin = UtilFecha.FECHA_POR_DEFECTO;
         }
 
         public Builder id(UUID id) {
@@ -76,32 +76,19 @@ public class HistoricoPrecioEntidad {
         }
 
         public Builder precio(BigDecimal precio) {
-            var precioSaneado =
-                    UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
-                            precio,
-                            BigDecimal.ZERO
-                    );
-            this.precio = UtilNumero.menorQue(precioSaneado, BigDecimal.ZERO)
-                    ? BigDecimal.ZERO
-                    : precioSaneado;
+            this.precio = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(precio, BigDecimal.ZERO);
             return this;
         }
 
         public Builder fechaInicio(LocalDate fechaInicio) {
             this.fechaInicio =
-                    UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
-                            fechaInicio,
-                            UtilFecha.ValorPorDefecto(1, 1, 1000)
-                    );
+                    UtilFecha.valorDefecto(fechaInicio);
             return this;
         }
 
         public Builder fechaFin(LocalDate fechaFin) {
             this.fechaFin =
-                    UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
-                            fechaFin,
-                            UtilFecha.ValorPorDefecto(1, 1, 1000)
-                    );
+                    UtilFecha.valorDefecto(fechaFin);
             return this;
         }
 

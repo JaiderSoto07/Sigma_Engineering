@@ -74,14 +74,7 @@ public class DetalleRecetaDominio {
         }
 
         public Builder cantidad(BigDecimal cantidad) {
-            var cantidadSaneada = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            cantidad,
-                            BigDecimal.ZERO
-                    );
-            this.cantidad = UtilNumero.menorQue(cantidadSaneada, BigDecimal.ZERO)
-                    ? BigDecimal.ZERO
-                    : cantidadSaneada;
+            this.cantidad = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(cantidad, BigDecimal.ZERO);
             return this;
         }
 

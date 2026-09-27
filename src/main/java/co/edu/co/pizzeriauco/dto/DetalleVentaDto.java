@@ -46,7 +46,7 @@ public class DetalleVentaDto {
     }
 
     public void setCantidad(int cantidad) {
-        this.cantidad = UtilNumero.menorQue(cantidad, 0) ? 0 : cantidad;
+        this.cantidad = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(cantidad, UtilNumero.cero);
     }
 
     public ProductoDto getProducto() {
@@ -62,8 +62,7 @@ public class DetalleVentaDto {
     }
 
     public void setPrecioProducto(BigDecimal precioProducto) {
-        var precioProductoSaneado = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(precioProducto, BigDecimal.ZERO);
-        this.precioProducto = UtilNumero.menorQue(precioProductoSaneado, BigDecimal.ZERO) ? BigDecimal.ZERO : precioProductoSaneado;
+        this.precioProducto = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(precioProducto, BigDecimal.ZERO);
     }
 
     public BigDecimal getSubtotal() {
@@ -71,7 +70,6 @@ public class DetalleVentaDto {
     }
 
     public void setSubtotal(BigDecimal subtotal) {
-        var subtotalSaneado = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(subtotal, BigDecimal.ZERO);
-        this.subtotal = UtilNumero.menorQue(subtotalSaneado, BigDecimal.ZERO) ? BigDecimal.ZERO : subtotalSaneado;
+        this.subtotal = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(subtotal, BigDecimal.ZERO);
     }
 }

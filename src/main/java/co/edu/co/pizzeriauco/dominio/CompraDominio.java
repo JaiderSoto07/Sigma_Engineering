@@ -57,7 +57,7 @@ public class CompraDominio {
         public Builder() {
             id = UtilId.valorDefecto(id);
             proveedor = new ProveedorDominio.Builder().build();
-            fechaCompra = UtilFecha.ValorPorDefecto(1, 1, 1000);
+            fechaCompra = UtilFecha.FECHA_POR_DEFECTO;
             numeroFactura = UtilTexto.vacia;
             total = BigDecimal.ZERO;
         }
@@ -77,11 +77,7 @@ public class CompraDominio {
         }
 
         public Builder fechaCompra(LocalDate fechaCompra) {
-            this.fechaCompra = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            fechaCompra,
-                            UtilFecha.ValorPorDefecto(1, 1, 1000)
-                    );
+            this.fechaCompra = UtilFecha.valorDefecto(fechaCompra);
             return this;
         }
 
@@ -92,14 +88,7 @@ public class CompraDominio {
         }
 
         public Builder total(BigDecimal total) {
-            var totalSaneado = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            total,
-                            BigDecimal.ZERO
-                    );
-            this.total = UtilNumero.menorQue(totalSaneado, BigDecimal.ZERO)
-                    ? BigDecimal.ZERO
-                    : totalSaneado;
+            this.total = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(total, BigDecimal.ZERO);
             return this;
         }
 

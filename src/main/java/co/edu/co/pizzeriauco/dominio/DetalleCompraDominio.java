@@ -73,7 +73,7 @@ public class DetalleCompraDominio {
             cantidad = BigDecimal.ZERO;
             unidadMedida = new UnidadMedidaDominio.Builder().build();
             precioCompra = BigDecimal.ZERO;
-            fechaVencimiento = UtilFecha.ValorPorDefecto(1, 1, 1000);
+            fechaVencimiento = UtilFecha.FECHA_POR_DEFECTO;
             compra = new CompraDominio.Builder().build();
         }
 
@@ -92,14 +92,7 @@ public class DetalleCompraDominio {
         }
 
         public Builder cantidad(BigDecimal cantidad) {
-            var cantidadSaneada = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            cantidad,
-                            BigDecimal.ZERO
-                    );
-            this.cantidad = UtilNumero.menorQue(cantidadSaneada, BigDecimal.ZERO)
-                    ? BigDecimal.ZERO
-                    : cantidadSaneada;
+            this.cantidad = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(cantidad, BigDecimal.ZERO);
             return this;
         }
 
@@ -113,23 +106,12 @@ public class DetalleCompraDominio {
         }
 
         public Builder precioCompra(BigDecimal precioCompra) {
-            var precioCompraSaneado = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            precioCompra,
-                            BigDecimal.ZERO
-                    );
-            this.precioCompra = UtilNumero.menorQue(precioCompraSaneado, BigDecimal.ZERO)
-                    ? BigDecimal.ZERO
-                    : precioCompraSaneado;
+            this.precioCompra = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(precioCompra, BigDecimal.ZERO);
             return this;
         }
 
         public Builder fechaVencimiento(LocalDate fechaVencimiento) {
-            this.fechaVencimiento = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            fechaVencimiento,
-                            UtilFecha.ValorPorDefecto(1, 1, 1000)
-                    );
+            this.fechaVencimiento = UtilFecha.valorDefecto(fechaVencimiento);
             return this;
         }
 

@@ -4,6 +4,7 @@ import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilFecha;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -56,9 +57,9 @@ public class VentaDominio {
 
         public Builder() {
             id = UtilId.valorDefecto(id);
-            fecha = UtilFecha.ValorPorDefecto(1, 1, 1000);
+            fecha = UtilFecha.FECHA_POR_DEFECTO;
             hora = LocalTime.MIN;
-            cliente = "";
+            cliente = UtilTexto.CLIENTE_POR_DEFECTO;
             total = BigDecimal.ZERO;
         }
 
@@ -68,11 +69,7 @@ public class VentaDominio {
         }
 
         public Builder fecha(LocalDate fecha) {
-            this.fecha = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            fecha,
-                            UtilFecha.ValorPorDefecto(1, 1, 1000)
-                    );
+            this.fecha = UtilFecha.valorDefecto(fecha);
             return this;
         }
 
@@ -86,23 +83,16 @@ public class VentaDominio {
         }
 
         public Builder cliente(String cliente) {
-            this.cliente = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            cliente,
-                            ""
-                    );
+            //si no me dicen el cliente (nulo o vacio), se usa el cliente por defecto
+            var clienteSaneado = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(cliente);
+            this.cliente = UtilTexto.getUtilTexto().esVacia(clienteSaneado)
+                    ? UtilTexto.CLIENTE_POR_DEFECTO
+                    : clienteSaneado;
             return this;
         }
 
         public Builder total(BigDecimal total) {
-            var totalSaneado = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            total,
-                            BigDecimal.ZERO
-                    );
-            this.total = UtilNumero.menorQue(totalSaneado, BigDecimal.ZERO)
-                    ? BigDecimal.ZERO
-                    : totalSaneado;
+            this.total = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(total, BigDecimal.ZERO);
             return this;
         }
 

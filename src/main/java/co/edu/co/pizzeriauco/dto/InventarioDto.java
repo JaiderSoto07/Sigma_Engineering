@@ -36,8 +36,7 @@ public class InventarioDto {
     }
 
     public void setCantidadTotal(BigDecimal cantidadTotal) {
-        var cantidadTotalSaneada = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(cantidadTotal, BigDecimal.ZERO);
-        this.cantidadTotal = UtilNumero.menorQue(cantidadTotalSaneada, BigDecimal.ZERO) ? BigDecimal.ZERO : cantidadTotalSaneada;
+        this.cantidadTotal = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(cantidadTotal, BigDecimal.ZERO);
     }
 
     public ProductoInternoDto getProductoInterno() {
@@ -61,7 +60,6 @@ public class InventarioDto {
     }
 
     public void setStockMinimo(BigDecimal stockMinimo) {
-        var stockMinimoSaneado = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(stockMinimo, BigDecimal.ZERO);
-        this.stockMinimo = UtilNumero.menorQue(stockMinimoSaneado, BigDecimal.ZERO) ? BigDecimal.ZERO : stockMinimoSaneado;
+        this.stockMinimo = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(stockMinimo, BigDecimal.ZERO);
     }
 }

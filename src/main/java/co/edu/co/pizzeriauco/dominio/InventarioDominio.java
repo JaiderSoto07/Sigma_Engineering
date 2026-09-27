@@ -5,6 +5,7 @@ import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 public class InventarioDominio {
@@ -43,6 +44,23 @@ public class InventarioDominio {
         return stockMinimo;
     }
 
+    //el inventario es la suma de los saldos de todos los lotes de ese producto interno
+    //los lotes de otros productos no se cuentan
+    public static BigDecimal calcularCantidadTotal(ProductoInternoDominio productoInterno, List<LoteDominio> lotes) {
+        var productoSaneado = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
+                productoInterno, new ProductoInternoDominio.Builder().build());
+        var lotesSaneados = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
+                lotes, List.<LoteDominio>of());
+
+        var cantidadTotal = BigDecimal.ZERO;
+        for (var lote : lotesSaneados) {
+            if (!UtilObjeto.esNulo(lote)
+                    && lote.getProductoInterno().getId().equals(productoSaneado.getId())) {
+                cantidadTotal = cantidadTotal.add(lote.getSaldo());
+            }
+        }
+        return cantidadTotal;
+    }
 
     public static class Builder {
 
@@ -68,14 +86,7 @@ public class InventarioDominio {
         }
 
         public Builder cantidadTotal(BigDecimal cantidadTotal) {
-            var cantidadTotalSaneada = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            cantidadTotal,
-                            BigDecimal.ZERO
-                    );
-            this.cantidadTotal = UtilNumero.menorQue(cantidadTotalSaneada, BigDecimal.ZERO)
-                    ? BigDecimal.ZERO
-                    : cantidadTotalSaneada;
+            this.cantidadTotal = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(cantidadTotal, BigDecimal.ZERO);
             return this;
         }
 
@@ -102,14 +113,7 @@ public class InventarioDominio {
         }
 
         public Builder stockMinimo(BigDecimal stockMinimo) {
-            var stockMinimoSaneado = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            stockMinimo,
-                            BigDecimal.ZERO
-                    );
-            this.stockMinimo = UtilNumero.menorQue(stockMinimoSaneado, BigDecimal.ZERO)
-                    ? BigDecimal.ZERO
-                    : stockMinimoSaneado;
+            this.stockMinimo = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(stockMinimo, BigDecimal.ZERO);
             return this;
         }
 

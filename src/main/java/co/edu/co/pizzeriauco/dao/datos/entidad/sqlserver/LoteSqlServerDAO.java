@@ -1,12 +1,18 @@
 package co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver;
 
 import co.edu.co.pizzeriauco.dao.datos.entidad.LoteDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.LoteEntidad;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
 
-public class LoteSqlServerDAO implements LoteDAO {
+public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
+
+    public LoteSqlServerDAO(Connection conexion) {
+        super(conexion);
+    }
 
     @Override
     public void crear(LoteEntidad entidad) {

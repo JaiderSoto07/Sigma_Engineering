@@ -21,7 +21,7 @@ public class CompraDto {
     public CompraDto() {
         setId(id);
         setProveedor(new ProveedorDto());
-        setFechaCompra(UtilFecha.ValorPorDefecto(1, 1, 1000));
+        setFechaCompra(UtilFecha.FECHA_POR_DEFECTO);
         setNumeroFactura(UtilTexto.vacia);
         setTotal(BigDecimal.ZERO);
     }
@@ -47,7 +47,7 @@ public class CompraDto {
     }
 
     public void setFechaCompra(LocalDate fechaCompra) {
-        this.fechaCompra = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(fechaCompra, UtilFecha.ValorPorDefecto(1, 1, 1000));
+        this.fechaCompra = UtilFecha.valorDefecto(fechaCompra);
     }
 
     public String getNumeroFactura() {
@@ -63,7 +63,6 @@ public class CompraDto {
     }
 
     public void setTotal(BigDecimal total) {
-        var totalSaneado = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(total, BigDecimal.ZERO);
-        this.total = UtilNumero.menorQue(totalSaneado, BigDecimal.ZERO) ? BigDecimal.ZERO : totalSaneado;
+        this.total = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(total, BigDecimal.ZERO);
     }
 }

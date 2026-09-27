@@ -12,21 +12,24 @@ import java.util.UUID;
 public class LoteEntidad {
 
     private UUID id;
-    private LocalDate fechaIngreso;
+    //movimiento de entrada que origina el lote; su origen dice si vino de una compra o de un cambio
+    private MovimientoInventarioEntidad movimientoInventario;
     private LocalDate fechaVencimiento;
     private boolean disponible;
     private ProductoInternoEntidad productoInterno;
     private BigDecimal cantidad;
+    private BigDecimal saldo;
     private UnidadMedidaEntidad unidadMedidaInventario;
     private int numeroLote;
 
     private LoteEntidad(Builder builder) {
         this.id = builder.id;
-        this.fechaIngreso = builder.fechaIngreso;
+        this.movimientoInventario = builder.movimientoInventario;
         this.fechaVencimiento = builder.fechaVencimiento;
         this.disponible = builder.disponible;
         this.productoInterno = builder.productoInterno;
         this.cantidad = builder.cantidad;
+        this.saldo = builder.saldo;
         this.unidadMedidaInventario = builder.unidadMedidaInventario;
         this.numeroLote = builder.numeroLote;
     }
@@ -35,8 +38,8 @@ public class LoteEntidad {
         return id;
     }
 
-    public LocalDate getFechaIngreso() {
-        return fechaIngreso;
+    public MovimientoInventarioEntidad getMovimientoInventario() {
+        return movimientoInventario;
     }
 
     public LocalDate getFechaVencimiento() {
@@ -55,6 +58,10 @@ public class LoteEntidad {
         return cantidad;
     }
 
+    public BigDecimal getSaldo() {
+        return saldo;
+    }
+
     public UnidadMedidaEntidad getUnidadMedidaInventario() {
         return unidadMedidaInventario;
     }
@@ -66,21 +73,23 @@ public class LoteEntidad {
     public static class Builder {
 
         private UUID id;
-        private LocalDate fechaIngreso;
+        private MovimientoInventarioEntidad movimientoInventario;
         private LocalDate fechaVencimiento;
         private boolean disponible;
         private ProductoInternoEntidad productoInterno;
         private BigDecimal cantidad;
+        private BigDecimal saldo;
         private UnidadMedidaEntidad unidadMedidaInventario;
         private int numeroLote;
 
         public Builder() {
             id = UtilId.valorDefecto(id);
-            fechaIngreso = UtilFecha.ValorPorDefecto(1, 1, 1000);
-            fechaVencimiento = UtilFecha.ValorPorDefecto(1, 1, 1000);
+            movimientoInventario = new MovimientoInventarioEntidad.Builder().build();
+            fechaVencimiento = UtilFecha.FECHA_POR_DEFECTO;
             disponible = false;
             productoInterno = new ProductoInternoEntidad.Builder().build();
             cantidad = BigDecimal.ZERO;
+            saldo = BigDecimal.ZERO;
             unidadMedidaInventario = new UnidadMedidaEntidad.Builder().build();
             numeroLote = 0;
         }
@@ -90,21 +99,19 @@ public class LoteEntidad {
             return this;
         }
 
-        public Builder fechaIngreso(LocalDate fechaIngreso) {
-            this.fechaIngreso = UtilObjeto
+        public Builder movimientoInventario(
+                MovimientoInventarioEntidad movimientoInventario) {
+
+            this.movimientoInventario = UtilObjeto
                     .obtenerValorDefectoSiValorOriginalEsNulo(
-                            fechaIngreso,
-                            UtilFecha.ValorPorDefecto(1, 1, 1000)
+                            movimientoInventario,
+                            new MovimientoInventarioEntidad.Builder().build()
                     );
             return this;
         }
 
         public Builder fechaVencimiento(LocalDate fechaVencimiento) {
-            this.fechaVencimiento = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            fechaVencimiento,
-                            UtilFecha.ValorPorDefecto(1, 1, 1000)
-                    );
+            this.fechaVencimiento = UtilFecha.valorDefecto(fechaVencimiento);
             return this;
         }
 
@@ -125,14 +132,13 @@ public class LoteEntidad {
         }
 
         public Builder cantidad(BigDecimal cantidad) {
-            var cantidadSaneada = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            cantidad,
-                            BigDecimal.ZERO
-                    );
-            this.cantidad = UtilNumero.menorQue(cantidadSaneada, BigDecimal.ZERO)
-                    ? BigDecimal.ZERO
-                    : cantidadSaneada;
+            this.cantidad = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(cantidad, BigDecimal.ZERO);
+            return this;
+        }
+
+        //lo que todavia queda del lote
+        public Builder saldo(BigDecimal saldo) {
+            this.saldo = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(saldo, BigDecimal.ZERO);
             return this;
         }
 
@@ -148,7 +154,7 @@ public class LoteEntidad {
         }
 
         public Builder numeroLote(int numeroLote) {
-            this.numeroLote = UtilNumero.menorQue(numeroLote, 0) ? 0 : numeroLote;
+            this.numeroLote = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(numeroLote, UtilNumero.cero);
             return this;
         }
 

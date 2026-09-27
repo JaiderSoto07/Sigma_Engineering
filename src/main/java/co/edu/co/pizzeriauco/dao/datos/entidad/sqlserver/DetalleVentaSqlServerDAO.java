@@ -1,12 +1,17 @@
 package co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver;
 
 import co.edu.co.pizzeriauco.dao.datos.entidad.DetalleVentaDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.DetalleVentaEntidad;
 
-import java.util.List;
+import java.sql.Connection;
 import java.util.UUID;
 
-public class DetalleVentaSqlServerDAO implements DetalleVentaDAO {
+public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO {
+
+    public DetalleVentaSqlServerDAO(Connection conexion) {
+        super(conexion);
+    }
 
     @Override
     public void crear(DetalleVentaEntidad entidad) {
@@ -14,20 +19,7 @@ public class DetalleVentaSqlServerDAO implements DetalleVentaDAO {
     }
 
     @Override
-    public DetalleVentaEntidad consultarPorId(UUID id) {
+    public void actualizar(UUID id, DetalleVentaEntidad entidad) {
         // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<DetalleVentaEntidad> consultarPorFiltro(DetalleVentaEntidad filtro) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<DetalleVentaEntidad> consultarTodos() {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

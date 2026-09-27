@@ -21,8 +21,8 @@ public class HistoricoPrecioDto {
         setId(id);
         setProducto(new ProductoDto());
         setPrecio(BigDecimal.ZERO);
-        setFechaInicio(UtilFecha.ValorPorDefecto(1, 1, 1000));
-        setFechaFin(UtilFecha.ValorPorDefecto(1, 1, 1000));
+        setFechaInicio(UtilFecha.FECHA_POR_DEFECTO);
+        setFechaFin(UtilFecha.FECHA_POR_DEFECTO);
     }
 
     public UUID getId() {
@@ -46,8 +46,7 @@ public class HistoricoPrecioDto {
     }
 
     public void setPrecio(BigDecimal precio) {
-        var precioSaneado = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(precio, BigDecimal.ZERO);
-        this.precio = UtilNumero.menorQue(precioSaneado, BigDecimal.ZERO) ? BigDecimal.ZERO : precioSaneado;
+        this.precio = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(precio, BigDecimal.ZERO);
     }
 
     public LocalDate getFechaInicio() {
@@ -55,7 +54,7 @@ public class HistoricoPrecioDto {
     }
 
     public void setFechaInicio(LocalDate fechaInicio) {
-        this.fechaInicio = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(fechaInicio, UtilFecha.ValorPorDefecto(1, 1, 1000));
+        this.fechaInicio = UtilFecha.valorDefecto(fechaInicio);
     }
 
     public LocalDate getFechaFin() {
@@ -63,6 +62,6 @@ public class HistoricoPrecioDto {
     }
 
     public void setFechaFin(LocalDate fechaFin) {
-        this.fechaFin = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(fechaFin, UtilFecha.ValorPorDefecto(1, 1, 1000));
+        this.fechaFin = UtilFecha.valorDefecto(fechaFin);
     }
 }

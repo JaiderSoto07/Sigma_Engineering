@@ -4,6 +4,7 @@ import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilFecha;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,19 +15,23 @@ public class MovimientoInventarioDto {
     private UUID id;
     private TipoMovimientoDto tipoMovimiento;
     private OrigenDto origen;
+    private String codigoOperacion;
     private ProductoInternoDto productoInterno;
     private BigDecimal cantidad;
     private UnidadMedidaDto unidadMedida;
     private LocalDate fechaMovimiento;
+    private UUID idLote;
 
     public MovimientoInventarioDto() {
         setId(id);
         setTipoMovimiento(new TipoMovimientoDto());
         setOrigen(new OrigenDto());
+        setCodigoOperacion(UtilTexto.vacia);
         setProductoInterno(new ProductoInternoDto());
         setCantidad(BigDecimal.ZERO);
         setUnidadMedida(new UnidadMedidaDto());
-        setFechaMovimiento(UtilFecha.ValorPorDefecto(1, 1, 1000));
+        setFechaMovimiento(UtilFecha.FECHA_POR_DEFECTO);
+        setIdLote(idLote);
     }
 
     public UUID getId() {
@@ -53,6 +58,14 @@ public class MovimientoInventarioDto {
         this.origen = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(origen, new OrigenDto());
     }
 
+    public String getCodigoOperacion() {
+        return codigoOperacion;
+    }
+
+    public void setCodigoOperacion(String codigoOperacion) {
+        this.codigoOperacion = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(codigoOperacion);
+    }
+
     public ProductoInternoDto getProductoInterno() {
         return productoInterno;
     }
@@ -66,8 +79,7 @@ public class MovimientoInventarioDto {
     }
 
     public void setCantidad(BigDecimal cantidad) {
-        var cantidadSaneada = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(cantidad, BigDecimal.ZERO);
-        this.cantidad = UtilNumero.menorQue(cantidadSaneada, BigDecimal.ZERO) ? BigDecimal.ZERO : cantidadSaneada;
+        this.cantidad = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(cantidad, BigDecimal.ZERO);
     }
 
     public UnidadMedidaDto getUnidadMedida() {
@@ -83,6 +95,14 @@ public class MovimientoInventarioDto {
     }
 
     public void setFechaMovimiento(LocalDate fechaMovimiento) {
-        this.fechaMovimiento = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(fechaMovimiento, UtilFecha.ValorPorDefecto(1, 1, 1000));
+        this.fechaMovimiento = UtilFecha.valorDefecto(fechaMovimiento);
+    }
+
+    public UUID getIdLote() {
+        return idLote;
+    }
+
+    public void setIdLote(UUID idLote) {
+        this.idLote = UtilId.valorDefecto(idLote);
     }
 }

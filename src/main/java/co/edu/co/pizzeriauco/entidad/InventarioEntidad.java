@@ -68,14 +68,7 @@ public class InventarioEntidad {
         }
 
         public Builder cantidadTotal(BigDecimal cantidadTotal) {
-            var cantidadTotalSaneada = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            cantidadTotal,
-                            BigDecimal.ZERO
-                    );
-            this.cantidadTotal = UtilNumero.menorQue(cantidadTotalSaneada, BigDecimal.ZERO)
-                    ? BigDecimal.ZERO
-                    : cantidadTotalSaneada;
+            this.cantidadTotal = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(cantidadTotal, BigDecimal.ZERO);
             return this;
         }
 
@@ -102,14 +95,7 @@ public class InventarioEntidad {
         }
 
         public Builder stockMinimo(BigDecimal stockMinimo) {
-            var stockMinimoSaneado = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            stockMinimo,
-                            BigDecimal.ZERO
-                    );
-            this.stockMinimo = UtilNumero.menorQue(stockMinimoSaneado, BigDecimal.ZERO)
-                    ? BigDecimal.ZERO
-                    : stockMinimoSaneado;
+            this.stockMinimo = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(stockMinimo, BigDecimal.ZERO);
             return this;
         }
 

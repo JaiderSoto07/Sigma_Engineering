@@ -1,12 +1,18 @@
 package co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver;
 
 import co.edu.co.pizzeriauco.dao.datos.entidad.OrigenDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.OrigenEntidad;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
 
-public class OrigenSqlServerDAO implements OrigenDAO {
+public class OrigenSqlServerDAO extends SqlDAO implements OrigenDAO {
+
+    public OrigenSqlServerDAO(Connection conexion) {
+        super(conexion);
+    }
 
     @Override
     public OrigenEntidad consultarPorId(UUID id) {

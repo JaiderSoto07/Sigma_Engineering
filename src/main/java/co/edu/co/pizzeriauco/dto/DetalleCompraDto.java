@@ -25,7 +25,7 @@ public class DetalleCompraDto {
         setCantidad(BigDecimal.ZERO);
         setUnidadMedida(new UnidadMedidaDto());
         setPrecioCompra(BigDecimal.ZERO);
-        setFechaVencimiento(UtilFecha.ValorPorDefecto(1, 1, 1000));
+        setFechaVencimiento(UtilFecha.FECHA_POR_DEFECTO);
         setCompra(new CompraDto());
     }
 
@@ -50,8 +50,7 @@ public class DetalleCompraDto {
     }
 
     public void setCantidad(BigDecimal cantidad) {
-        var cantidadSaneada = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(cantidad, BigDecimal.ZERO);
-        this.cantidad = UtilNumero.menorQue(cantidadSaneada, BigDecimal.ZERO) ? BigDecimal.ZERO : cantidadSaneada;
+        this.cantidad = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(cantidad, BigDecimal.ZERO);
     }
 
     public UnidadMedidaDto getUnidadMedida() {
@@ -67,8 +66,7 @@ public class DetalleCompraDto {
     }
 
     public void setPrecioCompra(BigDecimal precioCompra) {
-        var precioCompraSaneado = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(precioCompra, BigDecimal.ZERO);
-        this.precioCompra = UtilNumero.menorQue(precioCompraSaneado, BigDecimal.ZERO) ? BigDecimal.ZERO : precioCompraSaneado;
+        this.precioCompra = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(precioCompra, BigDecimal.ZERO);
     }
 
     public LocalDate getFechaVencimiento() {
@@ -76,7 +74,7 @@ public class DetalleCompraDto {
     }
 
     public void setFechaVencimiento(LocalDate fechaVencimiento) {
-        this.fechaVencimiento = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(fechaVencimiento, UtilFecha.ValorPorDefecto(1, 1, 1000));
+        this.fechaVencimiento = UtilFecha.valorDefecto(fechaVencimiento);
     }
 
     public CompraDto getCompra() {

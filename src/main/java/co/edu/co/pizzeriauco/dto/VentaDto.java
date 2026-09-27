@@ -4,6 +4,7 @@ import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilFecha;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,9 +21,9 @@ public class VentaDto {
 
     public VentaDto() {
         setId(id);
-        setFecha(UtilFecha.ValorPorDefecto(1, 1, 1000));
+        setFecha(UtilFecha.FECHA_POR_DEFECTO);
         setHora(LocalTime.MIN);
-        setCliente("");
+        setCliente(UtilTexto.CLIENTE_POR_DEFECTO);
         setTotal(BigDecimal.ZERO);
     }
 
@@ -39,7 +40,7 @@ public class VentaDto {
     }
 
     public void setFecha(LocalDate fecha) {
-        this.fecha = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(fecha, UtilFecha.ValorPorDefecto(1, 1, 1000));
+        this.fecha = UtilFecha.valorDefecto(fecha);
     }
 
     public LocalTime getHora() {
@@ -55,7 +56,9 @@ public class VentaDto {
     }
 
     public void setCliente(String cliente) {
-        this.cliente = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(cliente, "");
+        //si no me dicen el cliente (nulo o vacio), se usa el cliente por defecto
+        var clienteSaneado = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(cliente);
+        this.cliente = UtilTexto.getUtilTexto().esVacia(clienteSaneado) ? UtilTexto.CLIENTE_POR_DEFECTO : clienteSaneado;
     }
 
     public BigDecimal getTotal() {
@@ -63,7 +66,6 @@ public class VentaDto {
     }
 
     public void setTotal(BigDecimal total) {
-        var totalSaneado = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(total, BigDecimal.ZERO);
-        this.total = UtilNumero.menorQue(totalSaneado, BigDecimal.ZERO) ? BigDecimal.ZERO : totalSaneado;
+        this.total = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(total, BigDecimal.ZERO);
     }
 }

@@ -1,16 +1,17 @@
 package co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver;
 
 import co.edu.co.pizzeriauco.dao.datos.entidad.InventarioDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.InventarioEntidad;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
 
-public class InventarioSqlServerDAO implements InventarioDAO {
+public class InventarioSqlServerDAO extends SqlDAO implements InventarioDAO {
 
-    @Override
-    public void crear(InventarioEntidad entidad) {
-        // TODO Auto-generated method stub
+    public InventarioSqlServerDAO(Connection conexion) {
+        super(conexion);
     }
 
     @Override

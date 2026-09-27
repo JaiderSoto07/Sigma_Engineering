@@ -1,7 +1,7 @@
 package co.edu.co.pizzeriauco.crosscuting.utilitario;
 
 public class UtilNumero {
-    public static int cero=0;
+    public static final int cero = 0;
     private UtilNumero(){
 
     }
@@ -12,6 +12,12 @@ public class UtilNumero {
 
     public static <n extends Number> Number obtenerValorDefecto(n valor){
         return UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(valor, cero);
+    }
+
+    //si el valor es nulo o negativo, devuelvo el valor por defecto
+    //asi no se repite en cada clase la misma pregunta
+    public static <n extends Number> n obtenerValorDefectoSiEsNuloONegativo(n valor, n valorDefecto){
+        return UtilObjeto.esNulo(valor) || valor.doubleValue() < 0 ? valorDefecto : valor;
     }
 
     // doubleValue() dice no importa que tipo especifico de Number tengas dame su valor como double
@@ -34,17 +40,17 @@ public class UtilNumero {
 
     //valor que esta entre un rango y otro
     //el valor por defecto para que en caso
-    public static <n extends Number> boolean ValorEntreUnRangoYOtroSinIncluirlos(n numeroUno, n numeroDos , n numeroTres){
+    public static <n extends Number> boolean valorEntreUnRangoYOtroSinIncluirlos(n numeroUno, n numeroDos , n numeroTres){
         return obtenerValorDefecto(numeroDos).doubleValue() >  obtenerValorDefecto(numeroUno).doubleValue()  && obtenerValorDefecto(numeroDos).doubleValue() < obtenerValorDefecto(numeroTres).doubleValue();
     }
 
-    public static <n extends Number> boolean ValorEntreUnRangoIncluyeElPrimero(n numeroUno, n numeroDos , n numeroTres){
+    public static <n extends Number> boolean valorEntreUnRangoIncluyeElPrimero(n numeroUno, n numeroDos , n numeroTres){
         return obtenerValorDefecto(numeroDos).doubleValue() >=  obtenerValorDefecto(numeroUno).doubleValue()  && obtenerValorDefecto(numeroDos).doubleValue() < obtenerValorDefecto(numeroTres).doubleValue();
     }
-    public static <n extends Number> boolean ValorEntreUnRangoIncluyeElUltimo(n numeroUno, n numeroDos , n numeroTres){
+    public static <n extends Number> boolean valorEntreUnRangoIncluyeElUltimo(n numeroUno, n numeroDos , n numeroTres){
         return obtenerValorDefecto(numeroDos).doubleValue() >  obtenerValorDefecto(numeroUno).doubleValue()  && obtenerValorDefecto(numeroDos).doubleValue() <= obtenerValorDefecto(numeroTres).doubleValue();
     }
-    public static <n extends Number> boolean ValorEntreUnRangoIncluyendoAmbos(n numeroUno, n numeroDos , n numeroTres){
+    public static <n extends Number> boolean valorEntreUnRangoIncluyendoAmbos(n numeroUno, n numeroDos , n numeroTres){
         return obtenerValorDefecto(numeroDos).doubleValue() >=  obtenerValorDefecto(numeroUno).doubleValue()  && obtenerValorDefecto(numeroDos).doubleValue() <= obtenerValorDefecto(numeroTres).doubleValue();
     }
 

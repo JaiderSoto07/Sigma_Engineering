@@ -12,21 +12,23 @@ import java.util.UUID;
 public class LoteDto {
 
     private UUID id;
-    private LocalDate fechaIngreso;
+    private MovimientoInventarioDto movimientoInventario;
     private LocalDate fechaVencimiento;
     private boolean disponible;
     private ProductoInternoDto productoInterno;
     private BigDecimal cantidad;
+    private BigDecimal saldo;
     private UnidadMedidaDto unidadMedidaInventario;
     private int numeroLote;
 
     public LoteDto() {
         setId(id);
-        setFechaIngreso(UtilFecha.ValorPorDefecto(1, 1, 1000));
-        setFechaVencimiento(UtilFecha.ValorPorDefecto(1, 1, 1000));
+        setMovimientoInventario(new MovimientoInventarioDto());
+        setFechaVencimiento(UtilFecha.FECHA_POR_DEFECTO);
         setDisponible(false);
         setProductoInterno(new ProductoInternoDto());
         setCantidad(BigDecimal.ZERO);
+        setSaldo(BigDecimal.ZERO);
         setUnidadMedidaInventario(new UnidadMedidaDto());
         setNumeroLote(0);
     }
@@ -39,12 +41,12 @@ public class LoteDto {
         this.id = UtilId.valorDefecto(id);
     }
 
-    public LocalDate getFechaIngreso() {
-        return fechaIngreso;
+    public MovimientoInventarioDto getMovimientoInventario() {
+        return movimientoInventario;
     }
 
-    public void setFechaIngreso(LocalDate fechaIngreso) {
-        this.fechaIngreso = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(fechaIngreso, UtilFecha.ValorPorDefecto(1, 1, 1000));
+    public void setMovimientoInventario(MovimientoInventarioDto movimientoInventario) {
+        this.movimientoInventario = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(movimientoInventario, new MovimientoInventarioDto());
     }
 
     public LocalDate getFechaVencimiento() {
@@ -52,7 +54,7 @@ public class LoteDto {
     }
 
     public void setFechaVencimiento(LocalDate fechaVencimiento) {
-        this.fechaVencimiento = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(fechaVencimiento, UtilFecha.ValorPorDefecto(1, 1, 1000));
+        this.fechaVencimiento = UtilFecha.valorDefecto(fechaVencimiento);
     }
 
     public boolean isDisponible() {
@@ -76,8 +78,15 @@ public class LoteDto {
     }
 
     public void setCantidad(BigDecimal cantidad) {
-        var cantidadSaneada = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(cantidad, BigDecimal.ZERO);
-        this.cantidad = UtilNumero.menorQue(cantidadSaneada, BigDecimal.ZERO) ? BigDecimal.ZERO : cantidadSaneada;
+        this.cantidad = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(cantidad, BigDecimal.ZERO);
+    }
+
+    public BigDecimal getSaldo() {
+        return saldo;
+    }
+
+    public void setSaldo(BigDecimal saldo) {
+        this.saldo = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(saldo, BigDecimal.ZERO);
     }
 
     public UnidadMedidaDto getUnidadMedidaInventario() {
@@ -93,6 +102,6 @@ public class LoteDto {
     }
 
     public void setNumeroLote(int numeroLote) {
-        this.numeroLote = UtilNumero.menorQue(numeroLote, 0) ? 0 : numeroLote;
+        this.numeroLote = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(numeroLote, UtilNumero.cero);
     }
 }

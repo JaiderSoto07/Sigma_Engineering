@@ -1,34 +1,21 @@
 package co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver;
 
 import co.edu.co.pizzeriauco.dao.datos.entidad.ProductoInternoDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.ProductoInternoEntidad;
 
-import java.util.List;
+import java.sql.Connection;
 import java.util.UUID;
 
-public class ProductoInternoSqlServerDAO implements ProductoInternoDAO {
+public class ProductoInternoSqlServerDAO extends SqlDAO implements ProductoInternoDAO {
+
+    public ProductoInternoSqlServerDAO(Connection conexion) {
+        super(conexion);
+    }
 
     @Override
     public void crear(ProductoInternoEntidad entidad) {
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public ProductoInternoEntidad consultarPorId(UUID id) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<ProductoInternoEntidad> consultarPorFiltro(ProductoInternoEntidad filtro) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<ProductoInternoEntidad> consultarTodos() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

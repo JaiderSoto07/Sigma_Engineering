@@ -1,6 +1,7 @@
 package co.edu.co.pizzeriauco.dto;
 
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 
@@ -10,15 +11,15 @@ public class ProductoInternoDto {
 
     private UUID id;
     private String nombre;
-    private String perecedero;
-    private int vidaUtil;
+    private boolean perecedero;
+    private Integer vidaUtil;
     private UnidadMedidaDto tipoMedida;
 
     public ProductoInternoDto() {
         setId(id);
         setNombre(UtilTexto.vacia);
-        setPerecedero(UtilTexto.vacia);
-        setVidaUtil(0);
+        setPerecedero(false);
+        setVidaUtil(UtilNumero.cero);
         setTipoMedida(new UnidadMedidaDto());
     }
 
@@ -38,20 +39,20 @@ public class ProductoInternoDto {
         this.nombre = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(nombre);
     }
 
-    public String getPerecedero() {
+    public boolean isPerecedero() {
         return perecedero;
     }
 
-    public void setPerecedero(String perecedero) {
-        this.perecedero = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(perecedero);
+    public void setPerecedero(boolean perecedero) {
+        this.perecedero = perecedero;
     }
 
-    public int getVidaUtil() {
+    public Integer getVidaUtil() {
         return vidaUtil;
     }
 
-    public void setVidaUtil(int vidaUtil) {
-        this.vidaUtil = vidaUtil;
+    public void setVidaUtil(Integer vidaUtil) {
+        this.vidaUtil = UtilNumero.obtenerValorDefecto(vidaUtil, UtilNumero.cero);
     }
 
     public UnidadMedidaDto getTipoMedida() {

@@ -1,6 +1,7 @@
 package co.edu.co.pizzeriauco.dominio;
 
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 
@@ -10,8 +11,9 @@ public class ProductoInternoDominio {
 
     private UUID id;
     private String nombre;
-    private String perecedero;
-    private int vidaUtil;
+    private boolean perecedero;
+    //no es obligatoria, por eso es Integer y su valor por defecto es 0
+    private Integer vidaUtil;
     private UnidadMedidaDominio tipoMedida;
 
     private ProductoInternoDominio(Builder builder) {
@@ -30,11 +32,11 @@ public class ProductoInternoDominio {
         return nombre;
     }
 
-    public String getPerecedero() {
+    public boolean isPerecedero() {
         return perecedero;
     }
 
-    public int getVidaUtil() {
+    public Integer getVidaUtil() {
         return vidaUtil;
     }
 
@@ -46,15 +48,15 @@ public class ProductoInternoDominio {
 
         private UUID id;
         private String nombre;
-        private String perecedero;
-        private int vidaUtil;
+        private boolean perecedero;
+        private Integer vidaUtil;
         private UnidadMedidaDominio tipoMedida;
 
         public Builder() {
             id = UtilId.valorDefecto(id);
             nombre = UtilTexto.vacia;
-            perecedero = UtilTexto.vacia;
-            vidaUtil = 0;
+            perecedero = false;
+            vidaUtil = UtilNumero.cero;
             tipoMedida = new UnidadMedidaDominio.Builder().build();
         }
 
@@ -70,15 +72,13 @@ public class ProductoInternoDominio {
             return this;
         }
 
-        public Builder perecedero(String perecedero) {
-            this.perecedero =
-                    UtilTexto.getUtilTexto()
-                            .quitarEspaciosEnBlanco(perecedero);
+        public Builder perecedero(boolean perecedero) {
+            this.perecedero = perecedero;
             return this;
         }
 
-        public Builder vidaUtil(int vidaUtil) {
-            this.vidaUtil = vidaUtil;
+        public Builder vidaUtil(Integer vidaUtil) {
+            this.vidaUtil = UtilNumero.obtenerValorDefecto(vidaUtil, UtilNumero.cero);
             return this;
         }
 

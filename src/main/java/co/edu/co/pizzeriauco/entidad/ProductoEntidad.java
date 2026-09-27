@@ -1,21 +1,30 @@
 package co.edu.co.pizzeriauco.entidad;
 
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public class ProductoEntidad {
 
     private UUID id;
     private String nombre;
-    private HistoricoPrecioEntidad historicoPrecio;
+    private TipoProductoEntidad tipoProducto;
+    private TamanoEntidad tamano;
+    //si el producto es un producto interno (Si / No)
+    private boolean productoInterno;
+    private BigDecimal precio;
 
     private ProductoEntidad(Builder builder) {
         this.id = builder.id;
         this.nombre = builder.nombre;
-        this.historicoPrecio = builder.historicoPrecio;
+        this.tipoProducto = builder.tipoProducto;
+        this.tamano = builder.tamano;
+        this.productoInterno = builder.productoInterno;
+        this.precio = builder.precio;
     }
 
     public UUID getId() {
@@ -26,21 +35,38 @@ public class ProductoEntidad {
         return nombre;
     }
 
-    public HistoricoPrecioEntidad getHistoricoPrecio() {
-        return historicoPrecio;
+    public TipoProductoEntidad getTipoProducto() {
+        return tipoProducto;
+    }
+
+    public TamanoEntidad getTamano() {
+        return tamano;
+    }
+
+    public boolean isProductoInterno() {
+        return productoInterno;
+    }
+
+    public BigDecimal getPrecio() {
+        return precio;
     }
 
     public static class Builder {
 
         private UUID id;
         private String nombre;
-        private HistoricoPrecioEntidad historicoPrecio;
+        private TipoProductoEntidad tipoProducto;
+        private TamanoEntidad tamano;
+        private boolean productoInterno;
+        private BigDecimal precio;
 
         public Builder() {
             id = UtilId.valorDefecto(id);
             nombre = UtilTexto.vacia;
-            historicoPrecio =
-                    new HistoricoPrecioEntidad.Builder().build();
+            tipoProducto = new TipoProductoEntidad.Builder().build();
+            tamano = new TamanoEntidad.Builder().build();
+            productoInterno = false;
+            precio = BigDecimal.ZERO;
         }
 
         public Builder id(UUID id) {
@@ -55,15 +81,31 @@ public class ProductoEntidad {
             return this;
         }
 
-        public Builder historicoPrecio(
-                HistoricoPrecioEntidad historicoPrecio) {
-
-            this.historicoPrecio =
+        public Builder tipoProducto(TipoProductoEntidad tipoProducto) {
+            this.tipoProducto =
                     UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
-                            historicoPrecio,
-                            new HistoricoPrecioEntidad.Builder().build()
+                            tipoProducto,
+                            new TipoProductoEntidad.Builder().build()
                     );
+            return this;
+        }
 
+        public Builder tamano(TamanoEntidad tamano) {
+            this.tamano =
+                    UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
+                            tamano,
+                            new TamanoEntidad.Builder().build()
+                    );
+            return this;
+        }
+
+        public Builder productoInterno(boolean productoInterno) {
+            this.productoInterno = productoInterno;
+            return this;
+        }
+
+        public Builder precio(BigDecimal precio) {
+            this.precio = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(precio, BigDecimal.ZERO);
             return this;
         }
 
