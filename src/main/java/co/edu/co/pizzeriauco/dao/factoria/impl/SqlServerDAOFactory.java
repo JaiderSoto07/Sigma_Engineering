@@ -1,5 +1,7 @@
 package co.edu.co.pizzeriauco.dao.factoria.impl;
 
+import co.edu.co.pizzeriauco.crosscuting.catalogo.CatalogoMensajes;
+import co.edu.co.pizzeriauco.crosscuting.excepciones.PizzeriaDatosExcepcion;
 import co.edu.co.pizzeriauco.dao.datos.entidad.CambioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.CompraDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.DetalleCompraDAO;
@@ -39,13 +41,29 @@ import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.VentaSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.factoria.DAOFactory;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class SqlServerDAOFactory extends DAOFactory {
 
+    private static final String URL =
+            "jdbc:sqlserver://localhost:1433;databaseName=Pizzeria;encrypt=true;trustServerCertificate=true";
+    private static final String USUARIO = "pizzeriaUser";
+    private static final String CLAVE = "Pizza2026*";
+
     @Override
     protected void abrirConexion() {
-        // Tarea: ¿Como abrir una conexion con SQL Server desde Java?
-        Connection conexion = null;
+        //como abrir la conexion con SQL Server desde Java
+        Connection conexion;
+        try {
+            conexion = DriverManager.getConnection(URL, USUARIO, CLAVE);
+        } catch (SQLException exception) {
+            var mensajeUsuario = CatalogoMensajes.SqlServerDAOFactory.USUARIO_ERROR_PROBLEMA_ABRIENDO_CONEXION_SQL_SERVER;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, exception.getMessage(), exception);
+        } catch (Exception exception) {
+            var mensajeUsuario = CatalogoMensajes.SqlServerDAOFactory.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_ABRIENDO_CONEXION_SQL_SERVER;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, exception.getMessage(), exception);
+        }
         setConexion(conexion);
     }
 

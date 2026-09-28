@@ -34,4 +34,14 @@ public class CatalogoMensajes {
         public static final String USUARIO_ERROR_NO_ES_POSIBLE_CERRAR_CONEXION_SQL = "No es posible cerrar la conexion contra la fuente de informacion debido a que esta vacia o ya se encuentra cerrada. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
     }
 
+    public static class SqlServerDAOFactory {
+
+        private SqlServerDAOFactory() {
+        }
+
+        //problema concreto (SQLException) y problema no controlado (Exception) al abrir la conexion
+        public static final String USUARIO_ERROR_PROBLEMA_ABRIENDO_CONEXION_SQL_SERVER = "Se ha presentado un problema tratando de abrir la conexion contra la fuente de informacion. Por favor verifique que SQL Server este encendido, intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_ABRIENDO_CONEXION_SQL_SERVER = "Se ha presentado un problema NO CONTROLADO tratando de abrir la conexion contra la fuente de informacion. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+    }
+
 }
