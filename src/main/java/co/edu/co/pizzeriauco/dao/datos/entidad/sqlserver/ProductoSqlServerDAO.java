@@ -3,7 +3,6 @@ package co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver;
 import co.edu.co.pizzeriauco.crosscuting.catalogo.CatalogoMensajes;
 import co.edu.co.pizzeriauco.crosscuting.excepciones.PizzeriaDatosExcepcion;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 import co.edu.co.pizzeriauco.dao.datos.entidad.ProductoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
@@ -12,9 +11,7 @@ import co.edu.co.pizzeriauco.entidad.ProductoInternoEntidad;
 import co.edu.co.pizzeriauco.entidad.TamanoEntidad;
 import co.edu.co.pizzeriauco.entidad.TipoProductoEntidad;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,124 +19,247 @@ import java.util.UUID;
 
 public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
 
-    //consulta base: trae el producto con los datos de su tipo de producto y de su tamano
-    private static final String SENTENCIA_CONSULTA_BASE =
-            "select p.id_producto, p.nombre, p.id_producto_interno, p.precio, p.activo, "
-                    + "tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, "
-                    + "t.id_tamano, t.tamano "
-                    + "from producto p "
-                    + "inner join tipo_producto tp on tp.id_tipo_producto = p.id_tipo_producto "
-                    + "inner join tamano t on t.id_tamano = p.id_tamano";
-
     public ProductoSqlServerDAO(Connection conexion) {
         super(conexion);
     }
 
     @Override
     public void crear(ProductoEntidad entidad) {
-
-        var sentenciaSql = "insert into producto (id_producto, nombre, id_tipo_producto, id_tamano, "
-                + "id_producto_interno, precio) values (?, ?, ?, ?, ?, ?)";
+        //producto_interno no se escribe: la base la calcula con id_producto_interno
+        var sentenciaSql = "insert into producto(id_producto, nombre, id_tipo_producto, id_tamano, id_producto_interno, precio, activo) "
+                + "values(?, ?, ?, ?, ?, ?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+            //se llenan los datos en el mismo orden de los ?
             sentencia.setObject(1, entidad.getId());
             sentencia.setString(2, entidad.getNombre());
+            //del tipo de producto y del tamano solo se guarda su id (llaves foraneas)
             sentencia.setObject(3, entidad.getTipoProducto().getId());
             sentencia.setObject(4, entidad.getTamano().getId());
-            //producto_interno no se escribe: la base la calcula con id_producto_interno
-            sentencia.setObject(5, idProductoInternoAsociado(entidad));
+            //PENDIENTE (decision de los null): si no tiene insumo asociado hoy se guarda null
+            sentencia.setObject(5, entidad.isProductoInterno() ? entidad.getProductoInternoAsociado().getId() : null);
             sentencia.setBigDecimal(6, entidad.getPrecio());
+            sentencia.setBoolean(7, entidad.isActivo());
             sentencia.executeUpdate();
         } catch (SQLException excepcion) {
+            //el controlado
             var mensajeUsuario = CatalogoMensajes.ProductoSqlServerDAO.USUARIO_ERROR_PROBLEMA_CREANDO_PRODUCTO;
             throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
         } catch (Exception excepcion) {
+            //no controlado
             var mensajeUsuario = CatalogoMensajes.ProductoSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CREANDO_PRODUCTO;
             throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
         }
     }
 
-    //si no existe devuelve el producto por defecto (id 00000000-...), nunca nulo
     @Override
     public ProductoEntidad consultarPorId(UUID id) {
-        var filtro = new ProductoEntidad.Builder().id(id).build();
-        var resultados = consultarPorFiltro(filtro);
-        return resultados.isEmpty() ? new ProductoEntidad.Builder().build() : resultados.get(0);
+        var sentenciaSql = "select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.precio, p.activo, "
+                + "tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano "
+                + "from producto as p "
+                + "inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto "
+                + "inner join tamano as t on p.id_tamano = t.id_tamano "
+                + "where p.id_producto = ?";
+        //si no se encuentra, se devuelve el producto por defecto (nunca nulo)
+        var productoEncontrado = new ProductoEntidad.Builder().build();
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+            sentencia.setObject(1, id);
+
+            var resultado = sentencia.executeQuery();
+            if (resultado.next()) {
+                //primero se arman los padres (tipo de producto, tamano e insumo asociado) para luego asignarlos al producto
+                var tipoProducto = new TipoProductoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_tipo_producto")))
+                        .nombre(resultado.getString("nombre_tipo_producto"))
+                        .build();
+                var tamano = new TamanoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_tamano")))
+                        .tamano(resultado.getString("tamano"))
+                        .build();
+                //del insumo asociado solo se trae el id; si la columna viene vacia el producto se vende por receta
+                var idProductoInterno = resultado.getString("id_producto_interno");
+                var productoInternoAsociado = new ProductoInternoEntidad.Builder()
+                        .id(idProductoInterno == null ? null : UUID.fromString(idProductoInterno))
+                        .build();
+                productoEncontrado = new ProductoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_producto")))
+                        .nombre(resultado.getString("nombre_producto"))
+                        .tipoProducto(tipoProducto)
+                        .tamano(tamano)
+                        .productoInternoAsociado(productoInternoAsociado)
+                        .precio(resultado.getBigDecimal("precio"))
+                        .activo(resultado.getBoolean("activo"))
+                        .build();
+            }
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.ProductoSqlServerDAO.USUARIO_ERROR_PROBLEMA_CONSULTANDO_PRODUCTO_POR_ID;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.ProductoSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_PRODUCTO_POR_ID;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
+        return productoEncontrado;
     }
 
-    //solo filtra por los datos que vengan diferentes al valor por defecto
-    //productoInterno no se usa como filtro porque un boolean no tiene valor "sin definir"
+    //activo no se usa como filtro porque un boolean no tiene valor "sin definir"
     @Override
     public List<ProductoEntidad> consultarPorFiltro(ProductoEntidad filtro) {
-
-        var sentenciaSql = new StringBuilder(SENTENCIA_CONSULTA_BASE).append(" where 1 = 1");
+        var productosEncontrados = new ArrayList<ProductoEntidad>();
+        var sentenciaSql = "select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.precio, p.activo, "
+                + "tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano "
+                + "from producto as p "
+                + "inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto "
+                + "inner join tamano as t on p.id_tamano = t.id_tamano "
+                + "where 1=1";
         var parametros = new ArrayList<Object>();
-
+        //estos los del producto
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql.append(" and p.id_producto = ?");
+            sentenciaSql = sentenciaSql + " and p.id_producto = ?";
             parametros.add(filtro.getId());
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getNombre())) {
-            sentenciaSql.append(" and p.nombre = ?");
+            sentenciaSql = sentenciaSql + " and p.nombre = ?";
             parametros.add(filtro.getNombre());
         }
+        //estos los del tipo de producto
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getTipoProducto().getId())) {
-            sentenciaSql.append(" and p.id_tipo_producto = ?");
+            sentenciaSql = sentenciaSql + " and tp.id_tipo_producto = ?";
             parametros.add(filtro.getTipoProducto().getId());
         }
+        if (!UtilTexto.getUtilTexto().esVacia(filtro.getTipoProducto().getNombre())) {
+            sentenciaSql = sentenciaSql + " and tp.nombre = ?";
+            parametros.add(filtro.getTipoProducto().getNombre());
+        }
+        //estos los del tamano
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getTamano().getId())) {
-            sentenciaSql.append(" and p.id_tamano = ?");
+            sentenciaSql = sentenciaSql + " and t.id_tamano = ?";
             parametros.add(filtro.getTamano().getId());
         }
-        if (UtilNumero.mayorQue(filtro.getPrecio(), BigDecimal.ZERO)) {
-            sentenciaSql.append(" and p.precio = ?");
-            parametros.add(filtro.getPrecio());
+        if (!UtilTexto.getUtilTexto().esVacia(filtro.getTamano().getTamano())) {
+            sentenciaSql = sentenciaSql + " and t.tamano = ?";
+            parametros.add(filtro.getTamano().getTamano());
         }
+        // el orden va siempre al final
+        sentenciaSql = sentenciaSql + " order by p.nombre asc, t.tamano asc";
 
-        var resultados = new ArrayList<ProductoEntidad>();
-        try (var sentencia = getConexion().prepareStatement(sentenciaSql.toString())) {
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+
             for (var indice = 0; indice < parametros.size(); indice++) {
                 sentencia.setObject(indice + 1, parametros.get(indice));
             }
-            try (var resultado = sentencia.executeQuery()) {
-                while (resultado.next()) {
-                    resultados.add(ObjetoProductoSql(resultado));
-                }
+
+            var resultado = sentencia.executeQuery();
+            // por cada fila que llego, se arma un producto y se agrega a la lista
+            while (resultado.next()) {
+                //primero se arman los padres (tipo de producto, tamano e insumo asociado) para luego asignarlos al producto
+                var tipoProducto = new TipoProductoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_tipo_producto")))
+                        .nombre(resultado.getString("nombre_tipo_producto"))
+                        .build();
+                var tamano = new TamanoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_tamano")))
+                        .tamano(resultado.getString("tamano"))
+                        .build();
+                var idProductoInterno = resultado.getString("id_producto_interno");
+                var productoInternoAsociado = new ProductoInternoEntidad.Builder()
+                        .id(idProductoInterno == null ? null : UUID.fromString(idProductoInterno))
+                        .build();
+                var producto = new ProductoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_producto")))
+                        .nombre(resultado.getString("nombre_producto"))
+                        .tipoProducto(tipoProducto)
+                        .tamano(tamano)
+                        .productoInternoAsociado(productoInternoAsociado)
+                        .precio(resultado.getBigDecimal("precio"))
+                        .activo(resultado.getBoolean("activo"))
+                        .build();
+                productosEncontrados.add(producto);
             }
+
         } catch (SQLException excepcion) {
-            var mensajeUsuario = CatalogoMensajes.ProductoSqlServerDAO.USUARIO_ERROR_PROBLEMA_CONSULTANDO_PRODUCTO;
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.ProductoSqlServerDAO.USUARIO_ERROR_PROBLEMA_CONSULTANDO_PRODUCTO_POR_FILTRO;
             throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
         } catch (Exception excepcion) {
-            var mensajeUsuario = CatalogoMensajes.ProductoSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_PRODUCTO;
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.ProductoSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_PRODUCTO_POR_FILTRO;
             throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
         }
-        return resultados;
+        return productosEncontrados;
     }
 
-    //un filtro con todos los valores por defecto no agrega condiciones, por eso trae todo
     @Override
     public List<ProductoEntidad> consultarTodos() {
-        return consultarPorFiltro(new ProductoEntidad.Builder().build());
+        var sentenciaSql = "select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.precio, p.activo, "
+                + "tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano "
+                + "from producto as p "
+                + "inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto "
+                + "inner join tamano as t on p.id_tamano = t.id_tamano "
+                + "order by p.nombre asc, t.tamano asc";
+        var productosEncontrados = new ArrayList<ProductoEntidad>();
+
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+
+            var resultado = sentencia.executeQuery();
+            while (resultado.next()) {
+                //primero se arman los padres (tipo de producto, tamano e insumo asociado) para luego asignarlos al producto
+                var tipoProducto = new TipoProductoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_tipo_producto")))
+                        .nombre(resultado.getString("nombre_tipo_producto"))
+                        .build();
+                var tamano = new TamanoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_tamano")))
+                        .tamano(resultado.getString("tamano"))
+                        .build();
+                var idProductoInterno = resultado.getString("id_producto_interno");
+                var productoInternoAsociado = new ProductoInternoEntidad.Builder()
+                        .id(idProductoInterno == null ? null : UUID.fromString(idProductoInterno))
+                        .build();
+                var producto = new ProductoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_producto")))
+                        .nombre(resultado.getString("nombre_producto"))
+                        .tipoProducto(tipoProducto)
+                        .tamano(tamano)
+                        .productoInternoAsociado(productoInternoAsociado)
+                        .precio(resultado.getBigDecimal("precio"))
+                        .activo(resultado.getBoolean("activo"))
+                        .build();
+                productosEncontrados.add(producto);
+            }
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.ProductoSqlServerDAO.USUARIO_ERROR_PROBLEMA_CONSULTANDO_TODOS_LOS_PRODUCTOS;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.ProductoSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODOS_LOS_PRODUCTOS;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
+        return productosEncontrados;
     }
 
+    //tambien guarda activo: desactivar un producto (retirarlo del menu) es actualizarlo con activo = false
     @Override
     public void actualizar(UUID id, ProductoEntidad entidad) {
-
-        //tambien guarda activo: desactivar un producto (retirarlo del menu) es actualizarlo con activo = false
         var sentenciaSql = "update producto set nombre = ?, id_tipo_producto = ?, id_tamano = ?, "
                 + "id_producto_interno = ?, precio = ?, activo = ? where id_producto = ?";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setString(1, entidad.getNombre());
             sentencia.setObject(2, entidad.getTipoProducto().getId());
             sentencia.setObject(3, entidad.getTamano().getId());
-            sentencia.setObject(4, idProductoInternoAsociado(entidad));
+            //PENDIENTE (decision de los null): si no tiene insumo asociado hoy se guarda null
+            sentencia.setObject(4, entidad.isProductoInterno() ? entidad.getProductoInternoAsociado().getId() : null);
             sentencia.setBigDecimal(5, entidad.getPrecio());
             sentencia.setBoolean(6, entidad.isActivo());
             sentencia.setObject(7, id);
             sentencia.executeUpdate();
         } catch (SQLException excepcion) {
+            //el controlado
             var mensajeUsuario = CatalogoMensajes.ProductoSqlServerDAO.USUARIO_ERROR_PROBLEMA_ACTUALIZANDO_PRODUCTO;
             throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
         } catch (Exception excepcion) {
+            //no controlado
             var mensajeUsuario = CatalogoMensajes.ProductoSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_ACTUALIZANDO_PRODUCTO;
             throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
         }
@@ -150,54 +270,18 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
     //y negocio debe borrar antes su historial de precios en la misma transaccion
     @Override
     public void eliminar(UUID id) {
-
         var sentenciaSql = "delete from producto where id_producto = ?";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
             sentencia.executeUpdate();
         } catch (SQLException excepcion) {
+            //el controlado
             var mensajeUsuario = CatalogoMensajes.ProductoSqlServerDAO.USUARIO_ERROR_PROBLEMA_ELIMINANDO_PRODUCTO;
             throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
         } catch (Exception excepcion) {
+            //no controlado
             var mensajeUsuario = CatalogoMensajes.ProductoSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_ELIMINANDO_PRODUCTO;
             throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
         }
-    }
-
-    //arma la entidad con la fila actual: el producto con su tipo de producto y su tamano
-    private ProductoEntidad ObjetoProductoSql(ResultSet resultado) throws SQLException {
-
-        var tipoProducto = new TipoProductoEntidad.Builder()
-                .id(UUID.fromString(resultado.getString("id_tipo_producto")))
-                .nombre(resultado.getString("nombre_tipo_producto"))
-                .build();
-
-        var tamano = new TamanoEntidad.Builder()
-                .id(UUID.fromString(resultado.getString("id_tamano")))
-                .tamano(resultado.getString("tamano"))
-                .build();
-
-        return new ProductoEntidad.Builder()
-                .id(UUID.fromString(resultado.getString("id_producto")))
-                .nombre(resultado.getString("nombre"))
-                .tipoProducto(tipoProducto)
-                .tamano(tamano)
-                .productoInternoAsociado(ObjetoProductoInternoAsociadoSql(resultado))
-                .precio(resultado.getBigDecimal("precio"))
-                .activo(resultado.getBoolean("activo"))
-                .build();
-    }
-
-    //la llave foranea no acepta el id por defecto (00000000-...), por eso sin insumo asociado se guarda null
-    private UUID idProductoInternoAsociado(ProductoEntidad entidad) {
-        return entidad.isProductoInterno() ? entidad.getProductoInternoAsociado().getId() : null;
-    }
-
-    //si la columna viene null el producto no tiene insumo asociado (se vende por receta)
-    private ProductoInternoEntidad ObjetoProductoInternoAsociadoSql(ResultSet resultado) throws SQLException {
-        var idProductoInterno = resultado.getString("id_producto_interno");
-        return new ProductoInternoEntidad.Builder()
-                .id(idProductoInterno == null ? null : UUID.fromString(idProductoInterno))
-                .build();
     }
 }

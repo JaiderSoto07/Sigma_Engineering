@@ -1,10 +1,23 @@
 package co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver;
 
+import co.edu.co.pizzeriauco.crosscuting.catalogo.CatalogoMensajes;
+import co.edu.co.pizzeriauco.crosscuting.excepciones.PizzeriaDatosExcepcion;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 import co.edu.co.pizzeriauco.dao.datos.entidad.DetalleVentaDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.DetalleVentaEntidad;
+import co.edu.co.pizzeriauco.entidad.ProductoEntidad;
+import co.edu.co.pizzeriauco.entidad.ProductoInternoEntidad;
+import co.edu.co.pizzeriauco.entidad.TamanoEntidad;
+import co.edu.co.pizzeriauco.entidad.TipoProductoEntidad;
+import co.edu.co.pizzeriauco.entidad.VentaEntidad;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,24 +29,238 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
 
     @Override
     public void crear(DetalleVentaEntidad entidad) {
-        // TODO Auto-generated method stub
+        //subtotal no se escribe: la base lo calcula (cantidad * precio_producto)
+        var sentenciaSql = "insert into detalle_venta(id_detalle_venta, id_venta, id_producto, cantidad, precio_producto) "
+                + "values(?, ?, ?, ?, ?)";
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+            //se llenan los datos en el mismo orden de los ?
+            sentencia.setObject(1, entidad.getId());
+            //de la venta y del producto solo se guarda su id (llaves foraneas)
+            sentencia.setObject(2, entidad.getVenta().getId());
+            sentencia.setObject(3, entidad.getProducto().getId());
+            sentencia.setInt(4, entidad.getCantidad());
+            //precio congelado: el del producto en el momento de la venta
+            sentencia.setBigDecimal(5, entidad.getPrecioProducto());
+            sentencia.executeUpdate();
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.DetalleVentaSqlServerDAO.USUARIO_ERROR_PROBLEMA_CREANDO_DETALLE_VENTA;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.DetalleVentaSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CREANDO_DETALLE_VENTA;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
     }
 
     @Override
     public DetalleVentaEntidad consultarPorId(UUID id) {
-        // TODO Auto-generated method stub
-        return null;
+        var sentenciaSql = "select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, "
+                + "v.id_venta, v.fecha, v.hora, v.factura, v.cliente, v.total, "
+                + "p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, "
+                + "p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo "
+                + "from detalle_venta as dv "
+                + "inner join venta as v on dv.id_venta = v.id_venta "
+                + "inner join producto as p on dv.id_producto = p.id_producto "
+                + "where dv.id_detalle_venta = ?";
+        //si no se encuentra, se devuelve el detalle por defecto (nunca nulo)
+        var detalleVentaEncontrado = new DetalleVentaEntidad.Builder().build();
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+            sentencia.setObject(1, id);
+
+            var resultado = sentencia.executeQuery();
+            if (resultado.next()) {
+                //primero se arman los padres (venta y producto) para luego asignarlos al detalle
+                //de los "abuelos" (tipo, tamano e insumo del producto) solo se trae el id
+                var venta = new VentaEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_venta")))
+                        .fecha(resultado.getObject("fecha", LocalDate.class))
+                        .hora(resultado.getObject("hora", LocalTime.class))
+                        .factura(resultado.getString("factura"))
+                        .cliente(resultado.getString("cliente"))
+                        .total(resultado.getBigDecimal("total"))
+                        .build();
+                var idInsumoAsociado = resultado.getString("id_producto_interno_asociado");
+                var producto = new ProductoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_producto")))
+                        .nombre(resultado.getString("nombre_producto"))
+                        .tipoProducto(new TipoProductoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_tipo_producto"))).build())
+                        .tamano(new TamanoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_tamano"))).build())
+                        .productoInternoAsociado(new ProductoInternoEntidad.Builder()
+                                .id(idInsumoAsociado == null ? null : UUID.fromString(idInsumoAsociado)).build())
+                        .precio(resultado.getBigDecimal("precio"))
+                        .activo(resultado.getBoolean("activo"))
+                        .build();
+                //subtotal no se lee: el detalle lo calcula solo (cantidad * precio)
+                detalleVentaEncontrado = new DetalleVentaEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_detalle_venta")))
+                        .venta(venta)
+                        .producto(producto)
+                        .cantidad(resultado.getInt("cantidad"))
+                        .precioProducto(resultado.getBigDecimal("precio_producto"))
+                        .build();
+            }
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.DetalleVentaSqlServerDAO.USUARIO_ERROR_PROBLEMA_CONSULTANDO_DETALLE_VENTA_POR_ID;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.DetalleVentaSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_DETALLE_VENTA_POR_ID;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
+        return detalleVentaEncontrado;
     }
 
     @Override
     public List<DetalleVentaEntidad> consultarPorFiltro(DetalleVentaEntidad filtro) {
-        // TODO Auto-generated method stub
-        return null;
+        var detallesEncontrados = new ArrayList<DetalleVentaEntidad>();
+        var sentenciaSql = "select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, "
+                + "v.id_venta, v.fecha, v.hora, v.factura, v.cliente, v.total, "
+                + "p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, "
+                + "p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo "
+                + "from detalle_venta as dv "
+                + "inner join venta as v on dv.id_venta = v.id_venta "
+                + "inner join producto as p on dv.id_producto = p.id_producto "
+                + "where 1=1";
+        var parametros = new ArrayList<Object>();
+        //este el del detalle
+        if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
+            sentenciaSql = sentenciaSql + " and dv.id_detalle_venta = ?";
+            parametros.add(filtro.getId());
+        }
+        //estos los de la venta (para traer todos los renglones de una factura)
+        if (!UtilId.VALOR_DEFECTO.equals(filtro.getVenta().getId())) {
+            sentenciaSql = sentenciaSql + " and v.id_venta = ?";
+            parametros.add(filtro.getVenta().getId());
+        }
+        if (!UtilTexto.getUtilTexto().esVacia(filtro.getVenta().getFactura())) {
+            sentenciaSql = sentenciaSql + " and v.factura = ?";
+            parametros.add(filtro.getVenta().getFactura());
+        }
+        //estos los del producto (por ejemplo, para saber cuanto se ha vendido de un producto)
+        if (!UtilId.VALOR_DEFECTO.equals(filtro.getProducto().getId())) {
+            sentenciaSql = sentenciaSql + " and p.id_producto = ?";
+            parametros.add(filtro.getProducto().getId());
+        }
+        if (!UtilTexto.getUtilTexto().esVacia(filtro.getProducto().getNombre())) {
+            sentenciaSql = sentenciaSql + " and p.nombre = ?";
+            parametros.add(filtro.getProducto().getNombre());
+        }
+        // el orden va siempre al final: ventas mas recientes primero y sus productos por nombre
+        sentenciaSql = sentenciaSql + " order by v.fecha desc, v.hora desc, p.nombre asc";
+
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+
+            for (var indice = 0; indice < parametros.size(); indice++) {
+                sentencia.setObject(indice + 1, parametros.get(indice));
+            }
+
+            var resultado = sentencia.executeQuery();
+            // por cada fila que llego, se arma un detalle y se agrega a la lista
+            while (resultado.next()) {
+                //primero se arman los padres (venta y producto) para luego asignarlos al detalle
+                var venta = new VentaEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_venta")))
+                        .fecha(resultado.getObject("fecha", LocalDate.class))
+                        .hora(resultado.getObject("hora", LocalTime.class))
+                        .factura(resultado.getString("factura"))
+                        .cliente(resultado.getString("cliente"))
+                        .total(resultado.getBigDecimal("total"))
+                        .build();
+                var idInsumoAsociado = resultado.getString("id_producto_interno_asociado");
+                var producto = new ProductoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_producto")))
+                        .nombre(resultado.getString("nombre_producto"))
+                        .tipoProducto(new TipoProductoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_tipo_producto"))).build())
+                        .tamano(new TamanoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_tamano"))).build())
+                        .productoInternoAsociado(new ProductoInternoEntidad.Builder()
+                                .id(idInsumoAsociado == null ? null : UUID.fromString(idInsumoAsociado)).build())
+                        .precio(resultado.getBigDecimal("precio"))
+                        .activo(resultado.getBoolean("activo"))
+                        .build();
+                var detalleVenta = new DetalleVentaEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_detalle_venta")))
+                        .venta(venta)
+                        .producto(producto)
+                        .cantidad(resultado.getInt("cantidad"))
+                        .precioProducto(resultado.getBigDecimal("precio_producto"))
+                        .build();
+                detallesEncontrados.add(detalleVenta);
+            }
+
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.DetalleVentaSqlServerDAO.USUARIO_ERROR_PROBLEMA_CONSULTANDO_DETALLE_VENTA_POR_FILTRO;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.DetalleVentaSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_DETALLE_VENTA_POR_FILTRO;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
+        return detallesEncontrados;
     }
 
     @Override
     public List<DetalleVentaEntidad> consultarTodos() {
-        // TODO Auto-generated method stub
-        return null;
+        var sentenciaSql = "select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, "
+                + "v.id_venta, v.fecha, v.hora, v.factura, v.cliente, v.total, "
+                + "p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, "
+                + "p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo "
+                + "from detalle_venta as dv "
+                + "inner join venta as v on dv.id_venta = v.id_venta "
+                + "inner join producto as p on dv.id_producto = p.id_producto "
+                + "order by v.fecha desc, v.hora desc, p.nombre asc";
+        var detallesEncontrados = new ArrayList<DetalleVentaEntidad>();
+
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+
+            var resultado = sentencia.executeQuery();
+            while (resultado.next()) {
+                //primero se arman los padres (venta y producto) para luego asignarlos al detalle
+                var venta = new VentaEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_venta")))
+                        .fecha(resultado.getObject("fecha", LocalDate.class))
+                        .hora(resultado.getObject("hora", LocalTime.class))
+                        .factura(resultado.getString("factura"))
+                        .cliente(resultado.getString("cliente"))
+                        .total(resultado.getBigDecimal("total"))
+                        .build();
+                var idInsumoAsociado = resultado.getString("id_producto_interno_asociado");
+                var producto = new ProductoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_producto")))
+                        .nombre(resultado.getString("nombre_producto"))
+                        .tipoProducto(new TipoProductoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_tipo_producto"))).build())
+                        .tamano(new TamanoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_tamano"))).build())
+                        .productoInternoAsociado(new ProductoInternoEntidad.Builder()
+                                .id(idInsumoAsociado == null ? null : UUID.fromString(idInsumoAsociado)).build())
+                        .precio(resultado.getBigDecimal("precio"))
+                        .activo(resultado.getBoolean("activo"))
+                        .build();
+                var detalleVenta = new DetalleVentaEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_detalle_venta")))
+                        .venta(venta)
+                        .producto(producto)
+                        .cantidad(resultado.getInt("cantidad"))
+                        .precioProducto(resultado.getBigDecimal("precio_producto"))
+                        .build();
+                detallesEncontrados.add(detalleVenta);
+            }
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.DetalleVentaSqlServerDAO.USUARIO_ERROR_PROBLEMA_CONSULTANDO_TODOS_LOS_DETALLES_VENTA;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.DetalleVentaSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODOS_LOS_DETALLES_VENTA;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
+        return detallesEncontrados;
     }
 }

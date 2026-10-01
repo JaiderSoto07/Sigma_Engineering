@@ -1,10 +1,20 @@
 package co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver;
 
+import co.edu.co.pizzeriauco.crosscuting.catalogo.CatalogoMensajes;
+import co.edu.co.pizzeriauco.crosscuting.excepciones.PizzeriaDatosExcepcion;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilFecha;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 import co.edu.co.pizzeriauco.dao.datos.entidad.CambioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.CambioEntidad;
+import co.edu.co.pizzeriauco.entidad.ProductoInternoEntidad;
+import co.edu.co.pizzeriauco.entidad.UnidadMedidaEntidad;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,36 +24,262 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
         super(conexion);
     }
 
+    //el cambio es solo la ENTRADA del producto nuevo; la salida del lote viejo va aparte en el kardex
     @Override
     public void crear(CambioEntidad entidad) {
-        // TODO Auto-generated method stub
+        var sentenciaSql = "insert into cambio(id_cambio, id_producto_interno, cantidad, id_unidad_medida, fecha_vencimiento, fecha_cambio) "
+                + "values(?, ?, ?, ?, ?, ?)";
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+            //se llenan los datos en el mismo orden de los ?
+            sentencia.setObject(1, entidad.getId());
+            //del producto interno y de la unidad solo se guarda su id (llaves foraneas)
+            sentencia.setObject(2, entidad.getProductoCambio().getId());
+            sentencia.setBigDecimal(3, entidad.getCantidad());
+            sentencia.setObject(4, entidad.getUnidadMedida().getId());
+            sentencia.setObject(5, entidad.getFechaVencimiento());
+            sentencia.setObject(6, entidad.getFechaCambio());
+            sentencia.executeUpdate();
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.CambioSqlServerDAO.USUARIO_ERROR_PROBLEMA_CREANDO_CAMBIO;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.CambioSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CREANDO_CAMBIO;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
     }
 
     @Override
     public CambioEntidad consultarPorId(UUID id) {
-        // TODO Auto-generated method stub
-        return null;
+        var sentenciaSql = "select ca.id_cambio, ca.cantidad, ca.fecha_vencimiento, ca.fecha_cambio, "
+                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
+                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
+                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
+                + "from cambio as ca "
+                + "inner join producto_interno as pi on ca.id_producto_interno = pi.id_producto_interno "
+                + "inner join unidad_medida as um on ca.id_unidad_medida = um.id_unidad_medida "
+                + "where ca.id_cambio = ?";
+        //si no se encuentra, se devuelve el cambio por defecto (nunca nulo)
+        var cambioEncontrado = new CambioEntidad.Builder().build();
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+            sentencia.setObject(1, id);
+
+            var resultado = sentencia.executeQuery();
+            if (resultado.next()) {
+                //primero se arman los padres (producto interno y unidad) para luego asignarlos al cambio
+                var productoCambio = new ProductoInternoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_producto_interno")))
+                        .nombre(resultado.getString("nombre_producto_interno"))
+                        .perecedero(resultado.getBoolean("perecedero"))
+                        .vidaUtil(resultado.getInt("vida_util"))
+                        .tipoMedida(new UnidadMedidaEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_unidad_medida_producto_interno"))).build())
+                        .activo(resultado.getBoolean("activo"))
+                        .build();
+                var unidadMedida = new UnidadMedidaEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_unidad_medida")))
+                        .unidadMedida(resultado.getString("unidad_medida"))
+                        .tipoMedida(resultado.getString("tipo_medida"))
+                        .build();
+                cambioEncontrado = new CambioEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_cambio")))
+                        .productoCambio(productoCambio)
+                        .cantidad(resultado.getBigDecimal("cantidad"))
+                        .unidadMedida(unidadMedida)
+                        .fechaVencimiento(resultado.getObject("fecha_vencimiento", LocalDate.class))
+                        .fechaCambio(resultado.getObject("fecha_cambio", LocalDate.class))
+                        .build();
+            }
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.CambioSqlServerDAO.USUARIO_ERROR_PROBLEMA_CONSULTANDO_CAMBIO_POR_ID;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.CambioSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_CAMBIO_POR_ID;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
+        return cambioEncontrado;
     }
 
     @Override
     public List<CambioEntidad> consultarPorFiltro(CambioEntidad filtro) {
-        // TODO Auto-generated method stub
-        return null;
+        var cambiosEncontrados = new ArrayList<CambioEntidad>();
+        var sentenciaSql = "select ca.id_cambio, ca.cantidad, ca.fecha_vencimiento, ca.fecha_cambio, "
+                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
+                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
+                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
+                + "from cambio as ca "
+                + "inner join producto_interno as pi on ca.id_producto_interno = pi.id_producto_interno "
+                + "inner join unidad_medida as um on ca.id_unidad_medida = um.id_unidad_medida "
+                + "where 1=1";
+        var parametros = new ArrayList<Object>();
+        //estos los del cambio
+        if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
+            sentenciaSql = sentenciaSql + " and ca.id_cambio = ?";
+            parametros.add(filtro.getId());
+        }
+        if (!UtilFecha.FECHA_POR_DEFECTO.equals(filtro.getFechaCambio())) {
+            sentenciaSql = sentenciaSql + " and ca.fecha_cambio = ?";
+            parametros.add(filtro.getFechaCambio());
+        }
+        //estos los del producto interno (historia de cambios de un insumo)
+        if (!UtilId.VALOR_DEFECTO.equals(filtro.getProductoCambio().getId())) {
+            sentenciaSql = sentenciaSql + " and pi.id_producto_interno = ?";
+            parametros.add(filtro.getProductoCambio().getId());
+        }
+        if (!UtilTexto.getUtilTexto().esVacia(filtro.getProductoCambio().getNombre())) {
+            sentenciaSql = sentenciaSql + " and pi.nombre = ?";
+            parametros.add(filtro.getProductoCambio().getNombre());
+        }
+        //este el de la unidad de medida
+        if (!UtilId.VALOR_DEFECTO.equals(filtro.getUnidadMedida().getId())) {
+            sentenciaSql = sentenciaSql + " and um.id_unidad_medida = ?";
+            parametros.add(filtro.getUnidadMedida().getId());
+        }
+        // el orden va siempre al final: los cambios mas recientes primero
+        sentenciaSql = sentenciaSql + " order by ca.fecha_cambio desc, pi.nombre asc";
+
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+
+            for (var indice = 0; indice < parametros.size(); indice++) {
+                sentencia.setObject(indice + 1, parametros.get(indice));
+            }
+
+            var resultado = sentencia.executeQuery();
+            // por cada fila que llego, se arma un cambio y se agrega a la lista
+            while (resultado.next()) {
+                //primero se arman los padres (producto interno y unidad) para luego asignarlos al cambio
+                var productoCambio = new ProductoInternoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_producto_interno")))
+                        .nombre(resultado.getString("nombre_producto_interno"))
+                        .perecedero(resultado.getBoolean("perecedero"))
+                        .vidaUtil(resultado.getInt("vida_util"))
+                        .tipoMedida(new UnidadMedidaEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_unidad_medida_producto_interno"))).build())
+                        .activo(resultado.getBoolean("activo"))
+                        .build();
+                var unidadMedida = new UnidadMedidaEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_unidad_medida")))
+                        .unidadMedida(resultado.getString("unidad_medida"))
+                        .tipoMedida(resultado.getString("tipo_medida"))
+                        .build();
+                var cambio = new CambioEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_cambio")))
+                        .productoCambio(productoCambio)
+                        .cantidad(resultado.getBigDecimal("cantidad"))
+                        .unidadMedida(unidadMedida)
+                        .fechaVencimiento(resultado.getObject("fecha_vencimiento", LocalDate.class))
+                        .fechaCambio(resultado.getObject("fecha_cambio", LocalDate.class))
+                        .build();
+                cambiosEncontrados.add(cambio);
+            }
+
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.CambioSqlServerDAO.USUARIO_ERROR_PROBLEMA_CONSULTANDO_CAMBIO_POR_FILTRO;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.CambioSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_CAMBIO_POR_FILTRO;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
+        return cambiosEncontrados;
     }
 
     @Override
     public List<CambioEntidad> consultarTodos() {
-        // TODO Auto-generated method stub
-        return null;
+        var sentenciaSql = "select ca.id_cambio, ca.cantidad, ca.fecha_vencimiento, ca.fecha_cambio, "
+                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
+                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
+                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
+                + "from cambio as ca "
+                + "inner join producto_interno as pi on ca.id_producto_interno = pi.id_producto_interno "
+                + "inner join unidad_medida as um on ca.id_unidad_medida = um.id_unidad_medida "
+                + "order by ca.fecha_cambio desc, pi.nombre asc";
+        var cambiosEncontrados = new ArrayList<CambioEntidad>();
+
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+
+            var resultado = sentencia.executeQuery();
+            while (resultado.next()) {
+                //primero se arman los padres (producto interno y unidad) para luego asignarlos al cambio
+                var productoCambio = new ProductoInternoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_producto_interno")))
+                        .nombre(resultado.getString("nombre_producto_interno"))
+                        .perecedero(resultado.getBoolean("perecedero"))
+                        .vidaUtil(resultado.getInt("vida_util"))
+                        .tipoMedida(new UnidadMedidaEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_unidad_medida_producto_interno"))).build())
+                        .activo(resultado.getBoolean("activo"))
+                        .build();
+                var unidadMedida = new UnidadMedidaEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_unidad_medida")))
+                        .unidadMedida(resultado.getString("unidad_medida"))
+                        .tipoMedida(resultado.getString("tipo_medida"))
+                        .build();
+                var cambio = new CambioEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_cambio")))
+                        .productoCambio(productoCambio)
+                        .cantidad(resultado.getBigDecimal("cantidad"))
+                        .unidadMedida(unidadMedida)
+                        .fechaVencimiento(resultado.getObject("fecha_vencimiento", LocalDate.class))
+                        .fechaCambio(resultado.getObject("fecha_cambio", LocalDate.class))
+                        .build();
+                cambiosEncontrados.add(cambio);
+            }
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.CambioSqlServerDAO.USUARIO_ERROR_PROBLEMA_CONSULTANDO_TODOS_LOS_CAMBIOS;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.CambioSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODOS_LOS_CAMBIOS;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
+        return cambiosEncontrados;
     }
 
+    //negocio solo lo permite mientras el lote que creo el cambio este intacto (saldo = cantidad)
     @Override
     public void actualizar(UUID id, CambioEntidad entidad) {
-        // TODO Auto-generated method stub
+        var sentenciaSql = "update cambio set id_producto_interno = ?, cantidad = ?, id_unidad_medida = ?, "
+                + "fecha_vencimiento = ?, fecha_cambio = ? where id_cambio = ?";
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+            sentencia.setObject(1, entidad.getProductoCambio().getId());
+            sentencia.setBigDecimal(2, entidad.getCantidad());
+            sentencia.setObject(3, entidad.getUnidadMedida().getId());
+            sentencia.setObject(4, entidad.getFechaVencimiento());
+            sentencia.setObject(5, entidad.getFechaCambio());
+            sentencia.setObject(6, id);
+            sentencia.executeUpdate();
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.CambioSqlServerDAO.USUARIO_ERROR_PROBLEMA_ACTUALIZANDO_CAMBIO;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.CambioSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_ACTUALIZANDO_CAMBIO;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
     }
 
+    //negocio solo lo permite mientras el lote que creo el cambio este intacto (saldo = cantidad)
     @Override
     public void eliminar(UUID id) {
-        // TODO Auto-generated method stub
+        var sentenciaSql = "delete from cambio where id_cambio = ?";
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+            sentencia.setObject(1, id);
+            sentencia.executeUpdate();
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.CambioSqlServerDAO.USUARIO_ERROR_PROBLEMA_ELIMINANDO_CAMBIO;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.CambioSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_ELIMINANDO_CAMBIO;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
     }
 }

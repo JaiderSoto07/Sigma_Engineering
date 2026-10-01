@@ -1,10 +1,23 @@
 package co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver;
 
+import co.edu.co.pizzeriauco.crosscuting.catalogo.CatalogoMensajes;
+import co.edu.co.pizzeriauco.crosscuting.excepciones.PizzeriaDatosExcepcion;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilFecha;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 import co.edu.co.pizzeriauco.dao.datos.entidad.LoteDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.LoteEntidad;
+import co.edu.co.pizzeriauco.entidad.MovimientoInventarioEntidad;
+import co.edu.co.pizzeriauco.entidad.OrigenEntidad;
+import co.edu.co.pizzeriauco.entidad.ProductoInternoEntidad;
+import co.edu.co.pizzeriauco.entidad.TipoMovimientoEntidad;
+import co.edu.co.pizzeriauco.entidad.UnidadMedidaEntidad;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,29 +29,307 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
 
     @Override
     public void crear(LoteEntidad entidad) {
-        // TODO Auto-generated method stub
+        //disponible no se escribe: la base la calcula con el saldo
+        var sentenciaSql = "insert into lote(id_lote, id_movimiento_inventario, numero_lote, id_producto_interno, cantidad, "
+                + "saldo, id_unidad_medida, fecha_vencimiento) values(?, ?, ?, ?, ?, ?, ?, ?)";
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+            //se llenan los datos en el mismo orden de los ?
+            sentencia.setObject(1, entidad.getId());
+            //del movimiento, el producto interno y la unidad solo se guarda su id (llaves foraneas)
+            sentencia.setObject(2, entidad.getMovimientoInventario().getId());
+            sentencia.setInt(3, entidad.getNumeroLote());
+            sentencia.setObject(4, entidad.getProductoInterno().getId());
+            sentencia.setBigDecimal(5, entidad.getCantidad());
+            sentencia.setBigDecimal(6, entidad.getSaldo());
+            sentencia.setObject(7, entidad.getUnidadMedidaInventario().getId());
+            sentencia.setObject(8, entidad.getFechaVencimiento());
+            sentencia.executeUpdate();
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.LoteSqlServerDAO.USUARIO_ERROR_PROBLEMA_CREANDO_LOTE;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.LoteSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CREANDO_LOTE;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
     }
 
     @Override
     public LoteEntidad consultarPorId(UUID id) {
-        // TODO Auto-generated method stub
-        return null;
+        var sentenciaSql = "select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, "
+                + "mi.id_movimiento_inventario, mi.id_tipo_movimiento, mi.id_origen, mi.codigo_operacion, mi.cantidad as cantidad_movimiento, "
+                + "mi.id_producto_interno as id_producto_interno_movimiento, mi.id_unidad_medida as id_unidad_medida_movimiento, mi.fecha_movimiento, "
+                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
+                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
+                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
+                + "from lote as l "
+                + "inner join movimiento_inventario as mi on l.id_movimiento_inventario = mi.id_movimiento_inventario "
+                + "inner join producto_interno as pi on l.id_producto_interno = pi.id_producto_interno "
+                + "inner join unidad_medida as um on l.id_unidad_medida = um.id_unidad_medida "
+                + "where l.id_lote = ?";
+        //si no se encuentra, se devuelve el lote por defecto (nunca nulo)
+        var loteEncontrado = new LoteEntidad.Builder().build();
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+            sentencia.setObject(1, id);
+
+            var resultado = sentencia.executeQuery();
+            if (resultado.next()) {
+                //primero se arman los padres (movimiento, producto interno y unidad) para luego asignarlos al lote
+                //de los "abuelos" (tipo, origen, producto y unidad del movimiento; unidad del producto interno) solo se trae el id
+                var movimientoInventario = new MovimientoInventarioEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_movimiento_inventario")))
+                        .tipoMovimiento(new TipoMovimientoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_tipo_movimiento"))).build())
+                        .origen(new OrigenEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_origen"))).build())
+                        .codigoOperacion(resultado.getString("codigo_operacion"))
+                        .productoInterno(new ProductoInternoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_producto_interno_movimiento"))).build())
+                        .cantidad(resultado.getBigDecimal("cantidad_movimiento"))
+                        .unidadMedida(new UnidadMedidaEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_unidad_medida_movimiento"))).build())
+                        .fechaMovimiento(resultado.getObject("fecha_movimiento", LocalDate.class))
+                        .build();
+                var productoInterno = new ProductoInternoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_producto_interno")))
+                        .nombre(resultado.getString("nombre_producto_interno"))
+                        .perecedero(resultado.getBoolean("perecedero"))
+                        .vidaUtil(resultado.getInt("vida_util"))
+                        .tipoMedida(new UnidadMedidaEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_unidad_medida_producto_interno"))).build())
+                        .activo(resultado.getBoolean("activo"))
+                        .build();
+                var unidadMedidaInventario = new UnidadMedidaEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_unidad_medida")))
+                        .unidadMedida(resultado.getString("unidad_medida"))
+                        .tipoMedida(resultado.getString("tipo_medida"))
+                        .build();
+                //disponible no se lee: el lote lo calcula solo con el saldo
+                loteEncontrado = new LoteEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_lote")))
+                        .movimientoInventario(movimientoInventario)
+                        .numeroLote(resultado.getInt("numero_lote"))
+                        .productoInterno(productoInterno)
+                        .cantidad(resultado.getBigDecimal("cantidad"))
+                        .saldo(resultado.getBigDecimal("saldo"))
+                        .unidadMedidaInventario(unidadMedidaInventario)
+                        .fechaVencimiento(resultado.getObject("fecha_vencimiento", LocalDate.class))
+                        .build();
+            }
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.LoteSqlServerDAO.USUARIO_ERROR_PROBLEMA_CONSULTANDO_LOTE_POR_ID;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.LoteSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_LOTE_POR_ID;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
+        return loteEncontrado;
     }
 
+    //disponible no se usa como filtro porque un boolean no tiene valor "sin definir"
     @Override
     public List<LoteEntidad> consultarPorFiltro(LoteEntidad filtro) {
-        // TODO Auto-generated method stub
-        return null;
+        var lotesEncontrados = new ArrayList<LoteEntidad>();
+        var sentenciaSql = "select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, "
+                + "mi.id_movimiento_inventario, mi.id_tipo_movimiento, mi.id_origen, mi.codigo_operacion, mi.cantidad as cantidad_movimiento, "
+                + "mi.id_producto_interno as id_producto_interno_movimiento, mi.id_unidad_medida as id_unidad_medida_movimiento, mi.fecha_movimiento, "
+                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
+                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
+                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
+                + "from lote as l "
+                + "inner join movimiento_inventario as mi on l.id_movimiento_inventario = mi.id_movimiento_inventario "
+                + "inner join producto_interno as pi on l.id_producto_interno = pi.id_producto_interno "
+                + "inner join unidad_medida as um on l.id_unidad_medida = um.id_unidad_medida "
+                + "where 1=1";
+        var parametros = new ArrayList<Object>();
+        //estos los del lote
+        if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
+            sentenciaSql = sentenciaSql + " and l.id_lote = ?";
+            parametros.add(filtro.getId());
+        }
+        if (filtro.getNumeroLote() > 0) {
+            sentenciaSql = sentenciaSql + " and l.numero_lote = ?";
+            parametros.add(filtro.getNumeroLote());
+        }
+        if (!UtilFecha.FECHA_POR_DEFECTO.equals(filtro.getFechaVencimiento())) {
+            sentenciaSql = sentenciaSql + " and l.fecha_vencimiento = ?";
+            parametros.add(filtro.getFechaVencimiento());
+        }
+        //este el del movimiento que creo el lote
+        if (!UtilId.VALOR_DEFECTO.equals(filtro.getMovimientoInventario().getId())) {
+            sentenciaSql = sentenciaSql + " and mi.id_movimiento_inventario = ?";
+            parametros.add(filtro.getMovimientoInventario().getId());
+        }
+        //estos los del producto interno (para traer todos los lotes de un insumo)
+        if (!UtilId.VALOR_DEFECTO.equals(filtro.getProductoInterno().getId())) {
+            sentenciaSql = sentenciaSql + " and pi.id_producto_interno = ?";
+            parametros.add(filtro.getProductoInterno().getId());
+        }
+        if (!UtilTexto.getUtilTexto().esVacia(filtro.getProductoInterno().getNombre())) {
+            sentenciaSql = sentenciaSql + " and pi.nombre = ?";
+            parametros.add(filtro.getProductoInterno().getNombre());
+        }
+        // el orden va siempre al final: por insumo y por numero de lote (orden FIFO)
+        sentenciaSql = sentenciaSql + " order by pi.nombre asc, l.numero_lote asc";
+
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+
+            for (var indice = 0; indice < parametros.size(); indice++) {
+                sentencia.setObject(indice + 1, parametros.get(indice));
+            }
+
+            var resultado = sentencia.executeQuery();
+            // por cada fila que llego, se arma un lote y se agrega a la lista
+            while (resultado.next()) {
+                //primero se arman los padres (movimiento, producto interno y unidad) para luego asignarlos al lote
+                var movimientoInventario = new MovimientoInventarioEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_movimiento_inventario")))
+                        .tipoMovimiento(new TipoMovimientoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_tipo_movimiento"))).build())
+                        .origen(new OrigenEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_origen"))).build())
+                        .codigoOperacion(resultado.getString("codigo_operacion"))
+                        .productoInterno(new ProductoInternoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_producto_interno_movimiento"))).build())
+                        .cantidad(resultado.getBigDecimal("cantidad_movimiento"))
+                        .unidadMedida(new UnidadMedidaEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_unidad_medida_movimiento"))).build())
+                        .fechaMovimiento(resultado.getObject("fecha_movimiento", LocalDate.class))
+                        .build();
+                var productoInterno = new ProductoInternoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_producto_interno")))
+                        .nombre(resultado.getString("nombre_producto_interno"))
+                        .perecedero(resultado.getBoolean("perecedero"))
+                        .vidaUtil(resultado.getInt("vida_util"))
+                        .tipoMedida(new UnidadMedidaEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_unidad_medida_producto_interno"))).build())
+                        .activo(resultado.getBoolean("activo"))
+                        .build();
+                var unidadMedidaInventario = new UnidadMedidaEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_unidad_medida")))
+                        .unidadMedida(resultado.getString("unidad_medida"))
+                        .tipoMedida(resultado.getString("tipo_medida"))
+                        .build();
+                var lote = new LoteEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_lote")))
+                        .movimientoInventario(movimientoInventario)
+                        .numeroLote(resultado.getInt("numero_lote"))
+                        .productoInterno(productoInterno)
+                        .cantidad(resultado.getBigDecimal("cantidad"))
+                        .saldo(resultado.getBigDecimal("saldo"))
+                        .unidadMedidaInventario(unidadMedidaInventario)
+                        .fechaVencimiento(resultado.getObject("fecha_vencimiento", LocalDate.class))
+                        .build();
+                lotesEncontrados.add(lote);
+            }
+
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.LoteSqlServerDAO.USUARIO_ERROR_PROBLEMA_CONSULTANDO_LOTE_POR_FILTRO;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.LoteSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_LOTE_POR_FILTRO;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
+        return lotesEncontrados;
     }
 
     @Override
     public List<LoteEntidad> consultarTodos() {
-        // TODO Auto-generated method stub
-        return null;
+        var sentenciaSql = "select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, "
+                + "mi.id_movimiento_inventario, mi.id_tipo_movimiento, mi.id_origen, mi.codigo_operacion, mi.cantidad as cantidad_movimiento, "
+                + "mi.id_producto_interno as id_producto_interno_movimiento, mi.id_unidad_medida as id_unidad_medida_movimiento, mi.fecha_movimiento, "
+                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
+                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
+                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
+                + "from lote as l "
+                + "inner join movimiento_inventario as mi on l.id_movimiento_inventario = mi.id_movimiento_inventario "
+                + "inner join producto_interno as pi on l.id_producto_interno = pi.id_producto_interno "
+                + "inner join unidad_medida as um on l.id_unidad_medida = um.id_unidad_medida "
+                + "order by pi.nombre asc, l.numero_lote asc";
+        var lotesEncontrados = new ArrayList<LoteEntidad>();
+
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+
+            var resultado = sentencia.executeQuery();
+            while (resultado.next()) {
+                //primero se arman los padres (movimiento, producto interno y unidad) para luego asignarlos al lote
+                var movimientoInventario = new MovimientoInventarioEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_movimiento_inventario")))
+                        .tipoMovimiento(new TipoMovimientoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_tipo_movimiento"))).build())
+                        .origen(new OrigenEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_origen"))).build())
+                        .codigoOperacion(resultado.getString("codigo_operacion"))
+                        .productoInterno(new ProductoInternoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_producto_interno_movimiento"))).build())
+                        .cantidad(resultado.getBigDecimal("cantidad_movimiento"))
+                        .unidadMedida(new UnidadMedidaEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_unidad_medida_movimiento"))).build())
+                        .fechaMovimiento(resultado.getObject("fecha_movimiento", LocalDate.class))
+                        .build();
+                var productoInterno = new ProductoInternoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_producto_interno")))
+                        .nombre(resultado.getString("nombre_producto_interno"))
+                        .perecedero(resultado.getBoolean("perecedero"))
+                        .vidaUtil(resultado.getInt("vida_util"))
+                        .tipoMedida(new UnidadMedidaEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_unidad_medida_producto_interno"))).build())
+                        .activo(resultado.getBoolean("activo"))
+                        .build();
+                var unidadMedidaInventario = new UnidadMedidaEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_unidad_medida")))
+                        .unidadMedida(resultado.getString("unidad_medida"))
+                        .tipoMedida(resultado.getString("tipo_medida"))
+                        .build();
+                var lote = new LoteEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_lote")))
+                        .movimientoInventario(movimientoInventario)
+                        .numeroLote(resultado.getInt("numero_lote"))
+                        .productoInterno(productoInterno)
+                        .cantidad(resultado.getBigDecimal("cantidad"))
+                        .saldo(resultado.getBigDecimal("saldo"))
+                        .unidadMedidaInventario(unidadMedidaInventario)
+                        .fechaVencimiento(resultado.getObject("fecha_vencimiento", LocalDate.class))
+                        .build();
+                lotesEncontrados.add(lote);
+            }
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.LoteSqlServerDAO.USUARIO_ERROR_PROBLEMA_CONSULTANDO_TODOS_LOS_LOTES;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.LoteSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODOS_LOS_LOTES;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
+        return lotesEncontrados;
     }
 
+    //normalmente solo cambia el saldo (en cada salida); cantidad y fecha de vencimiento solo cambian
+    //cuando se corrige un renglon de compra o un cambio con el lote intacto (saldo = cantidad).
+    //insumo, unidad, numero de lote y movimiento de origen nunca se actualizan
     @Override
     public void actualizar(UUID id, LoteEntidad entidad) {
-        // TODO Auto-generated method stub
+        var sentenciaSql = "update lote set cantidad = ?, saldo = ?, fecha_vencimiento = ? where id_lote = ?";
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+            sentencia.setBigDecimal(1, entidad.getCantidad());
+            sentencia.setBigDecimal(2, entidad.getSaldo());
+            sentencia.setObject(3, entidad.getFechaVencimiento());
+            sentencia.setObject(4, id);
+            sentencia.executeUpdate();
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.LoteSqlServerDAO.USUARIO_ERROR_PROBLEMA_ACTUALIZANDO_LOTE;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.LoteSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_ACTUALIZANDO_LOTE;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
     }
 }
