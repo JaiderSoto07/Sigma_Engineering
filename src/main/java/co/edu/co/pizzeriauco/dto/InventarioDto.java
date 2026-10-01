@@ -20,7 +20,7 @@ public class InventarioDto {
         setCantidadTotal(BigDecimal.ZERO);
         setProductoInterno(new ProductoInternoDto());
         setUnidadMedidaInventario(new UnidadMedidaDto());
-        setStockMinimo(BigDecimal.ZERO);
+        setStockMinimo(UtilNumero.STOCK_MINIMO_POR_DEFECTO);
     }
 
     public UUID getId() {
@@ -60,6 +60,6 @@ public class InventarioDto {
     }
 
     public void setStockMinimo(BigDecimal stockMinimo) {
-        this.stockMinimo = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(stockMinimo, BigDecimal.ZERO);
+        this.stockMinimo = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(stockMinimo, UtilNumero.STOCK_MINIMO_POR_DEFECTO);
     }
 }

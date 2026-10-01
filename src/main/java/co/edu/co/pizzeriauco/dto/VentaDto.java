@@ -16,6 +16,8 @@ public class VentaDto {
     private UUID id;
     private LocalDate fecha;
     private LocalTime hora;
+    //consecutivo FV-000001, lo asigna el sistema al registrar la venta
+    private String factura;
     private String cliente;
     private BigDecimal total;
 
@@ -23,6 +25,7 @@ public class VentaDto {
         setId(id);
         setFecha(UtilFecha.FECHA_POR_DEFECTO);
         setHora(LocalTime.MIN);
+        setFactura(UtilTexto.vacia);
         setCliente(UtilTexto.CLIENTE_POR_DEFECTO);
         setTotal(BigDecimal.ZERO);
     }
@@ -49,6 +52,14 @@ public class VentaDto {
 
     public void setHora(LocalTime hora) {
         this.hora = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(hora, LocalTime.MIN);
+    }
+
+    public String getFactura() {
+        return factura;
+    }
+
+    public void setFactura(String factura) {
+        this.factura = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(factura);
     }
 
     public String getCliente() {

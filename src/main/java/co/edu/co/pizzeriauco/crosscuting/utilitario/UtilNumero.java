@@ -1,7 +1,13 @@
 package co.edu.co.pizzeriauco.crosscuting.utilitario;
 
+import java.math.BigDecimal;
+
 public class UtilNumero {
     public static final int cero = 0;
+
+    //stock minimo con el que nace un inventario (1 kg, 1 l o 1 und segun el insumo);
+    //luego el administrador lo ajusta con "Establecer stock minimo"
+    public static final BigDecimal STOCK_MINIMO_POR_DEFECTO = BigDecimal.ONE;
     private UtilNumero(){
 
     }

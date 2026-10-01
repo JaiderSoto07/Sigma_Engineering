@@ -14,16 +14,23 @@ public class ProductoDto {
     private String nombre;
     private TipoProductoDto tipoProducto;
     private TamanoDto tamano;
+    //se calcula solo: es producto interno si tiene un insumo de bodega asociado
     private boolean productoInterno;
+    //insumo de bodega que se vende directo (ej. la bebida); vacio si se vende por receta
+    private ProductoInternoDto productoInternoAsociado;
     private BigDecimal precio;
+    //true = esta en el menu; false = desactivado (retirado de la venta), se conserva su historial
+    private boolean activo;
 
     public ProductoDto() {
         setId(id);
         setNombre(UtilTexto.vacia);
         setTipoProducto(new TipoProductoDto());
         setTamano(new TamanoDto());
-        setProductoInterno(false);
+        setProductoInternoAsociado(new ProductoInternoDto());
         setPrecio(BigDecimal.ZERO);
+        //todo producto nace activo (en el menu)
+        setActivo(true);
     }
 
     public UUID getId() {
@@ -62,8 +69,13 @@ public class ProductoDto {
         return productoInterno;
     }
 
-    public void setProductoInterno(boolean productoInterno) {
-        this.productoInterno = productoInterno;
+    public ProductoInternoDto getProductoInternoAsociado() {
+        return productoInternoAsociado;
+    }
+
+    public void setProductoInternoAsociado(ProductoInternoDto productoInternoAsociado) {
+        this.productoInternoAsociado = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(productoInternoAsociado, new ProductoInternoDto());
+        this.productoInterno = !UtilId.VALOR_DEFECTO.equals(this.productoInternoAsociado.getId());
     }
 
     public BigDecimal getPrecio() {
@@ -72,5 +84,13 @@ public class ProductoDto {
 
     public void setPrecio(BigDecimal precio) {
         this.precio = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(precio, BigDecimal.ZERO);
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 }

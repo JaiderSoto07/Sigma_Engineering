@@ -31,9 +31,4 @@ public class UnidadMedidaSqlServerDAO extends SqlDAO implements UnidadMedidaDAO 
         // TODO Auto-generated method stub
         return null;
     }
-
-    @Override
-    public void eliminar(UUID id) {
-        // TODO Auto-generated method stub
-    }
 }

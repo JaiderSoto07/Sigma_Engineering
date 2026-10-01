@@ -14,6 +14,12 @@ public class InventarioSqlServerDAO extends SqlDAO implements InventarioDAO {
         super(conexion);
     }
 
+    //lo llama negocio cuando llega el primer lote de un producto interno sin inventario
+    @Override
+    public void crear(InventarioEntidad entidad) {
+        // TODO Auto-generated method stub
+    }
+
     @Override
     public InventarioEntidad consultarPorId(UUID id) {
         // TODO Auto-generated method stub

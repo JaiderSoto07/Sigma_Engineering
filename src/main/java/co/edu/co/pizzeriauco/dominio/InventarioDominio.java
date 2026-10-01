@@ -77,7 +77,7 @@ public class InventarioDominio {
                     new ProductoInternoDominio.Builder().build();
             unidadMedidaInventario =
                     new UnidadMedidaDominio.Builder().build();
-            stockMinimo = BigDecimal.ZERO;
+            stockMinimo = UtilNumero.STOCK_MINIMO_POR_DEFECTO;
         }
 
         public Builder id(UUID id) {
@@ -113,7 +113,7 @@ public class InventarioDominio {
         }
 
         public Builder stockMinimo(BigDecimal stockMinimo) {
-            this.stockMinimo = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(stockMinimo, BigDecimal.ZERO);
+            this.stockMinimo = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(stockMinimo, UtilNumero.STOCK_MINIMO_POR_DEFECTO);
             return this;
         }
 

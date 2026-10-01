@@ -5,6 +5,7 @@ import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.VentaEntidad;
 
 import java.sql.Connection;
+import java.util.List;
 import java.util.UUID;
 
 public class VentaSqlServerDAO extends SqlDAO implements VentaDAO {
@@ -19,7 +20,20 @@ public class VentaSqlServerDAO extends SqlDAO implements VentaDAO {
     }
 
     @Override
-    public void eliminar(UUID id) {
+    public VentaEntidad consultarPorId(UUID id) {
         // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<VentaEntidad> consultarPorFiltro(VentaEntidad filtro) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<VentaEntidad> consultarTodos() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

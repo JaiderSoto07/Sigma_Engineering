@@ -1,12 +1,7 @@
 package co.edu.co.pizzeriauco.crosscuting.utilitario;
 
 public class UtilTexto {
-    //The objective of this class is proporcionar operacioes comunes para trabajar con String
-    //Una clase de utilidad busca centralizar operaciones que se repiten y darles un comportamiento Consistente
 
-    //Solamente la propia clase puede puede acceder directamente a ese variable
-    //va a guardar un objeto de utiltexto
-    //Static lo que hace es que cada objeto pueda compartir ese valor pero ese valor va a ser el mismo en toda mi clase
     private static UtilTexto instancia;
 
     //puedo acceder a esta variable desde otras clases , hay un solo valor por vacio (por eso el static)
@@ -15,6 +10,8 @@ public class UtilTexto {
 
     //cliente por defecto de la venta cuando no me dicen quien compro (10 digitos, como en el Excel)
     public static final String CLIENTE_POR_DEFECTO = "2222222222";
+
+
 
     //Solo la propia clase puede llamar este constructor , es el que dice creemos un objeto de tipo UtilTexto
     private UtilTexto() {
@@ -64,6 +61,15 @@ public class UtilTexto {
 
     public String quitarEspaciosEnBlanco(String valor){
         return obtenerValorDefecto(valor).trim();
+    }
+
+    //quita espacios y deja la primera letra en mayuscula y el resto en minuscula
+    //asi "pizza", "PIZZA" o " pIzZa " se guardan igual: "Pizza"
+    public String primeraLetraMayuscula(String valor){
+        var valorSanitizado = quitarEspaciosEnBlanco(valor).toLowerCase();
+        return esVacia(valorSanitizado)
+                ? vacia
+                : valorSanitizado.substring(0, 1).toUpperCase() + valorSanitizado.substring(1);
     }
 
     public int obtenerLongitudCadena(String valor){

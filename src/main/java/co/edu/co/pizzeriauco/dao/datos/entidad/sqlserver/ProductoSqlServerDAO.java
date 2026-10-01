@@ -8,6 +8,7 @@ import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 import co.edu.co.pizzeriauco.dao.datos.entidad.ProductoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.ProductoEntidad;
+import co.edu.co.pizzeriauco.entidad.ProductoInternoEntidad;
 import co.edu.co.pizzeriauco.entidad.TamanoEntidad;
 import co.edu.co.pizzeriauco.entidad.TipoProductoEntidad;
 
@@ -23,7 +24,7 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
 
     //consulta base: trae el producto con los datos de su tipo de producto y de su tamano
     private static final String SENTENCIA_CONSULTA_BASE =
-            "select p.id_producto, p.nombre, p.producto_interno, p.precio, "
+            "select p.id_producto, p.nombre, p.id_producto_interno, p.precio, p.activo, "
                     + "tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, "
                     + "t.id_tamano, t.tamano "
                     + "from producto p "
@@ -38,13 +39,14 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
     public void crear(ProductoEntidad entidad) {
 
         var sentenciaSql = "insert into producto (id_producto, nombre, id_tipo_producto, id_tamano, "
-                + "producto_interno, precio) values (?, ?, ?, ?, ?, ?)";
+                + "id_producto_interno, precio) values (?, ?, ?, ?, ?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, entidad.getId());
             sentencia.setString(2, entidad.getNombre());
             sentencia.setObject(3, entidad.getTipoProducto().getId());
             sentencia.setObject(4, entidad.getTamano().getId());
-            sentencia.setBoolean(5, entidad.isProductoInterno());
+            //producto_interno no se escribe: la base la calcula con id_producto_interno
+            sentencia.setObject(5, idProductoInternoAsociado(entidad));
             sentencia.setBigDecimal(6, entidad.getPrecio());
             sentencia.executeUpdate();
         } catch (SQLException excepcion) {
@@ -122,15 +124,17 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
     @Override
     public void actualizar(UUID id, ProductoEntidad entidad) {
 
+        //tambien guarda activo: desactivar un producto (retirarlo del menu) es actualizarlo con activo = false
         var sentenciaSql = "update producto set nombre = ?, id_tipo_producto = ?, id_tamano = ?, "
-                + "producto_interno = ?, precio = ? where id_producto = ?";
+                + "id_producto_interno = ?, precio = ?, activo = ? where id_producto = ?";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setString(1, entidad.getNombre());
             sentencia.setObject(2, entidad.getTipoProducto().getId());
             sentencia.setObject(3, entidad.getTamano().getId());
-            sentencia.setBoolean(4, entidad.isProductoInterno());
+            sentencia.setObject(4, idProductoInternoAsociado(entidad));
             sentencia.setBigDecimal(5, entidad.getPrecio());
-            sentencia.setObject(6, id);
+            sentencia.setBoolean(6, entidad.isActivo());
+            sentencia.setObject(7, id);
             sentencia.executeUpdate();
         } catch (SQLException excepcion) {
             var mensajeUsuario = CatalogoMensajes.ProductoSqlServerDAO.USUARIO_ERROR_PROBLEMA_ACTUALIZANDO_PRODUCTO;
@@ -141,8 +145,9 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
         }
     }
 
-    //la receta del producto (detalle_receta) se borra en cascada;
-    //si el producto tiene ventas o historico de precios la base no deja eliminarlo
+    //eliminar = borrar de verdad (para retirarlo del menu se usa actualizar con activo = false);
+    //la receta se borra en cascada; si el producto tiene ventas la base no deja eliminarlo,
+    //y negocio debe borrar antes su historial de precios en la misma transaccion
     @Override
     public void eliminar(UUID id) {
 
@@ -177,8 +182,22 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
                 .nombre(resultado.getString("nombre"))
                 .tipoProducto(tipoProducto)
                 .tamano(tamano)
-                .productoInterno(resultado.getBoolean("producto_interno"))
+                .productoInternoAsociado(ObjetoProductoInternoAsociadoSql(resultado))
                 .precio(resultado.getBigDecimal("precio"))
+                .activo(resultado.getBoolean("activo"))
+                .build();
+    }
+
+    //la llave foranea no acepta el id por defecto (00000000-...), por eso sin insumo asociado se guarda null
+    private UUID idProductoInternoAsociado(ProductoEntidad entidad) {
+        return entidad.isProductoInterno() ? entidad.getProductoInternoAsociado().getId() : null;
+    }
+
+    //si la columna viene null el producto no tiene insumo asociado (se vende por receta)
+    private ProductoInternoEntidad ObjetoProductoInternoAsociadoSql(ResultSet resultado) throws SQLException {
+        var idProductoInterno = resultado.getString("id_producto_interno");
+        return new ProductoInternoEntidad.Builder()
+                .id(idProductoInterno == null ? null : UUID.fromString(idProductoInterno))
                 .build();
     }
 }

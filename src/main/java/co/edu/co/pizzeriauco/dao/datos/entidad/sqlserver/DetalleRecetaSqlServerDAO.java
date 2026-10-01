@@ -27,7 +27,7 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
     private static final String SENTENCIA_CONSULTA_BASE =
             "select dr.id_detalle_receta, dr.cantidad, "
                     + "p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, "
-                    + "p.producto_interno, p.precio, "
+                    + "p.id_producto_interno as id_producto_interno_asociado, p.precio, "
                     + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, "
                     + "pi.vida_util, pi.id_unidad_medida as id_unidad_medida_producto_interno, "
                     + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
@@ -171,7 +171,10 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
                         .id(UUID.fromString(resultado.getString("id_tipo_producto"))).build())
                 .tamano(new TamanoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_tamano"))).build())
-                .productoInterno(resultado.getBoolean("producto_interno"))
+                .productoInternoAsociado(new ProductoInternoEntidad.Builder()
+                        .id(resultado.getString("id_producto_interno_asociado") == null ? null
+                                : UUID.fromString(resultado.getString("id_producto_interno_asociado")))
+                        .build())
                 .precio(resultado.getBigDecimal("precio"))
                 .build();
 

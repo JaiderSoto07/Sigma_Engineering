@@ -1,13 +1,3 @@
--- Crea las tablas de la base Pizzeria a partir de las clases del paquete entidad.
--- Se ejecuta DESPUES de crear-usuario-pizzeria.sql, una sola vez.
---
--- Convenciones:
---   - Nombres en minuscula separados por guion bajo (detalle_venta, precio_producto).
---   - La llave primaria se llama id_<tabla> y es uniqueidentifier, porque las entidades usan UUID.
---   - La llave foranea se llama igual que la llave primaria a la que apunta.
---   - Cantidades con 4 decimales (gramos, litros...), dinero con 2 decimales.
---   - on delete cascade solo de encabezado a detalle (compra, venta, receta del producto);
---     en el resto no se deja borrar un registro que otro este usando.
 
 use Pizzeria;
 go
@@ -18,34 +8,46 @@ go
 
 create table unidad_medida (
 id_unidad_medida uniqueidentifier primary key default newid(),
-unidad_medida varchar(50) not null unique,
-tipo_medida varchar(50) not null
+unidad_medida varchar(4) not null unique,
+tipo_medida varchar(10) not null,
+
+constraint ck_unidad_medida_tipo_medida
+  check (tipo_medida in ('Peso', 'Volumen', 'Unidad'))
 );
 
 create table tipo_producto (
 id_tipo_producto uniqueidentifier primary key default newid(),
-nombre varchar(50) not null unique
+nombre varchar(20) not null unique
 );
 
 create table tamano (
 id_tamano uniqueidentifier primary key default newid(),
-tamano varchar(50) not null unique
+tamano varchar(20) not null unique
 );
 
 create table tipo_movimiento (
 id_tipo_movimiento uniqueidentifier primary key default newid(),
-nombre varchar(50) not null unique
+nombre varchar(20) not null unique,
+
+constraint ck_tipo_movimiento_nombre
+  check (nombre in ('Entrada', 'Salida'))
 );
 
 create table origen (
 id_origen uniqueidentifier primary key default newid(),
-nombre varchar(50) not null unique
+nombre varchar(16) not null unique,
+
+constraint ck_origen_nombre
+  check (nombre in ('Compra', 'Cambio', 'Venta', 'Lote - cambio', 'Lote - desecho'))
 );
 
 create table proveedor (
 id_proveedor uniqueidentifier primary key default newid(),
-nombre_empresa varchar(100) not null,
-contacto varchar(100) not null
+nombre_empresa varchar(60) not null unique,
+nit varchar(15) not null unique,
+contacto varchar(10) not null,
+-- 1 = se le puede comprar; 0 = desactivado (retirado), se conserva su historial
+activo bit not null default 1
 );
 
 -- ============================================================
@@ -54,27 +56,43 @@ contacto varchar(100) not null
 
 create table producto_interno (
 id_producto_interno uniqueidentifier primary key default newid(),
-nombre varchar(100) not null,
+nombre varchar(40) not null unique,
 perecedero bit not null,
 vida_util int not null default 0,
 id_unidad_medida uniqueidentifier not null,
+-- 1 = se puede usar en compras y recetas; 0 = desactivado (descontinuado), se conserva su historial
+activo bit not null default 1,
 
 constraint fk_producto_interno_id_unidad_medida
-  foreign key (id_unidad_medida) references unidad_medida(id_unidad_medida)
+  foreign key (id_unidad_medida) references unidad_medida(id_unidad_medida),
+constraint ck_producto_interno_vida_util
+  check ((perecedero = 1 and vida_util between 1 and 400)
+      or (perecedero = 0 and vida_util = 0))
 );
 
 create table producto (
 id_producto uniqueidentifier primary key default newid(),
-nombre varchar(100) not null,
+nombre varchar(40) not null,
 id_tipo_producto uniqueidentifier not null,
 id_tamano uniqueidentifier not null,
-producto_interno bit not null,
+-- insumo de bodega que se vende directo (ej. la bebida); null si se vende por receta
+id_producto_interno uniqueidentifier null,
+-- automatica: 1 si tiene insumo asociado, 0 si no (nadie la escribe)
+producto_interno as (case when id_producto_interno is null then 0 else 1 end),
 precio decimal(18,2) not null,
+-- 1 = esta en el menu; 0 = desactivado (retirado de la venta), se conserva su historial
+activo bit not null default 1,
 
 constraint fk_producto_id_tipo_producto
   foreign key (id_tipo_producto) references tipo_producto(id_tipo_producto),
 constraint fk_producto_id_tamano
-  foreign key (id_tamano) references tamano(id_tamano)
+  foreign key (id_tamano) references tamano(id_tamano),
+constraint fk_producto_id_producto_interno
+  foreign key (id_producto_interno) references producto_interno(id_producto_interno),
+constraint uk_producto_nombre_tamano
+  unique (nombre, id_tamano),
+constraint ck_producto_precio
+  check (precio > 0 and precio <= 1000000)
 );
 
 create table historico_precio (
@@ -82,10 +100,17 @@ id_historico_precio uniqueidentifier primary key default newid(),
 id_producto uniqueidentifier not null,
 precio decimal(18,2) not null,
 fecha_inicio date not null,
-fecha_fin date,
+-- 01/01/1000 = precio vigente (todavia no se ha cerrado)
+fecha_fin date not null default '1000-01-01',
 
 constraint fk_historico_precio_id_producto
-  foreign key (id_producto) references producto(id_producto)
+  foreign key (id_producto) references producto(id_producto),
+constraint uk_historico_precio_producto_fecha_inicio
+  unique (id_producto, fecha_inicio),
+constraint ck_historico_precio_precio
+  check (precio > 0 and precio <= 1000000),
+constraint ck_historico_precio_fechas
+  check (fecha_fin = '1000-01-01' or fecha_fin >= fecha_inicio)
 );
 
 create table detalle_receta (
@@ -102,7 +127,11 @@ constraint fk_detalle_receta_id_producto
 constraint fk_detalle_receta_id_producto_interno
   foreign key (id_producto_interno) references producto_interno(id_producto_interno),
 constraint fk_detalle_receta_id_unidad_medida
-  foreign key (id_unidad_medida) references unidad_medida(id_unidad_medida)
+  foreign key (id_unidad_medida) references unidad_medida(id_unidad_medida),
+constraint uk_detalle_receta_producto_producto_interno
+  unique (id_producto, id_producto_interno),
+constraint ck_detalle_receta_cantidad
+  check (cantidad > 0 and cantidad <= 10000)
 );
 
 -- ============================================================
@@ -114,12 +143,16 @@ id_inventario uniqueidentifier primary key default newid(),
 id_producto_interno uniqueidentifier not null unique,
 cantidad_total decimal(18,4) not null,
 id_unidad_medida uniqueidentifier not null,
-stock_minimo decimal(18,4) not null,
+stock_minimo decimal(18,4) not null default 1,
 
 constraint fk_inventario_id_producto_interno
   foreign key (id_producto_interno) references producto_interno(id_producto_interno),
 constraint fk_inventario_id_unidad_medida
-  foreign key (id_unidad_medida) references unidad_medida(id_unidad_medida)
+  foreign key (id_unidad_medida) references unidad_medida(id_unidad_medida),
+constraint ck_inventario_cantidad_total
+  check (cantidad_total >= 0 and cantidad_total <= 100000),
+constraint ck_inventario_stock_minimo
+  check (stock_minimo > 0 and stock_minimo <= 100000)
 );
 
 create table movimiento_inventario (
@@ -151,15 +184,26 @@ id_producto_interno uniqueidentifier not null,
 cantidad decimal(18,4) not null,
 saldo decimal(18,4) not null,
 id_unidad_medida uniqueidentifier not null,
-fecha_vencimiento date,
-disponible bit not null default 1,
+fecha_vencimiento date not null,
+-- automatica: 1 si le queda saldo, 0 si se agoto
+disponible as (case when saldo > 0 then 1 else 0 end),
 
 constraint fk_lote_id_movimiento_inventario
   foreign key (id_movimiento_inventario) references movimiento_inventario(id_movimiento_inventario),
 constraint fk_lote_id_producto_interno
   foreign key (id_producto_interno) references producto_interno(id_producto_interno),
 constraint fk_lote_id_unidad_medida
-  foreign key (id_unidad_medida) references unidad_medida(id_unidad_medida)
+  foreign key (id_unidad_medida) references unidad_medida(id_unidad_medida),
+constraint uk_lote_producto_numero_lote
+  unique (id_producto_interno, numero_lote),
+constraint uk_lote_movimiento_inventario
+  unique (id_movimiento_inventario),
+constraint ck_lote_numero_lote
+  check (numero_lote >= 1),
+constraint ck_lote_cantidad
+  check (cantidad > 0 and cantidad <= 10000),
+constraint ck_lote_saldo
+  check (saldo >= 0 and saldo <= cantidad)
 );
 
 -- movimiento_inventario y lote se apuntan entre si,
@@ -176,11 +220,15 @@ create table compra (
 id_compra uniqueidentifier primary key default newid(),
 id_proveedor uniqueidentifier not null,
 fecha_compra date not null,
-numero_factura varchar(50) not null,
+numero_factura varchar(40) not null,
 total decimal(18,2) not null,
 
 constraint fk_compra_id_proveedor
-  foreign key (id_proveedor) references proveedor(id_proveedor)
+  foreign key (id_proveedor) references proveedor(id_proveedor),
+constraint uk_compra_proveedor_numero_factura
+  unique (id_proveedor, numero_factura),
+constraint ck_compra_total
+  check (total > 0 and total <= 5000000)
 );
 
 create table detalle_compra (
@@ -190,16 +238,22 @@ id_producto_interno uniqueidentifier not null,
 cantidad decimal(18,4) not null,
 id_unidad_medida uniqueidentifier not null,
 precio_compra decimal(18,2) not null,
-fecha_vencimiento date,
+-- 01/01/1000 = sin fecha (perecedero: el Lote la calcula con la vida util)
+fecha_vencimiento date not null default '1000-01-01',
 
+-- sin cascade: no se puede borrar una compra que tenga renglones (P-COM-005)
 constraint fk_detalle_compra_id_compra
-  foreign key (id_compra) references compra(id_compra)
-  on delete cascade
-  on update cascade,
+  foreign key (id_compra) references compra(id_compra),
 constraint fk_detalle_compra_id_producto_interno
   foreign key (id_producto_interno) references producto_interno(id_producto_interno),
 constraint fk_detalle_compra_id_unidad_medida
-  foreign key (id_unidad_medida) references unidad_medida(id_unidad_medida)
+  foreign key (id_unidad_medida) references unidad_medida(id_unidad_medida),
+constraint uk_detalle_compra_compra_producto_fecha
+  unique (id_compra, id_producto_interno, fecha_vencimiento),
+constraint ck_detalle_compra_cantidad
+  check (cantidad > 0 and cantidad <= 100000),
+constraint ck_detalle_compra_precio_compra
+  check (precio_compra >= 0 and precio_compra <= 5000000)
 );
 
 create table cambio (
@@ -207,13 +261,19 @@ id_cambio uniqueidentifier primary key default newid(),
 id_producto_interno uniqueidentifier not null,
 cantidad decimal(18,4) not null,
 id_unidad_medida uniqueidentifier not null,
-fecha_vencimiento date,
+fecha_vencimiento date not null,
 fecha_cambio date not null,
 
 constraint fk_cambio_id_producto_interno
   foreign key (id_producto_interno) references producto_interno(id_producto_interno),
 constraint fk_cambio_id_unidad_medida
-  foreign key (id_unidad_medida) references unidad_medida(id_unidad_medida)
+  foreign key (id_unidad_medida) references unidad_medida(id_unidad_medida),
+constraint uk_cambio_producto_fecha_cambio
+  unique (id_producto_interno, fecha_cambio),
+constraint ck_cambio_cantidad
+  check (cantidad > 0 and cantidad <= 100000),
+constraint ck_cambio_fechas
+  check (fecha_vencimiento > fecha_cambio)
 );
 
 -- ============================================================
@@ -224,8 +284,15 @@ create table venta (
 id_venta uniqueidentifier primary key default newid(),
 fecha date not null,
 hora time(0) not null,
-cliente varchar(20) not null default '2222222222',
-total decimal(18,2) not null
+-- consecutivo FV-000001, lo asigna el sistema al registrar la venta
+factura varchar(9) not null,
+cliente varchar(15) not null default '2222222222',
+total decimal(18,2) not null,
+
+constraint uk_venta_factura
+  unique (factura),
+constraint ck_venta_total
+  check (total > 0 and total <= 1000000)
 );
 
 create table detalle_venta (
@@ -234,13 +301,19 @@ id_venta uniqueidentifier not null,
 id_producto uniqueidentifier not null,
 cantidad int not null,
 precio_producto decimal(18,2) not null,
-subtotal decimal(18,2) not null,
+-- automatica: cantidad por el precio congelado de la venta
+subtotal as (cantidad * precio_producto),
 
+-- sin cascade: una venta con renglones no se puede borrar (las ventas nunca se eliminan)
 constraint fk_detalle_venta_id_venta
-  foreign key (id_venta) references venta(id_venta)
-  on delete cascade
-  on update cascade,
+  foreign key (id_venta) references venta(id_venta),
 constraint fk_detalle_venta_id_producto
-  foreign key (id_producto) references producto(id_producto)
+  foreign key (id_producto) references producto(id_producto),
+constraint uk_detalle_venta_venta_producto
+  unique (id_venta, id_producto),
+constraint ck_detalle_venta_cantidad
+  check (cantidad > 0 and cantidad <= 1000),
+constraint ck_detalle_venta_precio_producto
+  check (precio_producto > 0 and precio_producto <= 1000000)
 );
 go

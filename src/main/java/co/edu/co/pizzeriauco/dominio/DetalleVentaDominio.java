@@ -14,6 +14,7 @@ public class DetalleVentaDominio {
     private int cantidad;
     private ProductoDominio producto;
     private BigDecimal precioProducto;
+    //se calcula solo: cantidad por el precio del producto en el momento de la venta
     private BigDecimal subtotal;
 
     private DetalleVentaDominio(Builder builder) {
@@ -22,7 +23,7 @@ public class DetalleVentaDominio {
         this.cantidad = builder.cantidad;
         this.producto = builder.producto;
         this.precioProducto = builder.precioProducto;
-        this.subtotal = builder.subtotal;
+        this.subtotal = precioProducto.multiply(BigDecimal.valueOf(cantidad));
     }
 
     public UUID getId() {
@@ -56,7 +57,6 @@ public class DetalleVentaDominio {
         private int cantidad;
         private ProductoDominio producto;
         private BigDecimal precioProducto;
-        private BigDecimal subtotal;
 
         public Builder() {
             id = UtilId.valorDefecto(id);
@@ -64,7 +64,6 @@ public class DetalleVentaDominio {
             cantidad = 0;
             producto = new ProductoDominio.Builder().build();
             precioProducto = BigDecimal.ZERO;
-            subtotal = BigDecimal.ZERO;
         }
 
         public Builder id(UUID id) {
@@ -97,11 +96,6 @@ public class DetalleVentaDominio {
 
         public Builder precioProducto(BigDecimal precioProducto) {
             this.precioProducto = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(precioProducto, BigDecimal.ZERO);
-            return this;
-        }
-
-        public Builder subtotal(BigDecimal subtotal) {
-            this.subtotal = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(subtotal, BigDecimal.ZERO);
             return this;
         }
 

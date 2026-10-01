@@ -16,6 +16,8 @@ public class VentaEntidad {
     private UUID id;
     private LocalDate fecha;
     private LocalTime hora;
+    //consecutivo FV-000001, lo asigna el sistema al registrar la venta
+    private String factura;
     private String cliente;
     private BigDecimal total;
 
@@ -23,6 +25,7 @@ public class VentaEntidad {
         this.id = builder.id;
         this.fecha = builder.fecha;
         this.hora = builder.hora;
+        this.factura = builder.factura;
         this.cliente = builder.cliente;
         this.total = builder.total;
     }
@@ -39,6 +42,10 @@ public class VentaEntidad {
         return hora;
     }
 
+    public String getFactura() {
+        return factura;
+    }
+
     public String getCliente() {
         return cliente;
     }
@@ -52,6 +59,7 @@ public class VentaEntidad {
         private UUID id;
         private LocalDate fecha;
         private LocalTime hora;
+        private String factura;
         private String cliente;
         private BigDecimal total;
 
@@ -59,6 +67,7 @@ public class VentaEntidad {
             id = UtilId.valorDefecto(id);
             fecha = UtilFecha.FECHA_POR_DEFECTO;
             hora = LocalTime.MIN;
+            factura = UtilTexto.vacia;
             cliente = UtilTexto.CLIENTE_POR_DEFECTO;
             total = BigDecimal.ZERO;
         }
@@ -79,6 +88,11 @@ public class VentaEntidad {
                             hora,
                             LocalTime.MIN
                     );
+            return this;
+        }
+
+        public Builder factura(String factura) {
+            this.factura = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(factura);
             return this;
         }
 

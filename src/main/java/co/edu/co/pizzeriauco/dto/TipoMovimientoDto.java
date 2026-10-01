@@ -28,6 +28,6 @@ public class TipoMovimientoDto {
     }
 
     public void setNombre(String nombre) {
-        this.nombre = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(nombre);
+        this.nombre = UtilTexto.getUtilTexto().primeraLetraMayuscula(nombre);
     }
 }

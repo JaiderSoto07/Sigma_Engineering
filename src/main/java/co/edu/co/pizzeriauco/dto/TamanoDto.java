@@ -28,6 +28,6 @@ public class TamanoDto {
     }
 
     public void setTamano(String tamano) {
-        this.tamano = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(tamano);
+        this.tamano = UtilTexto.getUtilTexto().primeraLetraMayuscula(tamano);
     }
 }

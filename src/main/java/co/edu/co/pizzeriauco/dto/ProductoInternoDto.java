@@ -14,6 +14,8 @@ public class ProductoInternoDto {
     private boolean perecedero;
     private Integer vidaUtil;
     private UnidadMedidaDto tipoMedida;
+    //true = se puede usar en compras y recetas; false = desactivado (descontinuado), se conserva su historial
+    private boolean activo;
 
     public ProductoInternoDto() {
         setId(id);
@@ -21,6 +23,8 @@ public class ProductoInternoDto {
         setPerecedero(false);
         setVidaUtil(UtilNumero.cero);
         setTipoMedida(new UnidadMedidaDto());
+        //todo producto interno nace activo
+        setActivo(true);
     }
 
     public UUID getId() {
@@ -61,5 +65,13 @@ public class ProductoInternoDto {
 
     public void setTipoMedida(UnidadMedidaDto tipoMedida) {
         this.tipoMedida = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(tipoMedida, new UnidadMedidaDto());
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 }

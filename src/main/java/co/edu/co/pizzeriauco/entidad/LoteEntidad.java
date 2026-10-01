@@ -15,6 +15,7 @@ public class LoteEntidad {
     //movimiento de entrada que origina el lote; su origen dice si vino de una compra o de un cambio
     private MovimientoInventarioEntidad movimientoInventario;
     private LocalDate fechaVencimiento;
+    //se calcula solo: esta disponible si todavia le queda saldo
     private boolean disponible;
     private ProductoInternoEntidad productoInterno;
     private BigDecimal cantidad;
@@ -26,10 +27,10 @@ public class LoteEntidad {
         this.id = builder.id;
         this.movimientoInventario = builder.movimientoInventario;
         this.fechaVencimiento = builder.fechaVencimiento;
-        this.disponible = builder.disponible;
         this.productoInterno = builder.productoInterno;
         this.cantidad = builder.cantidad;
         this.saldo = builder.saldo;
+        this.disponible = UtilNumero.mayorQue(saldo, BigDecimal.ZERO);
         this.unidadMedidaInventario = builder.unidadMedidaInventario;
         this.numeroLote = builder.numeroLote;
     }
@@ -75,7 +76,6 @@ public class LoteEntidad {
         private UUID id;
         private MovimientoInventarioEntidad movimientoInventario;
         private LocalDate fechaVencimiento;
-        private boolean disponible;
         private ProductoInternoEntidad productoInterno;
         private BigDecimal cantidad;
         private BigDecimal saldo;
@@ -86,7 +86,6 @@ public class LoteEntidad {
             id = UtilId.valorDefecto(id);
             movimientoInventario = new MovimientoInventarioEntidad.Builder().build();
             fechaVencimiento = UtilFecha.FECHA_POR_DEFECTO;
-            disponible = false;
             productoInterno = new ProductoInternoEntidad.Builder().build();
             cantidad = BigDecimal.ZERO;
             saldo = BigDecimal.ZERO;
@@ -112,11 +111,6 @@ public class LoteEntidad {
 
         public Builder fechaVencimiento(LocalDate fechaVencimiento) {
             this.fechaVencimiento = UtilFecha.valorDefecto(fechaVencimiento);
-            return this;
-        }
-
-        public Builder disponible(boolean disponible) {
-            this.disponible = disponible;
             return this;
         }
 

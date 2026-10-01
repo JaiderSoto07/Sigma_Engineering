@@ -14,17 +14,23 @@ public class ProductoEntidad {
     private String nombre;
     private TipoProductoEntidad tipoProducto;
     private TamanoEntidad tamano;
-    //si el producto es un producto interno (Si / No)
+    //se calcula solo: es producto interno si tiene un insumo de bodega asociado
     private boolean productoInterno;
+    //insumo de bodega que se vende directo (ej. la bebida); vacio si se vende por receta
+    private ProductoInternoEntidad productoInternoAsociado;
     private BigDecimal precio;
+    //true = esta en el menu; false = desactivado (retirado de la venta), se conserva su historial
+    private boolean activo;
 
     private ProductoEntidad(Builder builder) {
         this.id = builder.id;
         this.nombre = builder.nombre;
         this.tipoProducto = builder.tipoProducto;
         this.tamano = builder.tamano;
-        this.productoInterno = builder.productoInterno;
+        this.productoInternoAsociado = builder.productoInternoAsociado;
+        this.productoInterno = !UtilId.VALOR_DEFECTO.equals(productoInternoAsociado.getId());
         this.precio = builder.precio;
+        this.activo = builder.activo;
     }
 
     public UUID getId() {
@@ -47,8 +53,16 @@ public class ProductoEntidad {
         return productoInterno;
     }
 
+    public ProductoInternoEntidad getProductoInternoAsociado() {
+        return productoInternoAsociado;
+    }
+
     public BigDecimal getPrecio() {
         return precio;
+    }
+
+    public boolean isActivo() {
+        return activo;
     }
 
     public static class Builder {
@@ -57,16 +71,19 @@ public class ProductoEntidad {
         private String nombre;
         private TipoProductoEntidad tipoProducto;
         private TamanoEntidad tamano;
-        private boolean productoInterno;
+        private ProductoInternoEntidad productoInternoAsociado;
         private BigDecimal precio;
+        private boolean activo;
 
         public Builder() {
             id = UtilId.valorDefecto(id);
             nombre = UtilTexto.vacia;
             tipoProducto = new TipoProductoEntidad.Builder().build();
             tamano = new TamanoEntidad.Builder().build();
-            productoInterno = false;
+            productoInternoAsociado = new ProductoInternoEntidad.Builder().build();
             precio = BigDecimal.ZERO;
+            //todo producto nace activo (en el menu)
+            activo = true;
         }
 
         public Builder id(UUID id) {
@@ -99,13 +116,22 @@ public class ProductoEntidad {
             return this;
         }
 
-        public Builder productoInterno(boolean productoInterno) {
-            this.productoInterno = productoInterno;
+        public Builder productoInternoAsociado(ProductoInternoEntidad productoInternoAsociado) {
+            this.productoInternoAsociado =
+                    UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
+                            productoInternoAsociado,
+                            new ProductoInternoEntidad.Builder().build()
+                    );
             return this;
         }
 
         public Builder precio(BigDecimal precio) {
             this.precio = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(precio, BigDecimal.ZERO);
+            return this;
+        }
+
+        public Builder activo(boolean activo) {
+            this.activo = activo;
             return this;
         }
 

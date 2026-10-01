@@ -40,7 +40,7 @@ public class TamanoDominio {
 
         public Builder tamano(String tamano) {
             this.tamano =
-                    UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(tamano);
+                    UtilTexto.getUtilTexto().primeraLetraMayuscula(tamano);
             return this;
         }
 
