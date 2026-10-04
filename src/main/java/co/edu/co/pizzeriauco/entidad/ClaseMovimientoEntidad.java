@@ -5,12 +5,12 @@ import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 
 import java.util.UUID;
 
-public class OrigenEntidad {
+public class ClaseMovimientoEntidad {
 
     private UUID id;
     private String nombre;
 
-    private OrigenEntidad(Builder builder) {
+    private ClaseMovimientoEntidad(Builder builder) {
         this.id = builder.id;
         this.nombre = builder.nombre;
     }
@@ -44,8 +44,8 @@ public class OrigenEntidad {
             return this;
         }
 
-        public OrigenEntidad build() {
-            return new OrigenEntidad(this);
+        public ClaseMovimientoEntidad build() {
+            return new ClaseMovimientoEntidad(this);
         }
     }
 }

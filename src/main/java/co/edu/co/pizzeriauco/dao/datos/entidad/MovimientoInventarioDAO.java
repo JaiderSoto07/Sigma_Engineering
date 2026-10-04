@@ -1,7 +1,11 @@
 package co.edu.co.pizzeriauco.dao.datos.entidad;
 
+import co.edu.co.pizzeriauco.dao.datos.ConsultarDAO;
 import co.edu.co.pizzeriauco.dao.datos.CrearDAO;
 import co.edu.co.pizzeriauco.entidad.MovimientoInventarioEntidad;
 
-public interface MovimientoInventarioDAO extends CrearDAO<MovimientoInventarioEntidad> {
+import java.util.UUID;
+
+//es el kardex: los movimientos no se actualizan ni se eliminan
+public interface MovimientoInventarioDAO extends CrearDAO<MovimientoInventarioEntidad>, ConsultarDAO<MovimientoInventarioEntidad, UUID> {
 }

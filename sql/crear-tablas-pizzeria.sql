@@ -25,20 +25,20 @@ id_tamano uniqueidentifier primary key default newid(),
 tamano varchar(20) not null unique
 );
 
-create table tipo_movimiento (
-id_tipo_movimiento uniqueidentifier primary key default newid(),
-nombre varchar(20) not null unique,
+create table clase_movimiento (
+id_clase_movimiento uniqueidentifier primary key default newid(),
+nombre varchar(10) not null unique,
 
-constraint ck_tipo_movimiento_nombre
+constraint ck_clase_movimiento_nombre
   check (nombre in ('Entrada', 'Salida'))
 );
 
-create table origen (
-id_origen uniqueidentifier primary key default newid(),
-nombre varchar(16) not null unique,
+create table categoria_origen (
+id_categoria_origen uniqueidentifier primary key default newid(),
+nombre varchar(10) not null unique,
 
-constraint ck_origen_nombre
-  check (nombre in ('Compra', 'Cambio', 'Venta', 'Lote - cambio', 'Lote - desecho'))
+constraint ck_categoria_origen_nombre
+  check (nombre in ('Compra', 'Venta', 'Cambio'))
 );
 
 create table proveedor (
@@ -155,30 +155,20 @@ constraint ck_inventario_stock_minimo
   check (stock_minimo > 0 and stock_minimo <= 100000)
 );
 
-create table movimiento_inventario (
-id_movimiento_inventario uniqueidentifier primary key default newid(),
-id_tipo_movimiento uniqueidentifier not null,
-id_origen uniqueidentifier not null,
-codigo_operacion varchar(50) not null,
-id_producto_interno uniqueidentifier not null,
-cantidad decimal(18,4) not null,
-id_unidad_medida uniqueidentifier not null,
-fecha_movimiento date not null,
-id_lote uniqueidentifier,
+-- codigo de cada operacion (renglon de compra, consumo de venta o cambio);
+-- lo comparten el renglon que la genero y sus movimientos. No se actualiza ni se elimina
+create table tipo_movimiento (
+id_tipo_movimiento uniqueidentifier primary key default newid(),
+id_categoria_origen uniqueidentifier not null,
 
-constraint fk_movimiento_inventario_id_tipo_movimiento
-  foreign key (id_tipo_movimiento) references tipo_movimiento(id_tipo_movimiento),
-constraint fk_movimiento_inventario_id_origen
-  foreign key (id_origen) references origen(id_origen),
-constraint fk_movimiento_inventario_id_producto_interno
-  foreign key (id_producto_interno) references producto_interno(id_producto_interno),
-constraint fk_movimiento_inventario_id_unidad_medida
-  foreign key (id_unidad_medida) references unidad_medida(id_unidad_medida)
+constraint fk_tipo_movimiento_id_categoria_origen
+  foreign key (id_categoria_origen) references categoria_origen(id_categoria_origen)
 );
 
+-- se crea primero (en 0) y luego su movimiento de entrada lo llena; un lote en 0 solo existe
+-- dentro de la transaccion de la compra o el cambio
 create table lote (
 id_lote uniqueidentifier primary key default newid(),
-id_movimiento_inventario uniqueidentifier not null,
 numero_lote int not null,
 id_producto_interno uniqueidentifier not null,
 cantidad decimal(18,4) not null,
@@ -188,29 +178,55 @@ fecha_vencimiento date not null,
 -- automatica: 1 si le queda saldo, 0 si se agoto
 disponible as (case when saldo > 0 then 1 else 0 end),
 
-constraint fk_lote_id_movimiento_inventario
-  foreign key (id_movimiento_inventario) references movimiento_inventario(id_movimiento_inventario),
 constraint fk_lote_id_producto_interno
   foreign key (id_producto_interno) references producto_interno(id_producto_interno),
 constraint fk_lote_id_unidad_medida
   foreign key (id_unidad_medida) references unidad_medida(id_unidad_medida),
 constraint uk_lote_producto_numero_lote
   unique (id_producto_interno, numero_lote),
-constraint uk_lote_movimiento_inventario
-  unique (id_movimiento_inventario),
 constraint ck_lote_numero_lote
   check (numero_lote >= 1),
 constraint ck_lote_cantidad
-  check (cantidad > 0 and cantidad <= 10000),
+  check (cantidad >= 0 and cantidad <= 10000),
 constraint ck_lote_saldo
   check (saldo >= 0 and saldo <= cantidad)
 );
 
--- movimiento_inventario y lote se apuntan entre si,
--- por eso esta llave se agrega cuando ya existen las dos tablas
-alter table movimiento_inventario add
+create table movimiento_inventario (
+id_movimiento_inventario uniqueidentifier primary key default newid(),
+id_clase_movimiento uniqueidentifier not null,
+-- codigo de la operacion: lo comparte con su renglon de compra, consumo de venta o cambio
+-- (la categoria de origen se sabe por el codigo)
+id_tipo_movimiento uniqueidentifier not null,
+-- cuanto entro o salio de ese lote (unidad del lote); el insumo y la unidad se saben por el lote
+cantidad decimal(18,4) not null,
+fecha_movimiento date not null,
+-- entrada: el lote que se crea con esa compra o cambio; salida: el lote del que se saca
+id_lote uniqueidentifier not null,
+
+constraint fk_movimiento_inventario_id_clase_movimiento
+  foreign key (id_clase_movimiento) references clase_movimiento(id_clase_movimiento),
+constraint fk_movimiento_inventario_id_tipo_movimiento
+  foreign key (id_tipo_movimiento) references tipo_movimiento(id_tipo_movimiento),
 constraint fk_movimiento_inventario_id_lote
-  foreign key (id_lote) references lote(id_lote);
+  foreign key (id_lote) references lote(id_lote)
+);
+
+-- lo que la persona saca por la alerta de vencimiento del lote; no genera codigo ni movimiento.
+-- negocio, en la misma transaccion, deja el saldo del lote en 0 y lo descuenta del inventario
+create table salida_lote (
+id_salida_lote uniqueidentifier primary key default newid(),
+-- un lote se saca una sola vez y completo
+id_lote uniqueidentifier not null unique,
+-- el saldo que tenia el lote justo antes de sacarlo (unidad del lote)
+cantidad decimal(18,4) not null,
+fecha_movimiento date not null,
+
+constraint fk_salida_lote_id_lote
+  foreign key (id_lote) references lote(id_lote),
+constraint ck_salida_lote_cantidad
+  check (cantidad > 0 and cantidad <= 10000)
+);
 
 -- ============================================================
 -- Compras y cambios
@@ -240,6 +256,8 @@ id_unidad_medida uniqueidentifier not null,
 precio_compra decimal(18,2) not null,
 -- 01/01/1000 = sin fecha (perecedero: el Lote la calcula con la vida util)
 fecha_vencimiento date not null default '1000-01-01',
+-- codigo de la operacion: cada renglon tiene el suyo y lo comparte con su movimiento de entrada
+id_tipo_movimiento uniqueidentifier not null unique,
 
 -- sin cascade: no se puede borrar una compra que tenga renglones (P-COM-005)
 constraint fk_detalle_compra_id_compra
@@ -248,6 +266,8 @@ constraint fk_detalle_compra_id_producto_interno
   foreign key (id_producto_interno) references producto_interno(id_producto_interno),
 constraint fk_detalle_compra_id_unidad_medida
   foreign key (id_unidad_medida) references unidad_medida(id_unidad_medida),
+constraint fk_detalle_compra_id_tipo_movimiento
+  foreign key (id_tipo_movimiento) references tipo_movimiento(id_tipo_movimiento),
 constraint uk_detalle_compra_compra_producto_fecha
   unique (id_compra, id_producto_interno, fecha_vencimiento),
 constraint ck_detalle_compra_cantidad
@@ -263,11 +283,15 @@ cantidad decimal(18,4) not null,
 id_unidad_medida uniqueidentifier not null,
 fecha_vencimiento date not null,
 fecha_cambio date not null,
+-- codigo de la operacion: lo comparte con su movimiento de entrada
+id_tipo_movimiento uniqueidentifier not null unique,
 
 constraint fk_cambio_id_producto_interno
   foreign key (id_producto_interno) references producto_interno(id_producto_interno),
 constraint fk_cambio_id_unidad_medida
   foreign key (id_unidad_medida) references unidad_medida(id_unidad_medida),
+constraint fk_cambio_id_tipo_movimiento
+  foreign key (id_tipo_movimiento) references tipo_movimiento(id_tipo_movimiento),
 constraint uk_cambio_producto_fecha_cambio
   unique (id_producto_interno, fecha_cambio),
 constraint ck_cambio_cantidad
@@ -315,5 +339,32 @@ constraint ck_detalle_venta_cantidad
   check (cantidad > 0 and cantidad <= 1000),
 constraint ck_detalle_venta_precio_producto
   check (precio_producto > 0 and precio_producto <= 1000000)
+);
+
+-- cada renglon de venta se abre en los insumos de su receta: un consumo por insumo, cada uno con su codigo
+create table consumo_venta (
+id_consumo_venta uniqueidentifier primary key default newid(),
+id_detalle_venta uniqueidentifier not null,
+id_producto_interno uniqueidentifier not null,
+-- cantidad vendida por la cantidad de la receta, en la unidad de la receta
+cantidad decimal(18,4) not null,
+id_unidad_medida uniqueidentifier not null,
+-- codigo de la operacion: lo comparte con sus movimientos de salida
+id_tipo_movimiento uniqueidentifier not null unique,
+
+-- sin cascade: las ventas nunca se eliminan
+constraint fk_consumo_venta_id_detalle_venta
+  foreign key (id_detalle_venta) references detalle_venta(id_detalle_venta),
+constraint fk_consumo_venta_id_producto_interno
+  foreign key (id_producto_interno) references producto_interno(id_producto_interno),
+constraint fk_consumo_venta_id_unidad_medida
+  foreign key (id_unidad_medida) references unidad_medida(id_unidad_medida),
+constraint fk_consumo_venta_id_tipo_movimiento
+  foreign key (id_tipo_movimiento) references tipo_movimiento(id_tipo_movimiento),
+-- el mismo insumo no sale dos veces en el mismo renglon de venta
+constraint uk_consumo_venta_detalle_venta_producto_interno
+  unique (id_detalle_venta, id_producto_interno),
+constraint ck_consumo_venta_cantidad
+  check (cantidad > 0)
 );
 go

@@ -1,36 +1,37 @@
 package co.edu.co.pizzeriauco.dominio;
 
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
 
 import java.util.UUID;
 
+//es el codigo de cada operacion: lo comparten el renglon que la genero y sus movimientos
 public class TipoMovimientoDominio {
 
     private UUID id;
-    private String nombre;
+    private CategoriaOrigenDominio categoriaOrigen;
 
     private TipoMovimientoDominio(Builder builder) {
         this.id = builder.id;
-        this.nombre = builder.nombre;
+        this.categoriaOrigen = builder.categoriaOrigen;
     }
 
     public UUID getId() {
         return id;
     }
 
-    public String getNombre() {
-        return nombre;
+    public CategoriaOrigenDominio getCategoriaOrigen() {
+        return categoriaOrigen;
     }
 
     public static class Builder {
 
         private UUID id;
-        private String nombre;
+        private CategoriaOrigenDominio categoriaOrigen;
 
         public Builder() {
             id = UtilId.valorDefecto(id);
-            nombre = UtilTexto.vacia;
+            categoriaOrigen = new CategoriaOrigenDominio.Builder().build();
         }
 
         public Builder id(UUID id) {
@@ -38,9 +39,12 @@ public class TipoMovimientoDominio {
             return this;
         }
 
-        public Builder nombre(String nombre) {
-            this.nombre =
-                    UtilTexto.getUtilTexto().primeraLetraMayuscula(nombre);
+        public Builder categoriaOrigen(CategoriaOrigenDominio categoriaOrigen) {
+            this.categoriaOrigen = UtilObjeto
+                    .obtenerValorDefectoSiValorOriginalEsNulo(
+                            categoriaOrigen,
+                            new CategoriaOrigenDominio.Builder().build()
+                    );
             return this;
         }
 

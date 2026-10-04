@@ -5,12 +5,12 @@ import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 
 import java.util.UUID;
 
-public class OrigenDto {
+public class CategoriaOrigenDto {
 
     private UUID id;
     private String nombre;
 
-    public OrigenDto() {
+    public CategoriaOrigenDto() {
         setId(id);
         setNombre(UtilTexto.vacia);
     }

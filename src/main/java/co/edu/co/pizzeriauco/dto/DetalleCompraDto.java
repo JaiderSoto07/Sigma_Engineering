@@ -18,6 +18,8 @@ public class DetalleCompraDto {
     private BigDecimal precioCompra;
     private LocalDate fechaVencimiento;
     private CompraDto compra;
+    //codigo de la operacion: lo comparte con su movimiento de entrada
+    private TipoMovimientoDto tipoMovimiento;
 
     public DetalleCompraDto() {
         setId(id);
@@ -27,6 +29,7 @@ public class DetalleCompraDto {
         setPrecioCompra(BigDecimal.ZERO);
         setFechaVencimiento(UtilFecha.FECHA_POR_DEFECTO);
         setCompra(new CompraDto());
+        setTipoMovimiento(new TipoMovimientoDto());
     }
 
     public UUID getId() {
@@ -83,5 +86,13 @@ public class DetalleCompraDto {
 
     public void setCompra(CompraDto compra) {
         this.compra = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(compra, new CompraDto());
+    }
+
+    public TipoMovimientoDto getTipoMovimiento() {
+        return tipoMovimiento;
+    }
+
+    public void setTipoMovimiento(TipoMovimientoDto tipoMovimiento) {
+        this.tipoMovimiento = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(tipoMovimiento, new TipoMovimientoDto());
     }
 }

@@ -12,7 +12,6 @@ import java.util.UUID;
 public class LoteDto {
 
     private UUID id;
-    private MovimientoInventarioDto movimientoInventario;
     private LocalDate fechaVencimiento;
     //se calcula solo: esta disponible si todavia le queda saldo
     private boolean disponible;
@@ -24,7 +23,6 @@ public class LoteDto {
 
     public LoteDto() {
         setId(id);
-        setMovimientoInventario(new MovimientoInventarioDto());
         setFechaVencimiento(UtilFecha.FECHA_POR_DEFECTO);
         setProductoInterno(new ProductoInternoDto());
         setCantidad(BigDecimal.ZERO);
@@ -39,14 +37,6 @@ public class LoteDto {
 
     public void setId(UUID id) {
         this.id = UtilId.valorDefecto(id);
-    }
-
-    public MovimientoInventarioDto getMovimientoInventario() {
-        return movimientoInventario;
-    }
-
-    public void setMovimientoInventario(MovimientoInventarioDto movimientoInventario) {
-        this.movimientoInventario = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(movimientoInventario, new MovimientoInventarioDto());
     }
 
     public LocalDate getFechaVencimiento() {

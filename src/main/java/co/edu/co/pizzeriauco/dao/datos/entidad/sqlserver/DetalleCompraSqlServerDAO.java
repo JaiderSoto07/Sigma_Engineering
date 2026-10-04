@@ -10,7 +10,9 @@ import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.CompraEntidad;
 import co.edu.co.pizzeriauco.entidad.DetalleCompraEntidad;
 import co.edu.co.pizzeriauco.entidad.ProductoInternoEntidad;
+import co.edu.co.pizzeriauco.entidad.CategoriaOrigenEntidad;
 import co.edu.co.pizzeriauco.entidad.ProveedorEntidad;
+import co.edu.co.pizzeriauco.entidad.TipoMovimientoEntidad;
 import co.edu.co.pizzeriauco.entidad.UnidadMedidaEntidad;
 
 import java.sql.Connection;
@@ -29,17 +31,18 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
     @Override
     public void crear(DetalleCompraEntidad entidad) {
         var sentenciaSql = "insert into detalle_compra(id_detalle_compra, id_compra, id_producto_interno, cantidad, "
-                + "id_unidad_medida, precio_compra, fecha_vencimiento) values(?, ?, ?, ?, ?, ?, ?)";
+                + "id_unidad_medida, precio_compra, fecha_vencimiento, id_tipo_movimiento) values(?, ?, ?, ?, ?, ?, ?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             //se llenan los datos en el mismo orden de los ?
             sentencia.setObject(1, entidad.getId());
-            //de la compra, el producto interno y la unidad solo se guarda su id (llaves foraneas)
+            //de la compra, el producto interno, la unidad y el codigo solo se guarda su id (llaves foraneas)
             sentencia.setObject(2, entidad.getCompra().getId());
             sentencia.setObject(3, entidad.getProductoInterno().getId());
             sentencia.setBigDecimal(4, entidad.getCantidad());
             sentencia.setObject(5, entidad.getUnidadMedida().getId());
             sentencia.setBigDecimal(6, entidad.getPrecioCompra());
             sentencia.setObject(7, entidad.getFechaVencimiento());
+            sentencia.setObject(8, entidad.getTipoMovimiento().getId());
             sentencia.executeUpdate();
         } catch (SQLException excepcion) {
             //el controlado
@@ -58,11 +61,13 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
                 + "c.id_compra, c.fecha_compra, c.numero_factura, c.total, c.id_proveedor, "
                 + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
                 + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
+                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida, "
+                + "tm.id_tipo_movimiento, tm.id_categoria_origen "
                 + "from detalle_compra as dc "
                 + "inner join compra as c on dc.id_compra = c.id_compra "
                 + "inner join producto_interno as pi on dc.id_producto_interno = pi.id_producto_interno "
                 + "inner join unidad_medida as um on dc.id_unidad_medida = um.id_unidad_medida "
+                + "inner join tipo_movimiento as tm on dc.id_tipo_movimiento = tm.id_tipo_movimiento "
                 + "where dc.id_detalle_compra = ?";
         //si no se encuentra, se devuelve el detalle por defecto (nunca nulo)
         var detalleCompraEncontrado = new DetalleCompraEntidad.Builder().build();
@@ -71,8 +76,8 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
 
             var resultado = sentencia.executeQuery();
             if (resultado.next()) {
-                //primero se arman los padres (compra, producto interno y unidad) para luego asignarlos al detalle
-                //de los "abuelos" (proveedor de la compra, unidad del producto interno) solo se trae el id
+                //primero se arman los padres (compra, producto interno, unidad y codigo) para luego asignarlos al detalle
+                //de los "abuelos" (proveedor de la compra, unidad del producto interno, categoria del codigo) solo se trae el id
                 var compra = new CompraEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_compra")))
                         .proveedor(new ProveedorEntidad.Builder()
@@ -95,6 +100,11 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
                         .unidadMedida(resultado.getString("unidad_medida"))
                         .tipoMedida(resultado.getString("tipo_medida"))
                         .build();
+                var tipoMovimiento = new TipoMovimientoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_tipo_movimiento")))
+                        .categoriaOrigen(new CategoriaOrigenEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_categoria_origen"))).build())
+                        .build();
                 detalleCompraEncontrado = new DetalleCompraEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_detalle_compra")))
                         .compra(compra)
@@ -103,6 +113,7 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
                         .unidadMedida(unidadMedida)
                         .precioCompra(resultado.getBigDecimal("precio_compra"))
                         .fechaVencimiento(resultado.getObject("fecha_vencimiento", LocalDate.class))
+                        .tipoMovimiento(tipoMovimiento)
                         .build();
             }
         } catch (SQLException excepcion) {
@@ -124,11 +135,13 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
                 + "c.id_compra, c.fecha_compra, c.numero_factura, c.total, c.id_proveedor, "
                 + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
                 + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
+                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida, "
+                + "tm.id_tipo_movimiento, tm.id_categoria_origen "
                 + "from detalle_compra as dc "
                 + "inner join compra as c on dc.id_compra = c.id_compra "
                 + "inner join producto_interno as pi on dc.id_producto_interno = pi.id_producto_interno "
                 + "inner join unidad_medida as um on dc.id_unidad_medida = um.id_unidad_medida "
+                + "inner join tipo_movimiento as tm on dc.id_tipo_movimiento = tm.id_tipo_movimiento "
                 + "where 1=1";
         var parametros = new ArrayList<Object>();
         //este el del detalle
@@ -163,6 +176,11 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
             sentenciaSql = sentenciaSql + " and um.id_unidad_medida = ?";
             parametros.add(filtro.getUnidadMedida().getId());
         }
+        //este el del codigo (para llegar al renglon desde su movimiento)
+        if (!UtilId.VALOR_DEFECTO.equals(filtro.getTipoMovimiento().getId())) {
+            sentenciaSql = sentenciaSql + " and tm.id_tipo_movimiento = ?";
+            parametros.add(filtro.getTipoMovimiento().getId());
+        }
         // el orden va siempre al final
         sentenciaSql = sentenciaSql + " order by c.fecha_compra desc, pi.nombre asc";
 
@@ -175,7 +193,7 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
             var resultado = sentencia.executeQuery();
             // por cada fila que llego, se arma un detalle y se agrega a la lista
             while (resultado.next()) {
-                //primero se arman los padres (compra, producto interno y unidad) para luego asignarlos al detalle
+                //primero se arman los padres (compra, producto interno, unidad y codigo) para luego asignarlos al detalle
                 var compra = new CompraEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_compra")))
                         .proveedor(new ProveedorEntidad.Builder()
@@ -198,6 +216,11 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
                         .unidadMedida(resultado.getString("unidad_medida"))
                         .tipoMedida(resultado.getString("tipo_medida"))
                         .build();
+                var tipoMovimiento = new TipoMovimientoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_tipo_movimiento")))
+                        .categoriaOrigen(new CategoriaOrigenEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_categoria_origen"))).build())
+                        .build();
                 var detalleCompra = new DetalleCompraEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_detalle_compra")))
                         .compra(compra)
@@ -206,6 +229,7 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
                         .unidadMedida(unidadMedida)
                         .precioCompra(resultado.getBigDecimal("precio_compra"))
                         .fechaVencimiento(resultado.getObject("fecha_vencimiento", LocalDate.class))
+                        .tipoMovimiento(tipoMovimiento)
                         .build();
                 detallesEncontrados.add(detalleCompra);
             }
@@ -228,11 +252,13 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
                 + "c.id_compra, c.fecha_compra, c.numero_factura, c.total, c.id_proveedor, "
                 + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
                 + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
+                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida, "
+                + "tm.id_tipo_movimiento, tm.id_categoria_origen "
                 + "from detalle_compra as dc "
                 + "inner join compra as c on dc.id_compra = c.id_compra "
                 + "inner join producto_interno as pi on dc.id_producto_interno = pi.id_producto_interno "
                 + "inner join unidad_medida as um on dc.id_unidad_medida = um.id_unidad_medida "
+                + "inner join tipo_movimiento as tm on dc.id_tipo_movimiento = tm.id_tipo_movimiento "
                 + "order by c.fecha_compra desc, pi.nombre asc";
         var detallesEncontrados = new ArrayList<DetalleCompraEntidad>();
 
@@ -240,7 +266,7 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
 
             var resultado = sentencia.executeQuery();
             while (resultado.next()) {
-                //primero se arman los padres (compra, producto interno y unidad) para luego asignarlos al detalle
+                //primero se arman los padres (compra, producto interno, unidad y codigo) para luego asignarlos al detalle
                 var compra = new CompraEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_compra")))
                         .proveedor(new ProveedorEntidad.Builder()
@@ -263,6 +289,11 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
                         .unidadMedida(resultado.getString("unidad_medida"))
                         .tipoMedida(resultado.getString("tipo_medida"))
                         .build();
+                var tipoMovimiento = new TipoMovimientoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_tipo_movimiento")))
+                        .categoriaOrigen(new CategoriaOrigenEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_categoria_origen"))).build())
+                        .build();
                 var detalleCompra = new DetalleCompraEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_detalle_compra")))
                         .compra(compra)
@@ -271,6 +302,7 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
                         .unidadMedida(unidadMedida)
                         .precioCompra(resultado.getBigDecimal("precio_compra"))
                         .fechaVencimiento(resultado.getObject("fecha_vencimiento", LocalDate.class))
+                        .tipoMovimiento(tipoMovimiento)
                         .build();
                 detallesEncontrados.add(detalleCompra);
             }
@@ -287,6 +319,7 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
     }
 
     //negocio solo lo permite mientras el lote del renglon este intacto (saldo = cantidad)
+    //el codigo (id_tipo_movimiento) no se actualiza: el renglon conserva siempre el mismo
     @Override
     public void actualizar(UUID id, DetalleCompraEntidad entidad) {
         var sentenciaSql = "update detalle_compra set id_compra = ?, id_producto_interno = ?, cantidad = ?, "

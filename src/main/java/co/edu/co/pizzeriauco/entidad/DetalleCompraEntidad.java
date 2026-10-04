@@ -18,6 +18,8 @@ public class DetalleCompraEntidad {
     private BigDecimal precioCompra;
     private LocalDate fechaVencimiento;
     private CompraEntidad compra;
+    //codigo de la operacion: lo comparte con su movimiento de entrada
+    private TipoMovimientoEntidad tipoMovimiento;
 
     private DetalleCompraEntidad(Builder builder) {
         this.id = builder.id;
@@ -27,6 +29,7 @@ public class DetalleCompraEntidad {
         this.precioCompra = builder.precioCompra;
         this.fechaVencimiento = builder.fechaVencimiento;
         this.compra = builder.compra;
+        this.tipoMovimiento = builder.tipoMovimiento;
     }
 
     public UUID getId() {
@@ -57,6 +60,10 @@ public class DetalleCompraEntidad {
         return compra;
     }
 
+    public TipoMovimientoEntidad getTipoMovimiento() {
+        return tipoMovimiento;
+    }
+
     public static class Builder {
 
         private UUID id;
@@ -66,6 +73,7 @@ public class DetalleCompraEntidad {
         private BigDecimal precioCompra;
         private LocalDate fechaVencimiento;
         private CompraEntidad compra;
+        private TipoMovimientoEntidad tipoMovimiento;
 
         public Builder() {
             id = UtilId.valorDefecto(id);
@@ -75,6 +83,7 @@ public class DetalleCompraEntidad {
             precioCompra = BigDecimal.ZERO;
             fechaVencimiento = UtilFecha.FECHA_POR_DEFECTO;
             compra = new CompraEntidad.Builder().build();
+            tipoMovimiento = new TipoMovimientoEntidad.Builder().build();
         }
 
         public Builder id(UUID id) {
@@ -120,6 +129,15 @@ public class DetalleCompraEntidad {
                     .obtenerValorDefectoSiValorOriginalEsNulo(
                             compra,
                             new CompraEntidad.Builder().build()
+                    );
+            return this;
+        }
+
+        public Builder tipoMovimiento(TipoMovimientoEntidad tipoMovimiento) {
+            this.tipoMovimiento = UtilObjeto
+                    .obtenerValorDefectoSiValorOriginalEsNulo(
+                            tipoMovimiento,
+                            new TipoMovimientoEntidad.Builder().build()
                     );
             return this;
         }

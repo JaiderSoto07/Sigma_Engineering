@@ -8,7 +8,9 @@ import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 import co.edu.co.pizzeriauco.dao.datos.entidad.CambioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.CambioEntidad;
+import co.edu.co.pizzeriauco.entidad.CategoriaOrigenEntidad;
 import co.edu.co.pizzeriauco.entidad.ProductoInternoEntidad;
+import co.edu.co.pizzeriauco.entidad.TipoMovimientoEntidad;
 import co.edu.co.pizzeriauco.entidad.UnidadMedidaEntidad;
 
 import java.sql.Connection;
@@ -24,20 +26,21 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
         super(conexion);
     }
 
-    //el cambio es solo la ENTRADA del producto nuevo; la salida del lote viejo va aparte en el kardex
+    //el cambio es solo la ENTRADA del producto nuevo; la salida del lote viejo va aparte en SalidaLote
     @Override
     public void crear(CambioEntidad entidad) {
-        var sentenciaSql = "insert into cambio(id_cambio, id_producto_interno, cantidad, id_unidad_medida, fecha_vencimiento, fecha_cambio) "
-                + "values(?, ?, ?, ?, ?, ?)";
+        var sentenciaSql = "insert into cambio(id_cambio, id_producto_interno, cantidad, id_unidad_medida, fecha_vencimiento, fecha_cambio, "
+                + "id_tipo_movimiento) values(?, ?, ?, ?, ?, ?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             //se llenan los datos en el mismo orden de los ?
             sentencia.setObject(1, entidad.getId());
-            //del producto interno y de la unidad solo se guarda su id (llaves foraneas)
+            //del producto interno, la unidad y el codigo solo se guarda su id (llaves foraneas)
             sentencia.setObject(2, entidad.getProductoCambio().getId());
             sentencia.setBigDecimal(3, entidad.getCantidad());
             sentencia.setObject(4, entidad.getUnidadMedida().getId());
             sentencia.setObject(5, entidad.getFechaVencimiento());
             sentencia.setObject(6, entidad.getFechaCambio());
+            sentencia.setObject(7, entidad.getTipoMovimiento().getId());
             sentencia.executeUpdate();
         } catch (SQLException excepcion) {
             //el controlado
@@ -55,10 +58,12 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
         var sentenciaSql = "select ca.id_cambio, ca.cantidad, ca.fecha_vencimiento, ca.fecha_cambio, "
                 + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
                 + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
+                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida, "
+                + "tm.id_tipo_movimiento, tm.id_categoria_origen "
                 + "from cambio as ca "
                 + "inner join producto_interno as pi on ca.id_producto_interno = pi.id_producto_interno "
                 + "inner join unidad_medida as um on ca.id_unidad_medida = um.id_unidad_medida "
+                + "inner join tipo_movimiento as tm on ca.id_tipo_movimiento = tm.id_tipo_movimiento "
                 + "where ca.id_cambio = ?";
         //si no se encuentra, se devuelve el cambio por defecto (nunca nulo)
         var cambioEncontrado = new CambioEntidad.Builder().build();
@@ -67,7 +72,8 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
 
             var resultado = sentencia.executeQuery();
             if (resultado.next()) {
-                //primero se arman los padres (producto interno y unidad) para luego asignarlos al cambio
+                //primero se arman los padres (producto interno, unidad y codigo) para luego asignarlos al cambio
+                //de la categoria del codigo ("abuelo") solo se trae el id
                 var productoCambio = new ProductoInternoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto_interno")))
                         .nombre(resultado.getString("nombre_producto_interno"))
@@ -82,6 +88,11 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
                         .unidadMedida(resultado.getString("unidad_medida"))
                         .tipoMedida(resultado.getString("tipo_medida"))
                         .build();
+                var tipoMovimiento = new TipoMovimientoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_tipo_movimiento")))
+                        .categoriaOrigen(new CategoriaOrigenEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_categoria_origen"))).build())
+                        .build();
                 cambioEncontrado = new CambioEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_cambio")))
                         .productoCambio(productoCambio)
@@ -89,6 +100,7 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
                         .unidadMedida(unidadMedida)
                         .fechaVencimiento(resultado.getObject("fecha_vencimiento", LocalDate.class))
                         .fechaCambio(resultado.getObject("fecha_cambio", LocalDate.class))
+                        .tipoMovimiento(tipoMovimiento)
                         .build();
             }
         } catch (SQLException excepcion) {
@@ -109,10 +121,12 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
         var sentenciaSql = "select ca.id_cambio, ca.cantidad, ca.fecha_vencimiento, ca.fecha_cambio, "
                 + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
                 + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
+                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida, "
+                + "tm.id_tipo_movimiento, tm.id_categoria_origen "
                 + "from cambio as ca "
                 + "inner join producto_interno as pi on ca.id_producto_interno = pi.id_producto_interno "
                 + "inner join unidad_medida as um on ca.id_unidad_medida = um.id_unidad_medida "
+                + "inner join tipo_movimiento as tm on ca.id_tipo_movimiento = tm.id_tipo_movimiento "
                 + "where 1=1";
         var parametros = new ArrayList<Object>();
         //estos los del cambio
@@ -138,6 +152,11 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
             sentenciaSql = sentenciaSql + " and um.id_unidad_medida = ?";
             parametros.add(filtro.getUnidadMedida().getId());
         }
+        //este el del codigo (para llegar al cambio desde su movimiento)
+        if (!UtilId.VALOR_DEFECTO.equals(filtro.getTipoMovimiento().getId())) {
+            sentenciaSql = sentenciaSql + " and tm.id_tipo_movimiento = ?";
+            parametros.add(filtro.getTipoMovimiento().getId());
+        }
         // el orden va siempre al final: los cambios mas recientes primero
         sentenciaSql = sentenciaSql + " order by ca.fecha_cambio desc, pi.nombre asc";
 
@@ -150,7 +169,8 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
             var resultado = sentencia.executeQuery();
             // por cada fila que llego, se arma un cambio y se agrega a la lista
             while (resultado.next()) {
-                //primero se arman los padres (producto interno y unidad) para luego asignarlos al cambio
+                //primero se arman los padres (producto interno, unidad y codigo) para luego asignarlos al cambio
+                //de la categoria del codigo ("abuelo") solo se trae el id
                 var productoCambio = new ProductoInternoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto_interno")))
                         .nombre(resultado.getString("nombre_producto_interno"))
@@ -165,6 +185,11 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
                         .unidadMedida(resultado.getString("unidad_medida"))
                         .tipoMedida(resultado.getString("tipo_medida"))
                         .build();
+                var tipoMovimiento = new TipoMovimientoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_tipo_movimiento")))
+                        .categoriaOrigen(new CategoriaOrigenEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_categoria_origen"))).build())
+                        .build();
                 var cambio = new CambioEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_cambio")))
                         .productoCambio(productoCambio)
@@ -172,6 +197,7 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
                         .unidadMedida(unidadMedida)
                         .fechaVencimiento(resultado.getObject("fecha_vencimiento", LocalDate.class))
                         .fechaCambio(resultado.getObject("fecha_cambio", LocalDate.class))
+                        .tipoMovimiento(tipoMovimiento)
                         .build();
                 cambiosEncontrados.add(cambio);
             }
@@ -193,10 +219,12 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
         var sentenciaSql = "select ca.id_cambio, ca.cantidad, ca.fecha_vencimiento, ca.fecha_cambio, "
                 + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
                 + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
+                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida, "
+                + "tm.id_tipo_movimiento, tm.id_categoria_origen "
                 + "from cambio as ca "
                 + "inner join producto_interno as pi on ca.id_producto_interno = pi.id_producto_interno "
                 + "inner join unidad_medida as um on ca.id_unidad_medida = um.id_unidad_medida "
+                + "inner join tipo_movimiento as tm on ca.id_tipo_movimiento = tm.id_tipo_movimiento "
                 + "order by ca.fecha_cambio desc, pi.nombre asc";
         var cambiosEncontrados = new ArrayList<CambioEntidad>();
 
@@ -204,7 +232,8 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
 
             var resultado = sentencia.executeQuery();
             while (resultado.next()) {
-                //primero se arman los padres (producto interno y unidad) para luego asignarlos al cambio
+                //primero se arman los padres (producto interno, unidad y codigo) para luego asignarlos al cambio
+                //de la categoria del codigo ("abuelo") solo se trae el id
                 var productoCambio = new ProductoInternoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto_interno")))
                         .nombre(resultado.getString("nombre_producto_interno"))
@@ -219,6 +248,11 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
                         .unidadMedida(resultado.getString("unidad_medida"))
                         .tipoMedida(resultado.getString("tipo_medida"))
                         .build();
+                var tipoMovimiento = new TipoMovimientoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_tipo_movimiento")))
+                        .categoriaOrigen(new CategoriaOrigenEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_categoria_origen"))).build())
+                        .build();
                 var cambio = new CambioEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_cambio")))
                         .productoCambio(productoCambio)
@@ -226,6 +260,7 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
                         .unidadMedida(unidadMedida)
                         .fechaVencimiento(resultado.getObject("fecha_vencimiento", LocalDate.class))
                         .fechaCambio(resultado.getObject("fecha_cambio", LocalDate.class))
+                        .tipoMovimiento(tipoMovimiento)
                         .build();
                 cambiosEncontrados.add(cambio);
             }
@@ -242,6 +277,7 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
     }
 
     //negocio solo lo permite mientras el lote que creo el cambio este intacto (saldo = cantidad)
+    //el codigo (id_tipo_movimiento) no se actualiza: el cambio conserva siempre el mismo
     @Override
     public void actualizar(UUID id, CambioEntidad entidad) {
         var sentenciaSql = "update cambio set id_producto_interno = ?, cantidad = ?, id_unidad_medida = ?, "

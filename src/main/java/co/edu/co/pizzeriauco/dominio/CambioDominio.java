@@ -18,6 +18,8 @@ public class CambioDominio {
     private UnidadMedidaDominio unidadMedida;
     private LocalDate fechaVencimiento;
     private LocalDate fechaCambio;
+    //codigo de la operacion: lo comparte con su movimiento de entrada
+    private TipoMovimientoDominio tipoMovimiento;
 
     private CambioDominio(Builder builder) {
         this.id = builder.id;
@@ -26,6 +28,7 @@ public class CambioDominio {
         this.unidadMedida = builder.unidadMedida;
         this.fechaVencimiento = builder.fechaVencimiento;
         this.fechaCambio = builder.fechaCambio;
+        this.tipoMovimiento = builder.tipoMovimiento;
     }
 
     public UUID getId() {
@@ -52,6 +55,10 @@ public class CambioDominio {
         return fechaCambio;
     }
 
+    public TipoMovimientoDominio getTipoMovimiento() {
+        return tipoMovimiento;
+    }
+
     public static class Builder {
 
         private UUID id;
@@ -60,6 +67,7 @@ public class CambioDominio {
         private UnidadMedidaDominio unidadMedida;
         private LocalDate fechaVencimiento;
         private LocalDate fechaCambio;
+        private TipoMovimientoDominio tipoMovimiento;
 
         public Builder() {
             id = UtilId.valorDefecto(id);
@@ -68,6 +76,7 @@ public class CambioDominio {
             unidadMedida = new UnidadMedidaDominio.Builder().build();
             fechaVencimiento = UtilFecha.FECHA_POR_DEFECTO;
             fechaCambio = UtilFecha.FECHA_POR_DEFECTO;
+            tipoMovimiento = new TipoMovimientoDominio.Builder().build();
         }
 
         public Builder id(UUID id) {
@@ -105,6 +114,15 @@ public class CambioDominio {
 
         public Builder fechaCambio(LocalDate fechaCambio) {
             this.fechaCambio = UtilFecha.valorDefecto(fechaCambio);
+            return this;
+        }
+
+        public Builder tipoMovimiento(TipoMovimientoDominio tipoMovimiento) {
+            this.tipoMovimiento = UtilObjeto
+                    .obtenerValorDefectoSiValorOriginalEsNulo(
+                            tipoMovimiento,
+                            new TipoMovimientoDominio.Builder().build()
+                    );
             return this;
         }
 

@@ -1,16 +1,16 @@
-package co.edu.co.pizzeriauco.dominio;
+package co.edu.co.pizzeriauco.entidad;
 
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 
 import java.util.UUID;
 
-public class OrigenDominio {
+public class CategoriaOrigenEntidad {
 
     private UUID id;
     private String nombre;
 
-    private OrigenDominio(Builder builder) {
+    private CategoriaOrigenEntidad(Builder builder) {
         this.id = builder.id;
         this.nombre = builder.nombre;
     }
@@ -44,8 +44,8 @@ public class OrigenDominio {
             return this;
         }
 
-        public OrigenDominio build() {
-            return new OrigenDominio(this);
+        public CategoriaOrigenEntidad build() {
+            return new CategoriaOrigenEntidad(this);
         }
     }
 }

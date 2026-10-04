@@ -4,7 +4,6 @@ import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilFecha;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,88 +12,64 @@ import java.util.UUID;
 public class MovimientoInventarioDominio {
 
     private UUID id;
+    private ClaseMovimientoDominio claseMovimiento;
+    //codigo de la operacion que causo el movimiento: lo comparte con su renglon de compra, consumo de venta o cambio
+    //(la categoria de origen se sabe por el codigo)
     private TipoMovimientoDominio tipoMovimiento;
-    private OrigenDominio origen;
-    //codigo de la operacion que causo el movimiento (compra, venta o cambio)
-    private String codigoOperacion;
-    private ProductoInternoDominio productoInterno;
     private BigDecimal cantidad;
-    private UnidadMedidaDominio unidadMedida;
     private LocalDate fechaMovimiento;
-    //solo el id del lote afectado: el Lote ya guarda su movimiento de entrada como objeto
-    //y si los dos se guardaran como objeto, cada uno crearia al otro sin fin
-    private UUID idLote;
+    //entrada: el lote que se crea con esa compra o cambio; salida: el lote del que se saca
+    private LoteDominio lote;
 
     private MovimientoInventarioDominio(Builder builder) {
         this.id = builder.id;
+        this.claseMovimiento = builder.claseMovimiento;
         this.tipoMovimiento = builder.tipoMovimiento;
-        this.origen = builder.origen;
-        this.codigoOperacion = builder.codigoOperacion;
-        this.productoInterno = builder.productoInterno;
         this.cantidad = builder.cantidad;
-        this.unidadMedida = builder.unidadMedida;
         this.fechaMovimiento = builder.fechaMovimiento;
-        this.idLote = builder.idLote;
+        this.lote = builder.lote;
     }
 
     public UUID getId() {
         return id;
     }
 
+    public ClaseMovimientoDominio getClaseMovimiento() {
+        return claseMovimiento;
+    }
+
     public TipoMovimientoDominio getTipoMovimiento() {
         return tipoMovimiento;
-    }
-
-    public OrigenDominio getOrigen() {
-        return origen;
-    }
-
-    public String getCodigoOperacion() {
-        return codigoOperacion;
-    }
-
-    public ProductoInternoDominio getProductoInterno() {
-        return productoInterno;
     }
 
     public BigDecimal getCantidad() {
         return cantidad;
     }
 
-    public UnidadMedidaDominio getUnidadMedida() {
-        return unidadMedida;
-    }
-
     public LocalDate getFechaMovimiento() {
         return fechaMovimiento;
     }
 
-    public UUID getIdLote() {
-        return idLote;
+    public LoteDominio getLote() {
+        return lote;
     }
 
     public static class Builder {
 
         private UUID id;
+        private ClaseMovimientoDominio claseMovimiento;
         private TipoMovimientoDominio tipoMovimiento;
-        private OrigenDominio origen;
-        private String codigoOperacion;
-        private ProductoInternoDominio productoInterno;
         private BigDecimal cantidad;
-        private UnidadMedidaDominio unidadMedida;
         private LocalDate fechaMovimiento;
-        private UUID idLote;
+        private LoteDominio lote;
 
         public Builder() {
             id = UtilId.valorDefecto(id);
+            claseMovimiento = new ClaseMovimientoDominio.Builder().build();
             tipoMovimiento = new TipoMovimientoDominio.Builder().build();
-            origen = new OrigenDominio.Builder().build();
-            codigoOperacion = UtilTexto.vacia;
-            productoInterno = new ProductoInternoDominio.Builder().build();
             cantidad = BigDecimal.ZERO;
-            unidadMedida = new UnidadMedidaDominio.Builder().build();
             fechaMovimiento = UtilFecha.FECHA_POR_DEFECTO;
-            idLote = UtilId.valorDefecto(idLote);
+            lote = new LoteDominio.Builder().build();
         }
 
         public Builder id(UUID id) {
@@ -102,41 +77,23 @@ public class MovimientoInventarioDominio {
             return this;
         }
 
-        public Builder tipoMovimiento(
-                TipoMovimientoDominio tipoMovimiento) {
+        public Builder claseMovimiento(
+                ClaseMovimientoDominio claseMovimiento) {
 
+            this.claseMovimiento = UtilObjeto
+                    .obtenerValorDefectoSiValorOriginalEsNulo(
+                            claseMovimiento,
+                            new ClaseMovimientoDominio.Builder().build()
+                    );
+
+            return this;
+        }
+
+        public Builder tipoMovimiento(TipoMovimientoDominio tipoMovimiento) {
             this.tipoMovimiento = UtilObjeto
                     .obtenerValorDefectoSiValorOriginalEsNulo(
                             tipoMovimiento,
                             new TipoMovimientoDominio.Builder().build()
-                    );
-
-            return this;
-        }
-
-        public Builder origen(OrigenDominio origen) {
-            this.origen = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            origen,
-                            new OrigenDominio.Builder().build()
-                    );
-
-            return this;
-        }
-
-        public Builder codigoOperacion(String codigoOperacion) {
-            this.codigoOperacion = UtilTexto.getUtilTexto()
-                    .quitarEspaciosEnBlanco(codigoOperacion);
-            return this;
-        }
-
-        public Builder productoInterno(
-                ProductoInternoDominio productoInterno) {
-
-            this.productoInterno = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            productoInterno,
-                            new ProductoInternoDominio.Builder().build()
                     );
 
             return this;
@@ -148,26 +105,18 @@ public class MovimientoInventarioDominio {
             return this;
         }
 
-        public Builder unidadMedida(
-                UnidadMedidaDominio unidadMedida) {
-
-            this.unidadMedida = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            unidadMedida,
-                            new UnidadMedidaDominio.Builder().build()
-                    );
-
-            return this;
-        }
-
         public Builder fechaMovimiento(LocalDate fechaMovimiento) {
             this.fechaMovimiento = UtilFecha.valorDefecto(fechaMovimiento);
 
             return this;
         }
 
-        public Builder idLote(UUID idLote) {
-            this.idLote = UtilId.valorDefecto(idLote);
+        public Builder lote(LoteDominio lote) {
+            this.lote = UtilObjeto
+                    .obtenerValorDefectoSiValorOriginalEsNulo(
+                            lote,
+                            new LoteDominio.Builder().build()
+                    );
             return this;
         }
 
