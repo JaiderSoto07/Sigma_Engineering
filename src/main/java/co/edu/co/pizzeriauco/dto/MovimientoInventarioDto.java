@@ -4,7 +4,6 @@ import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilFecha;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,25 +12,22 @@ import java.util.UUID;
 public class MovimientoInventarioDto {
 
     private UUID id;
+    private ClaseMovimientoDto claseMovimiento;
+    //codigo de la operacion que causo el movimiento: lo comparte con su renglon de compra, consumo de venta o cambio
+    //(la categoria de origen se sabe por el codigo)
     private TipoMovimientoDto tipoMovimiento;
-    private OrigenDto origen;
-    private String codigoOperacion;
-    private ProductoInternoDto productoInterno;
     private BigDecimal cantidad;
-    private UnidadMedidaDto unidadMedida;
     private LocalDate fechaMovimiento;
-    private UUID idLote;
+    //entrada: el lote que se crea con esa compra o cambio; salida: el lote del que se saca
+    private LoteDto lote;
 
     public MovimientoInventarioDto() {
         setId(id);
+        setClaseMovimiento(new ClaseMovimientoDto());
         setTipoMovimiento(new TipoMovimientoDto());
-        setOrigen(new OrigenDto());
-        setCodigoOperacion(UtilTexto.vacia);
-        setProductoInterno(new ProductoInternoDto());
         setCantidad(BigDecimal.ZERO);
-        setUnidadMedida(new UnidadMedidaDto());
         setFechaMovimiento(UtilFecha.FECHA_POR_DEFECTO);
-        setIdLote(idLote);
+        setLote(new LoteDto());
     }
 
     public UUID getId() {
@@ -42,36 +38,20 @@ public class MovimientoInventarioDto {
         this.id = UtilId.valorDefecto(id);
     }
 
+    public ClaseMovimientoDto getClaseMovimiento() {
+        return claseMovimiento;
+    }
+
+    public void setClaseMovimiento(ClaseMovimientoDto claseMovimiento) {
+        this.claseMovimiento = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(claseMovimiento, new ClaseMovimientoDto());
+    }
+
     public TipoMovimientoDto getTipoMovimiento() {
         return tipoMovimiento;
     }
 
     public void setTipoMovimiento(TipoMovimientoDto tipoMovimiento) {
         this.tipoMovimiento = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(tipoMovimiento, new TipoMovimientoDto());
-    }
-
-    public OrigenDto getOrigen() {
-        return origen;
-    }
-
-    public void setOrigen(OrigenDto origen) {
-        this.origen = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(origen, new OrigenDto());
-    }
-
-    public String getCodigoOperacion() {
-        return codigoOperacion;
-    }
-
-    public void setCodigoOperacion(String codigoOperacion) {
-        this.codigoOperacion = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(codigoOperacion);
-    }
-
-    public ProductoInternoDto getProductoInterno() {
-        return productoInterno;
-    }
-
-    public void setProductoInterno(ProductoInternoDto productoInterno) {
-        this.productoInterno = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(productoInterno, new ProductoInternoDto());
     }
 
     public BigDecimal getCantidad() {
@@ -82,14 +62,6 @@ public class MovimientoInventarioDto {
         this.cantidad = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(cantidad, BigDecimal.ZERO);
     }
 
-    public UnidadMedidaDto getUnidadMedida() {
-        return unidadMedida;
-    }
-
-    public void setUnidadMedida(UnidadMedidaDto unidadMedida) {
-        this.unidadMedida = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(unidadMedida, new UnidadMedidaDto());
-    }
-
     public LocalDate getFechaMovimiento() {
         return fechaMovimiento;
     }
@@ -98,11 +70,11 @@ public class MovimientoInventarioDto {
         this.fechaMovimiento = UtilFecha.valorDefecto(fechaMovimiento);
     }
 
-    public UUID getIdLote() {
-        return idLote;
+    public LoteDto getLote() {
+        return lote;
     }
 
-    public void setIdLote(UUID idLote) {
-        this.idLote = UtilId.valorDefecto(idLote);
+    public void setLote(LoteDto lote) {
+        this.lote = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(lote, new LoteDto());
     }
 }

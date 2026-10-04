@@ -1,32 +1,29 @@
 package co.edu.co.pizzeriauco.dto;
 
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilFecha;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.UUID;
 
-public class CambioDto {
+public class ConsumoVentaDto {
 
     private UUID id;
-    private ProductoInternoDto productoCambio;
+    private DetalleVentaDto detalleVenta;
+    private ProductoInternoDto productoInterno;
+    //cantidad vendida por la cantidad de la receta, en la unidad de la receta
     private BigDecimal cantidad;
     private UnidadMedidaDto unidadMedida;
-    private LocalDate fechaVencimiento;
-    private LocalDate fechaCambio;
-    //codigo de la operacion: lo comparte con su movimiento de entrada
+    //codigo de la operacion: lo comparte con sus movimientos de salida
     private TipoMovimientoDto tipoMovimiento;
 
-    public CambioDto() {
+    public ConsumoVentaDto() {
         setId(id);
-        setProductoCambio(new ProductoInternoDto());
+        setDetalleVenta(new DetalleVentaDto());
+        setProductoInterno(new ProductoInternoDto());
         setCantidad(BigDecimal.ZERO);
         setUnidadMedida(new UnidadMedidaDto());
-        setFechaVencimiento(UtilFecha.FECHA_POR_DEFECTO);
-        setFechaCambio(UtilFecha.FECHA_POR_DEFECTO);
         setTipoMovimiento(new TipoMovimientoDto());
     }
 
@@ -38,12 +35,20 @@ public class CambioDto {
         this.id = UtilId.valorDefecto(id);
     }
 
-    public ProductoInternoDto getProductoCambio() {
-        return productoCambio;
+    public DetalleVentaDto getDetalleVenta() {
+        return detalleVenta;
     }
 
-    public void setProductoCambio(ProductoInternoDto productoCambio) {
-        this.productoCambio = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(productoCambio, new ProductoInternoDto());
+    public void setDetalleVenta(DetalleVentaDto detalleVenta) {
+        this.detalleVenta = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(detalleVenta, new DetalleVentaDto());
+    }
+
+    public ProductoInternoDto getProductoInterno() {
+        return productoInterno;
+    }
+
+    public void setProductoInterno(ProductoInternoDto productoInterno) {
+        this.productoInterno = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(productoInterno, new ProductoInternoDto());
     }
 
     public BigDecimal getCantidad() {
@@ -60,22 +65,6 @@ public class CambioDto {
 
     public void setUnidadMedida(UnidadMedidaDto unidadMedida) {
         this.unidadMedida = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(unidadMedida, new UnidadMedidaDto());
-    }
-
-    public LocalDate getFechaVencimiento() {
-        return fechaVencimiento;
-    }
-
-    public void setFechaVencimiento(LocalDate fechaVencimiento) {
-        this.fechaVencimiento = UtilFecha.valorDefecto(fechaVencimiento);
-    }
-
-    public LocalDate getFechaCambio() {
-        return fechaCambio;
-    }
-
-    public void setFechaCambio(LocalDate fechaCambio) {
-        this.fechaCambio = UtilFecha.valorDefecto(fechaCambio);
     }
 
     public TipoMovimientoDto getTipoMovimiento() {

@@ -12,8 +12,6 @@ import java.util.UUID;
 public class LoteEntidad {
 
     private UUID id;
-    //movimiento de entrada que origina el lote; su origen dice si vino de una compra o de un cambio
-    private MovimientoInventarioEntidad movimientoInventario;
     private LocalDate fechaVencimiento;
     //se calcula solo: esta disponible si todavia le queda saldo
     private boolean disponible;
@@ -25,7 +23,6 @@ public class LoteEntidad {
 
     private LoteEntidad(Builder builder) {
         this.id = builder.id;
-        this.movimientoInventario = builder.movimientoInventario;
         this.fechaVencimiento = builder.fechaVencimiento;
         this.productoInterno = builder.productoInterno;
         this.cantidad = builder.cantidad;
@@ -37,10 +34,6 @@ public class LoteEntidad {
 
     public UUID getId() {
         return id;
-    }
-
-    public MovimientoInventarioEntidad getMovimientoInventario() {
-        return movimientoInventario;
     }
 
     public LocalDate getFechaVencimiento() {
@@ -74,7 +67,6 @@ public class LoteEntidad {
     public static class Builder {
 
         private UUID id;
-        private MovimientoInventarioEntidad movimientoInventario;
         private LocalDate fechaVencimiento;
         private ProductoInternoEntidad productoInterno;
         private BigDecimal cantidad;
@@ -84,7 +76,6 @@ public class LoteEntidad {
 
         public Builder() {
             id = UtilId.valorDefecto(id);
-            movimientoInventario = new MovimientoInventarioEntidad.Builder().build();
             fechaVencimiento = UtilFecha.FECHA_POR_DEFECTO;
             productoInterno = new ProductoInternoEntidad.Builder().build();
             cantidad = BigDecimal.ZERO;
@@ -95,17 +86,6 @@ public class LoteEntidad {
 
         public Builder id(UUID id) {
             this.id = UtilId.valorDefecto(id);
-            return this;
-        }
-
-        public Builder movimientoInventario(
-                MovimientoInventarioEntidad movimientoInventario) {
-
-            this.movimientoInventario = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            movimientoInventario,
-                            new MovimientoInventarioEntidad.Builder().build()
-                    );
             return this;
         }
 

@@ -1,32 +1,30 @@
 package co.edu.co.pizzeriauco.entidad;
 
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilFecha;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.UUID;
 
-public class CambioEntidad {
+//cada renglon de venta se abre en los insumos de su receta: un consumo por insumo, cada uno con su codigo
+public class ConsumoVentaEntidad {
 
     private UUID id;
-    private ProductoInternoEntidad productoCambio;
+    private DetalleVentaEntidad detalleVenta;
+    private ProductoInternoEntidad productoInterno;
+    //cantidad vendida por la cantidad de la receta, en la unidad de la receta
     private BigDecimal cantidad;
     private UnidadMedidaEntidad unidadMedida;
-    private LocalDate fechaVencimiento;
-    private LocalDate fechaCambio;
-    //codigo de la operacion: lo comparte con su movimiento de entrada
+    //codigo de la operacion: lo comparte con sus movimientos de salida
     private TipoMovimientoEntidad tipoMovimiento;
 
-    private CambioEntidad(Builder builder) {
+    private ConsumoVentaEntidad(Builder builder) {
         this.id = builder.id;
-        this.productoCambio = builder.productoCambio;
+        this.detalleVenta = builder.detalleVenta;
+        this.productoInterno = builder.productoInterno;
         this.cantidad = builder.cantidad;
         this.unidadMedida = builder.unidadMedida;
-        this.fechaVencimiento = builder.fechaVencimiento;
-        this.fechaCambio = builder.fechaCambio;
         this.tipoMovimiento = builder.tipoMovimiento;
     }
 
@@ -34,8 +32,12 @@ public class CambioEntidad {
         return id;
     }
 
-    public ProductoInternoEntidad getProductoCambio() {
-        return productoCambio;
+    public DetalleVentaEntidad getDetalleVenta() {
+        return detalleVenta;
+    }
+
+    public ProductoInternoEntidad getProductoInterno() {
+        return productoInterno;
     }
 
     public BigDecimal getCantidad() {
@@ -46,14 +48,6 @@ public class CambioEntidad {
         return unidadMedida;
     }
 
-    public LocalDate getFechaVencimiento() {
-        return fechaVencimiento;
-    }
-
-    public LocalDate getFechaCambio() {
-        return fechaCambio;
-    }
-
     public TipoMovimientoEntidad getTipoMovimiento() {
         return tipoMovimiento;
     }
@@ -61,20 +55,18 @@ public class CambioEntidad {
     public static class Builder {
 
         private UUID id;
-        private ProductoInternoEntidad productoCambio;
+        private DetalleVentaEntidad detalleVenta;
+        private ProductoInternoEntidad productoInterno;
         private BigDecimal cantidad;
         private UnidadMedidaEntidad unidadMedida;
-        private LocalDate fechaVencimiento;
-        private LocalDate fechaCambio;
         private TipoMovimientoEntidad tipoMovimiento;
 
         public Builder() {
             id = UtilId.valorDefecto(id);
-            productoCambio = new ProductoInternoEntidad.Builder().build();
+            detalleVenta = new DetalleVentaEntidad.Builder().build();
+            productoInterno = new ProductoInternoEntidad.Builder().build();
             cantidad = BigDecimal.ZERO;
             unidadMedida = new UnidadMedidaEntidad.Builder().build();
-            fechaVencimiento = UtilFecha.FECHA_POR_DEFECTO;
-            fechaCambio = UtilFecha.FECHA_POR_DEFECTO;
             tipoMovimiento = new TipoMovimientoEntidad.Builder().build();
         }
 
@@ -83,10 +75,19 @@ public class CambioEntidad {
             return this;
         }
 
-        public Builder productoCambio(ProductoInternoEntidad productoCambio) {
-            this.productoCambio = UtilObjeto
+        public Builder detalleVenta(DetalleVentaEntidad detalleVenta) {
+            this.detalleVenta = UtilObjeto
                     .obtenerValorDefectoSiValorOriginalEsNulo(
-                            productoCambio,
+                            detalleVenta,
+                            new DetalleVentaEntidad.Builder().build()
+                    );
+            return this;
+        }
+
+        public Builder productoInterno(ProductoInternoEntidad productoInterno) {
+            this.productoInterno = UtilObjeto
+                    .obtenerValorDefectoSiValorOriginalEsNulo(
+                            productoInterno,
                             new ProductoInternoEntidad.Builder().build()
                     );
             return this;
@@ -106,16 +107,6 @@ public class CambioEntidad {
             return this;
         }
 
-        public Builder fechaVencimiento(LocalDate fechaVencimiento) {
-            this.fechaVencimiento = UtilFecha.valorDefecto(fechaVencimiento);
-            return this;
-        }
-
-        public Builder fechaCambio(LocalDate fechaCambio) {
-            this.fechaCambio = UtilFecha.valorDefecto(fechaCambio);
-            return this;
-        }
-
         public Builder tipoMovimiento(TipoMovimientoEntidad tipoMovimiento) {
             this.tipoMovimiento = UtilObjeto
                     .obtenerValorDefectoSiValorOriginalEsNulo(
@@ -125,8 +116,8 @@ public class CambioEntidad {
             return this;
         }
 
-        public CambioEntidad build() {
-            return new CambioEntidad(this);
+        public ConsumoVentaEntidad build() {
+            return new ConsumoVentaEntidad(this);
         }
     }
 }

@@ -5,16 +5,19 @@ import co.edu.co.pizzeriauco.dao.datos.entidad.CambioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.CompraDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.DetalleCompraDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.DetalleRecetaDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.ConsumoVentaDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.DetalleVentaDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.HistoricoPrecioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.InventarioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.LoteDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.MovimientoInventarioDAO;
-import co.edu.co.pizzeriauco.dao.datos.entidad.OrigenDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.CategoriaOrigenDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.ProductoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.ProductoInternoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.ProveedorDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.SalidaLoteDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.TamanoDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.ClaseMovimientoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.TipoMovimientoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.TipoProductoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.UnidadMedidaDAO;
@@ -61,7 +64,9 @@ public abstract class DAOFactory {
 
     //va a fabricar los DAO de las entidades
 
-    public abstract OrigenDAO obtenerOrigenDAO();
+    public abstract CategoriaOrigenDAO obtenerCategoriaOrigenDAO();
+
+    public abstract ClaseMovimientoDAO obtenerClaseMovimientoDAO();
 
     public abstract TipoMovimientoDAO obtenerTipoMovimientoDAO();
 
@@ -83,6 +88,8 @@ public abstract class DAOFactory {
 
     public abstract LoteDAO obtenerLoteDAO();
 
+    public abstract SalidaLoteDAO obtenerSalidaLoteDAO();
+
     public abstract InventarioDAO obtenerInventarioDAO();
 
     public abstract HistoricoPrecioDAO obtenerHistoricoPrecioDAO();
@@ -96,4 +103,6 @@ public abstract class DAOFactory {
     public abstract VentaDAO obtenerVentaDAO();
 
     public abstract DetalleVentaDAO obtenerDetalleVentaDAO();
+
+    public abstract ConsumoVentaDAO obtenerConsumoVentaDAO();
 }

@@ -1,18 +1,18 @@
 package co.edu.co.pizzeriauco.dto;
 
 import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
+import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
 
 import java.util.UUID;
 
 public class TipoMovimientoDto {
 
     private UUID id;
-    private String nombre;
+    private CategoriaOrigenDto categoriaOrigen;
 
     public TipoMovimientoDto() {
         setId(id);
-        setNombre(UtilTexto.vacia);
+        setCategoriaOrigen(new CategoriaOrigenDto());
     }
 
     public UUID getId() {
@@ -23,11 +23,11 @@ public class TipoMovimientoDto {
         this.id = UtilId.valorDefecto(id);
     }
 
-    public String getNombre() {
-        return nombre;
+    public CategoriaOrigenDto getCategoriaOrigen() {
+        return categoriaOrigen;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = UtilTexto.getUtilTexto().primeraLetraMayuscula(nombre);
+    public void setCategoriaOrigen(CategoriaOrigenDto categoriaOrigen) {
+        this.categoriaOrigen = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(categoriaOrigen, new CategoriaOrigenDto());
     }
 }

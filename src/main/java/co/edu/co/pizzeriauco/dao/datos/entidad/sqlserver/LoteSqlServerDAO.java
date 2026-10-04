@@ -8,10 +8,7 @@ import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
 import co.edu.co.pizzeriauco.dao.datos.entidad.LoteDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.LoteEntidad;
-import co.edu.co.pizzeriauco.entidad.MovimientoInventarioEntidad;
-import co.edu.co.pizzeriauco.entidad.OrigenEntidad;
 import co.edu.co.pizzeriauco.entidad.ProductoInternoEntidad;
-import co.edu.co.pizzeriauco.entidad.TipoMovimientoEntidad;
 import co.edu.co.pizzeriauco.entidad.UnidadMedidaEntidad;
 
 import java.sql.Connection;
@@ -30,19 +27,19 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
     @Override
     public void crear(LoteEntidad entidad) {
         //disponible no se escribe: la base la calcula con el saldo
-        var sentenciaSql = "insert into lote(id_lote, id_movimiento_inventario, numero_lote, id_producto_interno, cantidad, "
-                + "saldo, id_unidad_medida, fecha_vencimiento) values(?, ?, ?, ?, ?, ?, ?, ?)";
+        //el lote se crea primero (en 0) y luego su movimiento de entrada lo llena
+        var sentenciaSql = "insert into lote(id_lote, numero_lote, id_producto_interno, cantidad, "
+                + "saldo, id_unidad_medida, fecha_vencimiento) values(?, ?, ?, ?, ?, ?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             //se llenan los datos en el mismo orden de los ?
             sentencia.setObject(1, entidad.getId());
-            //del movimiento, el producto interno y la unidad solo se guarda su id (llaves foraneas)
-            sentencia.setObject(2, entidad.getMovimientoInventario().getId());
-            sentencia.setInt(3, entidad.getNumeroLote());
-            sentencia.setObject(4, entidad.getProductoInterno().getId());
-            sentencia.setBigDecimal(5, entidad.getCantidad());
-            sentencia.setBigDecimal(6, entidad.getSaldo());
-            sentencia.setObject(7, entidad.getUnidadMedidaInventario().getId());
-            sentencia.setObject(8, entidad.getFechaVencimiento());
+            //del producto interno y la unidad solo se guarda su id (llaves foraneas)
+            sentencia.setInt(2, entidad.getNumeroLote());
+            sentencia.setObject(3, entidad.getProductoInterno().getId());
+            sentencia.setBigDecimal(4, entidad.getCantidad());
+            sentencia.setBigDecimal(5, entidad.getSaldo());
+            sentencia.setObject(6, entidad.getUnidadMedidaInventario().getId());
+            sentencia.setObject(7, entidad.getFechaVencimiento());
             sentencia.executeUpdate();
         } catch (SQLException excepcion) {
             //el controlado
@@ -58,13 +55,10 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
     @Override
     public LoteEntidad consultarPorId(UUID id) {
         var sentenciaSql = "select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, "
-                + "mi.id_movimiento_inventario, mi.id_tipo_movimiento, mi.id_origen, mi.codigo_operacion, mi.cantidad as cantidad_movimiento, "
-                + "mi.id_producto_interno as id_producto_interno_movimiento, mi.id_unidad_medida as id_unidad_medida_movimiento, mi.fecha_movimiento, "
                 + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
                 + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
                 + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
                 + "from lote as l "
-                + "inner join movimiento_inventario as mi on l.id_movimiento_inventario = mi.id_movimiento_inventario "
                 + "inner join producto_interno as pi on l.id_producto_interno = pi.id_producto_interno "
                 + "inner join unidad_medida as um on l.id_unidad_medida = um.id_unidad_medida "
                 + "where l.id_lote = ?";
@@ -75,22 +69,8 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
 
             var resultado = sentencia.executeQuery();
             if (resultado.next()) {
-                //primero se arman los padres (movimiento, producto interno y unidad) para luego asignarlos al lote
-                //de los "abuelos" (tipo, origen, producto y unidad del movimiento; unidad del producto interno) solo se trae el id
-                var movimientoInventario = new MovimientoInventarioEntidad.Builder()
-                        .id(UUID.fromString(resultado.getString("id_movimiento_inventario")))
-                        .tipoMovimiento(new TipoMovimientoEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_tipo_movimiento"))).build())
-                        .origen(new OrigenEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_origen"))).build())
-                        .codigoOperacion(resultado.getString("codigo_operacion"))
-                        .productoInterno(new ProductoInternoEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_producto_interno_movimiento"))).build())
-                        .cantidad(resultado.getBigDecimal("cantidad_movimiento"))
-                        .unidadMedida(new UnidadMedidaEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_unidad_medida_movimiento"))).build())
-                        .fechaMovimiento(resultado.getObject("fecha_movimiento", LocalDate.class))
-                        .build();
+                //primero se arman los padres (producto interno y unidad) para luego asignarlos al lote
+                //del "abuelo" (unidad del producto interno) solo se trae el id
                 var productoInterno = new ProductoInternoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto_interno")))
                         .nombre(resultado.getString("nombre_producto_interno"))
@@ -108,7 +88,6 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
                 //disponible no se lee: el lote lo calcula solo con el saldo
                 loteEncontrado = new LoteEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_lote")))
-                        .movimientoInventario(movimientoInventario)
                         .numeroLote(resultado.getInt("numero_lote"))
                         .productoInterno(productoInterno)
                         .cantidad(resultado.getBigDecimal("cantidad"))
@@ -134,13 +113,10 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
     public List<LoteEntidad> consultarPorFiltro(LoteEntidad filtro) {
         var lotesEncontrados = new ArrayList<LoteEntidad>();
         var sentenciaSql = "select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, "
-                + "mi.id_movimiento_inventario, mi.id_tipo_movimiento, mi.id_origen, mi.codigo_operacion, mi.cantidad as cantidad_movimiento, "
-                + "mi.id_producto_interno as id_producto_interno_movimiento, mi.id_unidad_medida as id_unidad_medida_movimiento, mi.fecha_movimiento, "
                 + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
                 + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
                 + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
                 + "from lote as l "
-                + "inner join movimiento_inventario as mi on l.id_movimiento_inventario = mi.id_movimiento_inventario "
                 + "inner join producto_interno as pi on l.id_producto_interno = pi.id_producto_interno "
                 + "inner join unidad_medida as um on l.id_unidad_medida = um.id_unidad_medida "
                 + "where 1=1";
@@ -157,11 +133,6 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
         if (!UtilFecha.FECHA_POR_DEFECTO.equals(filtro.getFechaVencimiento())) {
             sentenciaSql = sentenciaSql + " and l.fecha_vencimiento = ?";
             parametros.add(filtro.getFechaVencimiento());
-        }
-        //este el del movimiento que creo el lote
-        if (!UtilId.VALOR_DEFECTO.equals(filtro.getMovimientoInventario().getId())) {
-            sentenciaSql = sentenciaSql + " and mi.id_movimiento_inventario = ?";
-            parametros.add(filtro.getMovimientoInventario().getId());
         }
         //estos los del producto interno (para traer todos los lotes de un insumo)
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getProductoInterno().getId())) {
@@ -184,21 +155,7 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
             var resultado = sentencia.executeQuery();
             // por cada fila que llego, se arma un lote y se agrega a la lista
             while (resultado.next()) {
-                //primero se arman los padres (movimiento, producto interno y unidad) para luego asignarlos al lote
-                var movimientoInventario = new MovimientoInventarioEntidad.Builder()
-                        .id(UUID.fromString(resultado.getString("id_movimiento_inventario")))
-                        .tipoMovimiento(new TipoMovimientoEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_tipo_movimiento"))).build())
-                        .origen(new OrigenEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_origen"))).build())
-                        .codigoOperacion(resultado.getString("codigo_operacion"))
-                        .productoInterno(new ProductoInternoEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_producto_interno_movimiento"))).build())
-                        .cantidad(resultado.getBigDecimal("cantidad_movimiento"))
-                        .unidadMedida(new UnidadMedidaEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_unidad_medida_movimiento"))).build())
-                        .fechaMovimiento(resultado.getObject("fecha_movimiento", LocalDate.class))
-                        .build();
+                //primero se arman los padres (producto interno y unidad) para luego asignarlos al lote
                 var productoInterno = new ProductoInternoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto_interno")))
                         .nombre(resultado.getString("nombre_producto_interno"))
@@ -215,7 +172,6 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
                         .build();
                 var lote = new LoteEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_lote")))
-                        .movimientoInventario(movimientoInventario)
                         .numeroLote(resultado.getInt("numero_lote"))
                         .productoInterno(productoInterno)
                         .cantidad(resultado.getBigDecimal("cantidad"))
@@ -241,13 +197,10 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
     @Override
     public List<LoteEntidad> consultarTodos() {
         var sentenciaSql = "select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, "
-                + "mi.id_movimiento_inventario, mi.id_tipo_movimiento, mi.id_origen, mi.codigo_operacion, mi.cantidad as cantidad_movimiento, "
-                + "mi.id_producto_interno as id_producto_interno_movimiento, mi.id_unidad_medida as id_unidad_medida_movimiento, mi.fecha_movimiento, "
                 + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
                 + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
                 + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
                 + "from lote as l "
-                + "inner join movimiento_inventario as mi on l.id_movimiento_inventario = mi.id_movimiento_inventario "
                 + "inner join producto_interno as pi on l.id_producto_interno = pi.id_producto_interno "
                 + "inner join unidad_medida as um on l.id_unidad_medida = um.id_unidad_medida "
                 + "order by pi.nombre asc, l.numero_lote asc";
@@ -257,21 +210,7 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
 
             var resultado = sentencia.executeQuery();
             while (resultado.next()) {
-                //primero se arman los padres (movimiento, producto interno y unidad) para luego asignarlos al lote
-                var movimientoInventario = new MovimientoInventarioEntidad.Builder()
-                        .id(UUID.fromString(resultado.getString("id_movimiento_inventario")))
-                        .tipoMovimiento(new TipoMovimientoEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_tipo_movimiento"))).build())
-                        .origen(new OrigenEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_origen"))).build())
-                        .codigoOperacion(resultado.getString("codigo_operacion"))
-                        .productoInterno(new ProductoInternoEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_producto_interno_movimiento"))).build())
-                        .cantidad(resultado.getBigDecimal("cantidad_movimiento"))
-                        .unidadMedida(new UnidadMedidaEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_unidad_medida_movimiento"))).build())
-                        .fechaMovimiento(resultado.getObject("fecha_movimiento", LocalDate.class))
-                        .build();
+                //primero se arman los padres (producto interno y unidad) para luego asignarlos al lote
                 var productoInterno = new ProductoInternoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto_interno")))
                         .nombre(resultado.getString("nombre_producto_interno"))
@@ -288,7 +227,6 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
                         .build();
                 var lote = new LoteEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_lote")))
-                        .movimientoInventario(movimientoInventario)
                         .numeroLote(resultado.getInt("numero_lote"))
                         .productoInterno(productoInterno)
                         .cantidad(resultado.getBigDecimal("cantidad"))
@@ -312,7 +250,8 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
 
     //normalmente solo cambia el saldo (en cada salida); cantidad y fecha de vencimiento solo cambian
     //cuando se corrige un renglon de compra o un cambio con el lote intacto (saldo = cantidad).
-    //insumo, unidad, numero de lote y movimiento de origen nunca se actualizan
+    //al crearse el lote queda en 0: su movimiento de entrada lo llena (cantidad = saldo = lo que entro)
+    //insumo, unidad y numero de lote nunca se actualizan
     @Override
     public void actualizar(UUID id, LoteEntidad entidad) {
         var sentenciaSql = "update lote set cantidad = ?, saldo = ?, fecha_vencimiento = ? where id_lote = ?";

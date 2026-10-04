@@ -6,16 +6,19 @@ import co.edu.co.pizzeriauco.dao.datos.entidad.CambioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.CompraDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.DetalleCompraDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.DetalleRecetaDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.ConsumoVentaDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.DetalleVentaDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.HistoricoPrecioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.InventarioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.LoteDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.MovimientoInventarioDAO;
-import co.edu.co.pizzeriauco.dao.datos.entidad.OrigenDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.CategoriaOrigenDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.ProductoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.ProductoInternoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.ProveedorDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.SalidaLoteDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.TamanoDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.ClaseMovimientoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.TipoMovimientoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.TipoProductoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.UnidadMedidaDAO;
@@ -24,16 +27,19 @@ import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.CambioSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.CompraSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.DetalleCompraSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.DetalleRecetaSqlServerDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.ConsumoVentaSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.DetalleVentaSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.HistoricoPrecioSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.InventarioSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.LoteSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.MovimientoInventarioSqlServerDAO;
-import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.OrigenSqlServerDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.CategoriaOrigenSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.ProductoInternoSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.ProductoSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.ProveedorSqlServerDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.SalidaLoteSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.TamanoSqlServerDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.ClaseMovimientoSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.TipoMovimientoSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.TipoProductoSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.UnidadMedidaSqlServerDAO;
@@ -68,8 +74,13 @@ public class SqlServerDAOFactory extends DAOFactory {
     }
 
     @Override
-    public OrigenDAO obtenerOrigenDAO() {
-        return new OrigenSqlServerDAO(getConexion());
+    public CategoriaOrigenDAO obtenerCategoriaOrigenDAO() {
+        return new CategoriaOrigenSqlServerDAO(getConexion());
+    }
+
+    @Override
+    public ClaseMovimientoDAO obtenerClaseMovimientoDAO() {
+        return new ClaseMovimientoSqlServerDAO(getConexion());
     }
 
     @Override
@@ -123,6 +134,11 @@ public class SqlServerDAOFactory extends DAOFactory {
     }
 
     @Override
+    public SalidaLoteDAO obtenerSalidaLoteDAO() {
+        return new SalidaLoteSqlServerDAO(getConexion());
+    }
+
+    @Override
     public InventarioDAO obtenerInventarioDAO() {
         return new InventarioSqlServerDAO(getConexion());
     }
@@ -155,5 +171,10 @@ public class SqlServerDAOFactory extends DAOFactory {
     @Override
     public DetalleVentaDAO obtenerDetalleVentaDAO() {
         return new DetalleVentaSqlServerDAO(getConexion());
+    }
+
+    @Override
+    public ConsumoVentaDAO obtenerConsumoVentaDAO() {
+        return new ConsumoVentaSqlServerDAO(getConexion());
     }
 }
