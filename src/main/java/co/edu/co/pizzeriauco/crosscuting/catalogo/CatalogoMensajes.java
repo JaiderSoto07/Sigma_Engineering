@@ -333,4 +333,27 @@ public class CatalogoMensajes {
         public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODOS_LOS_DETALLES_VENTA = "Se ha presentado un problema NO CONTROLADO tratando de consultar todos los renglones de venta. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
     }
 
+    public static class DetalleRecetaNegocioImpl {
+
+        private DetalleRecetaNegocioImpl() {
+        }
+
+
+        public static final String DATOS_DETALLE_RECETA_OBLIGATORIOS = "No es posible registrar el ingrediente de la receta porque no se recibio su informacion. Por favor diligencie los datos del ingrediente e intente de nuevo";
+        public static final String PRODUCTO_DETALLE_RECETA_OBLIGATORIO = "No es posible registrar el ingrediente de la receta porque no se indico el producto (receta) al que pertenece. Por favor seleccione el producto e intente de nuevo";
+        public static final String PRODUCTO_INTERNO_DETALLE_RECETA_OBLIGATORIO = "No es posible registrar el ingrediente de la receta porque no se indico el producto interno (ingrediente). Por favor seleccione el producto interno e intente de nuevo";
+        public static final String UNIDAD_MEDIDA_DETALLE_RECETA_OBLIGATORIA = "No es posible registrar el ingrediente de la receta porque no se indico la unidad de medida de la cantidad. Por favor seleccione la unidad de medida e intente de nuevo";
+        public static final String CANTIDAD_DETALLE_RECETA_OBLIGATORIA = "No es posible registrar el ingrediente de la receta porque la cantidad es obligatoria y debe ser mayor que cero. Por favor ingrese una cantidad valida e intente de nuevo";
+        public static final String CANTIDAD_DETALLE_RECETA_FUERA_DE_RANGO = "No es posible registrar el ingrediente de la receta porque la cantidad no puede ser mayor que 10000. Por favor ingrese una cantidad valida e intente de nuevo";
+        public static final String CANTIDAD_DETALLE_RECETA_FORMATO_INVALIDO = "No es posible registrar el ingrediente de la receta porque la cantidad puede tener maximo 4 decimales. Por favor ingrese una cantidad valida e intente de nuevo";
+
+        public static final String PRODUCTO_DETALLE_RECETA_NO_EXISTE = "No es posible registrar el ingrediente porque el producto (receta) al que se desea agregar no existe. Por favor verifique el producto e intente de nuevo";
+
+        public static final String EXISTE_OTRA_RECETA_CON_EL_MISMO_NOMBRE = "No es posible registrar el ingrediente porque existe otro producto (receta) con el mismo nombre y tamano. Por favor verifique la receta e intente de nuevo";
+
+        public static final String PRODUCTO_INTERNO_DETALLE_RECETA_NO_EXISTE = "No es posible registrar el ingrediente porque el producto interno seleccionado no existe. Por favor verifique el producto interno e intente de nuevo";
+
+        public static final String PRODUCTO_INTERNO_YA_REGISTRADO_EN_RECETA = "No es posible registrar el ingrediente porque el producto interno ya esta registrado en esta receta. Si necesita cambiar la cantidad, modifique el ingrediente existente";
+    }
+
 }
