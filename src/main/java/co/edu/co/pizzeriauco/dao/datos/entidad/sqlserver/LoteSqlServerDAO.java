@@ -54,7 +54,7 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
 
     @Override
     public LoteEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, "
+        var sentenciaSql = "select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, l.disponible, "
                 + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
                 + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
                 + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
@@ -85,13 +85,14 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
                         .unidadMedida(resultado.getString("unidad_medida"))
                         .tipoMedida(resultado.getString("tipo_medida"))
                         .build();
-                //disponible no se lee: el lote lo calcula solo con el saldo
+                //disponible lo calcula la base con el saldo; aqui solo se lee
                 loteEncontrado = new LoteEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_lote")))
                         .numeroLote(resultado.getInt("numero_lote"))
                         .productoInterno(productoInterno)
                         .cantidad(resultado.getBigDecimal("cantidad"))
                         .saldo(resultado.getBigDecimal("saldo"))
+                        .disponible(resultado.getBoolean("disponible"))
                         .unidadMedidaInventario(unidadMedidaInventario)
                         .fechaVencimiento(resultado.getObject("fecha_vencimiento", LocalDate.class))
                         .build();
@@ -112,7 +113,7 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
     @Override
     public List<LoteEntidad> consultarPorFiltro(LoteEntidad filtro) {
         var lotesEncontrados = new ArrayList<LoteEntidad>();
-        var sentenciaSql = "select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, "
+        var sentenciaSql = "select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, l.disponible, "
                 + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
                 + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
                 + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
@@ -176,6 +177,7 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
                         .productoInterno(productoInterno)
                         .cantidad(resultado.getBigDecimal("cantidad"))
                         .saldo(resultado.getBigDecimal("saldo"))
+                        .disponible(resultado.getBoolean("disponible"))
                         .unidadMedidaInventario(unidadMedidaInventario)
                         .fechaVencimiento(resultado.getObject("fecha_vencimiento", LocalDate.class))
                         .build();
@@ -196,7 +198,7 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
 
     @Override
     public List<LoteEntidad> consultarTodos() {
-        var sentenciaSql = "select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, "
+        var sentenciaSql = "select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, l.disponible, "
                 + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
                 + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
                 + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
@@ -231,6 +233,7 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
                         .productoInterno(productoInterno)
                         .cantidad(resultado.getBigDecimal("cantidad"))
                         .saldo(resultado.getBigDecimal("saldo"))
+                        .disponible(resultado.getBoolean("disponible"))
                         .unidadMedidaInventario(unidadMedidaInventario)
                         .fechaVencimiento(resultado.getObject("fecha_vencimiento", LocalDate.class))
                         .build();

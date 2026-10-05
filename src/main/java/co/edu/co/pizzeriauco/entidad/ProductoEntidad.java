@@ -14,7 +14,6 @@ public class ProductoEntidad {
     private String nombre;
     private TipoProductoEntidad tipoProducto;
     private TamanoEntidad tamano;
-    //se calcula solo: es producto interno si tiene un insumo de bodega asociado
     private boolean productoInterno;
     //insumo de bodega que se vende directo (ej. la bebida); vacio si se vende por receta
     private ProductoInternoEntidad productoInternoAsociado;
@@ -28,7 +27,7 @@ public class ProductoEntidad {
         this.tipoProducto = builder.tipoProducto;
         this.tamano = builder.tamano;
         this.productoInternoAsociado = builder.productoInternoAsociado;
-        this.productoInterno = !UtilId.VALOR_DEFECTO.equals(productoInternoAsociado.getId());
+        this.productoInterno = builder.productoInterno;
         this.precio = builder.precio;
         this.activo = builder.activo;
     }
@@ -71,6 +70,7 @@ public class ProductoEntidad {
         private String nombre;
         private TipoProductoEntidad tipoProducto;
         private TamanoEntidad tamano;
+        private boolean productoInterno;
         private ProductoInternoEntidad productoInternoAsociado;
         private BigDecimal precio;
         private boolean activo;
@@ -80,6 +80,7 @@ public class ProductoEntidad {
             nombre = UtilTexto.vacia;
             tipoProducto = new TipoProductoEntidad.Builder().build();
             tamano = new TamanoEntidad.Builder().build();
+            productoInterno = false;
             productoInternoAsociado = new ProductoInternoEntidad.Builder().build();
             precio = BigDecimal.ZERO;
             //todo producto nace activo (en el menu)
@@ -113,6 +114,11 @@ public class ProductoEntidad {
                             tamano,
                             new TamanoEntidad.Builder().build()
                     );
+            return this;
+        }
+
+        public Builder productoInterno(boolean productoInterno) {
+            this.productoInterno = productoInterno;
             return this;
         }
 

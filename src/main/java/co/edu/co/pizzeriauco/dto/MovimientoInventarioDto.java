@@ -13,12 +13,9 @@ public class MovimientoInventarioDto {
 
     private UUID id;
     private ClaseMovimientoDto claseMovimiento;
-    //codigo de la operacion que causo el movimiento: lo comparte con su renglon de compra, consumo de venta o cambio
-    //(la categoria de origen se sabe por el codigo)
     private TipoMovimientoDto tipoMovimiento;
     private BigDecimal cantidad;
     private LocalDate fechaMovimiento;
-    //entrada: el lote que se crea con esa compra o cambio; salida: el lote del que se saca
     private LoteDto lote;
 
     public MovimientoInventarioDto() {

@@ -14,15 +14,15 @@ public class DetalleVentaDto {
     private int cantidad;
     private ProductoDto producto;
     private BigDecimal precioProducto;
-    //se calcula solo: cantidad por el precio del producto en el momento de la venta
     private BigDecimal subtotal;
 
     public DetalleVentaDto() {
         setId(UtilId.VALOR_DEFECTO);
-        setVenta(new VentaDto());
+        setCantidad(UtilNumero.cero);
         setCantidad(0);
         setProducto(new ProductoDto());
         setPrecioProducto(BigDecimal.ZERO);
+        setSubtotal(BigDecimal.ZERO);
     }
 
     public UUID getId() {
@@ -47,7 +47,6 @@ public class DetalleVentaDto {
 
     public void setCantidad(int cantidad) {
         this.cantidad = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(cantidad, UtilNumero.cero);
-        calcularSubtotal();
     }
 
     public ProductoDto getProducto() {
@@ -64,16 +63,13 @@ public class DetalleVentaDto {
 
     public void setPrecioProducto(BigDecimal precioProducto) {
         this.precioProducto = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(precioProducto, BigDecimal.ZERO);
-        calcularSubtotal();
     }
 
     public BigDecimal getSubtotal() {
         return subtotal;
     }
 
-    //cada vez que cambia la cantidad o el precio se vuelve a calcular el subtotal
-    private void calcularSubtotal() {
-        var precio = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(precioProducto, BigDecimal.ZERO);
-        this.subtotal = precio.multiply(BigDecimal.valueOf(cantidad));
+    public void setSubtotal(BigDecimal subtotal) {
+        this.subtotal = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(subtotal, BigDecimal.ZERO);
     }
 }

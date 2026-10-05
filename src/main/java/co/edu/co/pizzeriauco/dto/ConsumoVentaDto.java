@@ -12,10 +12,8 @@ public class ConsumoVentaDto {
     private UUID id;
     private DetalleVentaDto detalleVenta;
     private ProductoInternoDto productoInterno;
-    //cantidad vendida por la cantidad de la receta, en la unidad de la receta
     private BigDecimal cantidad;
     private UnidadMedidaDto unidadMedida;
-    //codigo de la operacion: lo comparte con sus movimientos de salida
     private TipoMovimientoDto tipoMovimiento;
 
     public ConsumoVentaDto() {

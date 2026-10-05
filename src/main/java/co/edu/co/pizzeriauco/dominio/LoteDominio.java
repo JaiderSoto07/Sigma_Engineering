@@ -13,7 +13,6 @@ public class LoteDominio {
 
     private UUID id;
     private LocalDate fechaVencimiento;
-    //se calcula solo: esta disponible si todavia le queda saldo
     private boolean disponible;
     private ProductoInternoDominio productoInterno;
     private BigDecimal cantidad;
@@ -27,7 +26,7 @@ public class LoteDominio {
         this.productoInterno = builder.productoInterno;
         this.cantidad = builder.cantidad;
         this.saldo = builder.saldo;
-        this.disponible = UtilNumero.mayorQue(saldo, BigDecimal.ZERO);
+        this.disponible = builder.disponible;
         this.unidadMedidaInventario = builder.unidadMedidaInventario;
         this.numeroLote = builder.numeroLote;
     }
@@ -68,6 +67,7 @@ public class LoteDominio {
 
         private UUID id;
         private LocalDate fechaVencimiento;
+        private boolean disponible;
         private ProductoInternoDominio productoInterno;
         private BigDecimal cantidad;
         private BigDecimal saldo;
@@ -77,6 +77,7 @@ public class LoteDominio {
         public Builder() {
             id = UtilId.valorDefecto(id);
             fechaVencimiento = UtilFecha.FECHA_POR_DEFECTO;
+            disponible = false;
             productoInterno = new ProductoInternoDominio.Builder().build();
             cantidad = BigDecimal.ZERO;
             saldo = BigDecimal.ZERO;
@@ -91,6 +92,11 @@ public class LoteDominio {
 
         public Builder fechaVencimiento(LocalDate fechaVencimiento) {
             this.fechaVencimiento = UtilFecha.valorDefecto(fechaVencimiento);
+            return this;
+        }
+
+        public Builder disponible(boolean disponible) {
+            this.disponible = disponible;
             return this;
         }
 

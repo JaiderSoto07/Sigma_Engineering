@@ -17,7 +17,6 @@ public class CambioDto {
     private UnidadMedidaDto unidadMedida;
     private LocalDate fechaVencimiento;
     private LocalDate fechaCambio;
-    //codigo de la operacion: lo comparte con su movimiento de entrada
     private TipoMovimientoDto tipoMovimiento;
 
     public CambioDto() {

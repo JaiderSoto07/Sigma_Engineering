@@ -24,6 +24,7 @@ public class ProductoDto {
         setNombre(UtilTexto.vacia);
         setTipoProducto(new TipoProductoDto());
         setTamano(new TamanoDto());
+        setProductoInterno(false);
         setProductoInternoAsociado(new ProductoInternoDto());
         setPrecio(BigDecimal.ZERO);
         setActivo(true);
@@ -65,13 +66,16 @@ public class ProductoDto {
         return productoInterno;
     }
 
+    public void setProductoInterno(boolean productoInterno) {
+        this.productoInterno = productoInterno;
+    }
+
     public ProductoInternoDto getProductoInternoAsociado() {
         return productoInternoAsociado;
     }
 
     public void setProductoInternoAsociado(ProductoInternoDto productoInternoAsociado) {
         this.productoInternoAsociado = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(productoInternoAsociado, new ProductoInternoDto());
-        this.productoInterno = !UtilId.VALOR_DEFECTO.equals(this.productoInternoAsociado.getId());
     }
 
     public BigDecimal getPrecio() {

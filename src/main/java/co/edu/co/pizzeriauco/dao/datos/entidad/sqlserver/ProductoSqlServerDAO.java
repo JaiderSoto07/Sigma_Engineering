@@ -36,7 +36,7 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
             sentencia.setObject(3, entidad.getTipoProducto().getId());
             sentencia.setObject(4, entidad.getTamano().getId());
             //PENDIENTE (decision de los null): si no tiene insumo asociado hoy se guarda null
-            sentencia.setObject(5, entidad.isProductoInterno() ? entidad.getProductoInternoAsociado().getId() : null);
+            sentencia.setObject(5, !UtilId.VALOR_DEFECTO.equals(entidad.getProductoInternoAsociado().getId()) ? entidad.getProductoInternoAsociado().getId() : null);
             sentencia.setBigDecimal(6, entidad.getPrecio());
             sentencia.setBoolean(7, entidad.isActivo());
             sentencia.executeUpdate();
@@ -53,7 +53,7 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
 
     @Override
     public ProductoEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.precio, p.activo, "
+        var sentenciaSql = "select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.producto_interno, p.precio, p.activo, "
                 + "tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano "
                 + "from producto as p "
                 + "inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto "
@@ -85,6 +85,7 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
                         .nombre(resultado.getString("nombre_producto"))
                         .tipoProducto(tipoProducto)
                         .tamano(tamano)
+                        .productoInterno(resultado.getBoolean("producto_interno"))
                         .productoInternoAsociado(productoInternoAsociado)
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo"))
@@ -106,7 +107,7 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
     @Override
     public List<ProductoEntidad> consultarPorFiltro(ProductoEntidad filtro) {
         var productosEncontrados = new ArrayList<ProductoEntidad>();
-        var sentenciaSql = "select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.precio, p.activo, "
+        var sentenciaSql = "select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.producto_interno, p.precio, p.activo, "
                 + "tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano "
                 + "from producto as p "
                 + "inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto "
@@ -170,6 +171,7 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
                         .nombre(resultado.getString("nombre_producto"))
                         .tipoProducto(tipoProducto)
                         .tamano(tamano)
+                        .productoInterno(resultado.getBoolean("producto_interno"))
                         .productoInternoAsociado(productoInternoAsociado)
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo"))
@@ -191,7 +193,7 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
 
     @Override
     public List<ProductoEntidad> consultarTodos() {
-        var sentenciaSql = "select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.precio, p.activo, "
+        var sentenciaSql = "select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.producto_interno, p.precio, p.activo, "
                 + "tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano "
                 + "from producto as p "
                 + "inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto "
@@ -221,6 +223,7 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
                         .nombre(resultado.getString("nombre_producto"))
                         .tipoProducto(tipoProducto)
                         .tamano(tamano)
+                        .productoInterno(resultado.getBoolean("producto_interno"))
                         .productoInternoAsociado(productoInternoAsociado)
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo"))
@@ -249,7 +252,7 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
             sentencia.setObject(2, entidad.getTipoProducto().getId());
             sentencia.setObject(3, entidad.getTamano().getId());
             //PENDIENTE (decision de los null): si no tiene insumo asociado hoy se guarda null
-            sentencia.setObject(4, entidad.isProductoInterno() ? entidad.getProductoInternoAsociado().getId() : null);
+            sentencia.setObject(4, !UtilId.VALOR_DEFECTO.equals(entidad.getProductoInternoAsociado().getId()) ? entidad.getProductoInternoAsociado().getId() : null);
             sentencia.setBigDecimal(5, entidad.getPrecio());
             sentencia.setBoolean(6, entidad.isActivo());
             sentencia.setObject(7, id);

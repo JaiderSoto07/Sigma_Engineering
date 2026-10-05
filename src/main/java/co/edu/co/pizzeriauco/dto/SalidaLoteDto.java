@@ -12,9 +12,7 @@ import java.util.UUID;
 public class SalidaLoteDto {
 
     private UUID id;
-    //un lote se saca una sola vez y completo
     private LoteDto lote;
-    //el saldo que tenia el lote justo antes de sacarlo (unidad del lote)
     private BigDecimal cantidad;
     private LocalDate fechaMovimiento;
 

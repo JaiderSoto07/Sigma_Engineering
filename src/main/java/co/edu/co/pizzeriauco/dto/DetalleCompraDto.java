@@ -18,7 +18,6 @@ public class DetalleCompraDto {
     private BigDecimal precioCompra;
     private LocalDate fechaVencimiento;
     private CompraDto compra;
-    //codigo de la operacion: lo comparte con su movimiento de entrada
     private TipoMovimientoDto tipoMovimiento;
 
     public DetalleCompraDto() {

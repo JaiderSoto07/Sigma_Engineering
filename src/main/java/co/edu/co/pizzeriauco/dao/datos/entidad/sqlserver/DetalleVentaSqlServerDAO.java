@@ -55,7 +55,7 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
 
     @Override
     public DetalleVentaEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, "
+        var sentenciaSql = "select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, dv.subtotal, "
                 + "v.id_venta, v.fecha, v.hora, v.factura, v.cliente, v.total, "
                 + "p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, "
                 + "p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo "
@@ -93,13 +93,14 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo"))
                         .build();
-                //subtotal no se lee: el detalle lo calcula solo (cantidad * precio)
+                //subtotal lo calcula la base (cantidad * precio); aqui solo se lee
                 detalleVentaEncontrado = new DetalleVentaEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_detalle_venta")))
                         .venta(venta)
                         .producto(producto)
                         .cantidad(resultado.getInt("cantidad"))
                         .precioProducto(resultado.getBigDecimal("precio_producto"))
+                        .subtotal(resultado.getBigDecimal("subtotal"))
                         .build();
             }
         } catch (SQLException excepcion) {
@@ -117,7 +118,7 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
     @Override
     public List<DetalleVentaEntidad> consultarPorFiltro(DetalleVentaEntidad filtro) {
         var detallesEncontrados = new ArrayList<DetalleVentaEntidad>();
-        var sentenciaSql = "select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, "
+        var sentenciaSql = "select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, dv.subtotal, "
                 + "v.id_venta, v.fecha, v.hora, v.factura, v.cliente, v.total, "
                 + "p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, "
                 + "p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo "
@@ -189,6 +190,7 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
                         .producto(producto)
                         .cantidad(resultado.getInt("cantidad"))
                         .precioProducto(resultado.getBigDecimal("precio_producto"))
+                        .subtotal(resultado.getBigDecimal("subtotal"))
                         .build();
                 detallesEncontrados.add(detalleVenta);
             }
@@ -207,7 +209,7 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
 
     @Override
     public List<DetalleVentaEntidad> consultarTodos() {
-        var sentenciaSql = "select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, "
+        var sentenciaSql = "select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, dv.subtotal, "
                 + "v.id_venta, v.fecha, v.hora, v.factura, v.cliente, v.total, "
                 + "p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, "
                 + "p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo "
@@ -249,6 +251,7 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
                         .producto(producto)
                         .cantidad(resultado.getInt("cantidad"))
                         .precioProducto(resultado.getBigDecimal("precio_producto"))
+                        .subtotal(resultado.getBigDecimal("subtotal"))
                         .build();
                 detallesEncontrados.add(detalleVenta);
             }

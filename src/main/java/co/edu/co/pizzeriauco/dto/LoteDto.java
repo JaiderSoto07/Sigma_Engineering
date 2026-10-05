@@ -13,7 +13,6 @@ public class LoteDto {
 
     private UUID id;
     private LocalDate fechaVencimiento;
-    //se calcula solo: esta disponible si todavia le queda saldo
     private boolean disponible;
     private ProductoInternoDto productoInterno;
     private BigDecimal cantidad;
@@ -24,11 +23,12 @@ public class LoteDto {
     public LoteDto() {
         setId(UtilId.VALOR_DEFECTO);
         setFechaVencimiento(UtilFecha.FECHA_POR_DEFECTO);
+        setDisponible(false);
         setProductoInterno(new ProductoInternoDto());
         setCantidad(BigDecimal.ZERO);
         setSaldo(BigDecimal.ZERO);
         setUnidadMedidaInventario(new UnidadMedidaDto());
-        setNumeroLote(0);
+        setNumeroLote(UtilNumero.cero);
     }
 
     public UUID getId() {
@@ -49,6 +49,10 @@ public class LoteDto {
 
     public boolean isDisponible() {
         return disponible;
+    }
+
+    public void setDisponible(boolean disponible) {
+        this.disponible = disponible;
     }
 
     public ProductoInternoDto getProductoInterno() {
@@ -73,7 +77,6 @@ public class LoteDto {
 
     public void setSaldo(BigDecimal saldo) {
         this.saldo = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(saldo, BigDecimal.ZERO);
-        this.disponible = UtilNumero.mayorQue(this.saldo, BigDecimal.ZERO);
     }
 
     public UnidadMedidaDto getUnidadMedidaInventario() {
