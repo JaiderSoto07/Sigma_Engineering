@@ -55,30 +55,45 @@ public class CatalogoMensajes {
         public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODAS_LAS_UNIDADES_MEDIDA = "Se ha presentado un problema NO CONTROLADO tratando de consultar todas las unidades de medida. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
     }
 
+    public static class ClaseMovimientoSqlServerDAO {
+
+        private ClaseMovimientoSqlServerDAO() {
+        }
+
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_CLASE_MOVIMIENTO_POR_ID = "Se ha presentado un problema tratando de consultar la informacion de la clase de movimiento deseada. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_CLASE_MOVIMIENTO_POR_ID = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion de la clase de movimiento deseada. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_CLASE_MOVIMIENTO_POR_FILTRO = "Se ha presentado un problema tratando de consultar la informacion de las clases de movimiento. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_CLASE_MOVIMIENTO_POR_FILTRO = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion de las clases de movimiento. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_TODAS_LAS_CLASES_MOVIMIENTO = "Se ha presentado un problema tratando de consultar todas las clases de movimiento. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODAS_LAS_CLASES_MOVIMIENTO = "Se ha presentado un problema NO CONTROLADO tratando de consultar todas las clases de movimiento. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+    }
+
+    public static class CategoriaOrigenSqlServerDAO {
+
+        private CategoriaOrigenSqlServerDAO() {
+        }
+
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_CATEGORIA_ORIGEN_POR_ID = "Se ha presentado un problema tratando de consultar la informacion de la categoria de origen deseada. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_CATEGORIA_ORIGEN_POR_ID = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion de la categoria de origen deseada. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_CATEGORIA_ORIGEN_POR_FILTRO = "Se ha presentado un problema tratando de consultar la informacion de las categorias de origen. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_CATEGORIA_ORIGEN_POR_FILTRO = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion de las categorias de origen. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_TODAS_LAS_CATEGORIAS_ORIGEN = "Se ha presentado un problema tratando de consultar todas las categorias de origen. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODAS_LAS_CATEGORIAS_ORIGEN = "Se ha presentado un problema NO CONTROLADO tratando de consultar todas las categorias de origen. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+    }
+
     public static class TipoMovimientoSqlServerDAO {
 
         private TipoMovimientoSqlServerDAO() {
         }
 
+        public static final String USUARIO_ERROR_PROBLEMA_CREANDO_TIPO_MOVIMIENTO = "Se ha presentado un problema tratando de registrar el codigo de la operacion. Por favor verifique que la categoria de origen exista, intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CREANDO_TIPO_MOVIMIENTO = "Se ha presentado un problema NO CONTROLADO tratando de registrar el codigo de la operacion. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
         public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_TIPO_MOVIMIENTO_POR_ID = "Se ha presentado un problema tratando de consultar la informacion de el tipo de movimiento deseado. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
         public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TIPO_MOVIMIENTO_POR_ID = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion de el tipo de movimiento deseado. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
         public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_TIPO_MOVIMIENTO_POR_FILTRO = "Se ha presentado un problema tratando de consultar la informacion de los tipos de movimiento. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
         public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TIPO_MOVIMIENTO_POR_FILTRO = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion de los tipos de movimiento. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
         public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_TODOS_LOS_TIPOS_MOVIMIENTO = "Se ha presentado un problema tratando de consultar todos los tipos de movimiento. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
         public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODOS_LOS_TIPOS_MOVIMIENTO = "Se ha presentado un problema NO CONTROLADO tratando de consultar todos los tipos de movimiento. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
-    }
-
-    public static class OrigenSqlServerDAO {
-
-        private OrigenSqlServerDAO() {
-        }
-
-        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_ORIGEN_POR_ID = "Se ha presentado un problema tratando de consultar la informacion de el origen deseado. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
-        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_ORIGEN_POR_ID = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion de el origen deseado. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
-        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_ORIGEN_POR_FILTRO = "Se ha presentado un problema tratando de consultar la informacion de los origenes. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
-        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_ORIGEN_POR_FILTRO = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion de los origenes. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
-        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_TODOS_LOS_ORIGENES = "Se ha presentado un problema tratando de consultar todos los origenes. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
-        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODOS_LOS_ORIGENES = "Se ha presentado un problema NO CONTROLADO tratando de consultar todos los origenes. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
     }
 
     public static class TipoProductoSqlServerDAO {
@@ -238,7 +253,7 @@ public class CatalogoMensajes {
         private LoteSqlServerDAO() {
         }
 
-        public static final String USUARIO_ERROR_PROBLEMA_CREANDO_LOTE = "Se ha presentado un problema tratando de registrar el lote. Por favor verifique que el movimiento, el producto interno y la unidad de medida existan, que el numero de lote no este repetido para ese insumo y que el saldo este entre cero y la cantidad del lote, intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_CREANDO_LOTE = "Se ha presentado un problema tratando de registrar el lote. Por favor verifique que el producto interno y la unidad de medida existan, que el numero de lote no este repetido para ese insumo y que el saldo este entre cero y la cantidad del lote, intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
         public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CREANDO_LOTE = "Se ha presentado un problema NO CONTROLADO tratando de registrar el lote. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
         public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_LOTE_POR_ID = "Se ha presentado un problema tratando de consultar la informacion de el lote. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
         public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_LOTE_POR_ID = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion de el lote. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
@@ -333,6 +348,51 @@ public class CatalogoMensajes {
         public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODOS_LOS_DETALLES_VENTA = "Se ha presentado un problema NO CONTROLADO tratando de consultar todos los renglones de venta. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
     }
 
+    public static class ConsumoVentaSqlServerDAO {
+
+        private ConsumoVentaSqlServerDAO() {
+        }
+
+        public static final String USUARIO_ERROR_PROBLEMA_CREANDO_CONSUMO_VENTA = "Se ha presentado un problema tratando de registrar el consumo de insumos de la venta. Por favor verifique que el renglon de venta, el insumo, la unidad de medida y el codigo existan y que el insumo no este repetido en el renglon, intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CREANDO_CONSUMO_VENTA = "Se ha presentado un problema NO CONTROLADO tratando de registrar el consumo de insumos de la venta. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_CONSUMO_VENTA_POR_ID = "Se ha presentado un problema tratando de consultar la informacion de el consumo de insumos deseado. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_CONSUMO_VENTA_POR_ID = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion de el consumo de insumos deseado. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_CONSUMO_VENTA_POR_FILTRO = "Se ha presentado un problema tratando de consultar la informacion de los consumos de insumos de las ventas. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_CONSUMO_VENTA_POR_FILTRO = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion de los consumos de insumos de las ventas. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_TODOS_LOS_CONSUMOS_VENTA = "Se ha presentado un problema tratando de consultar todos los consumos de insumos de las ventas. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODOS_LOS_CONSUMOS_VENTA = "Se ha presentado un problema NO CONTROLADO tratando de consultar todos los consumos de insumos de las ventas. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+    }
+
+    public static class SalidaLoteSqlServerDAO {
+
+        private SalidaLoteSqlServerDAO() {
+        }
+
+        public static final String USUARIO_ERROR_PROBLEMA_CREANDO_SALIDA_LOTE = "Se ha presentado un problema tratando de registrar la salida del lote. Por favor verifique que el lote exista y que no se haya sacado antes, intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CREANDO_SALIDA_LOTE = "Se ha presentado un problema NO CONTROLADO tratando de registrar la salida del lote. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_SALIDA_LOTE_POR_ID = "Se ha presentado un problema tratando de consultar la informacion de la salida de lote deseada. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_SALIDA_LOTE_POR_ID = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion de la salida de lote deseada. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_SALIDA_LOTE_POR_FILTRO = "Se ha presentado un problema tratando de consultar la informacion de las salidas de lotes. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_SALIDA_LOTE_POR_FILTRO = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion de las salidas de lotes. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_TODAS_LAS_SALIDAS_LOTE = "Se ha presentado un problema tratando de consultar todas las salidas de lotes. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODAS_LAS_SALIDAS_LOTE = "Se ha presentado un problema NO CONTROLADO tratando de consultar todas las salidas de lotes. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+    }
+
+    public static class MovimientoInventarioSqlServerDAO {
+
+        private MovimientoInventarioSqlServerDAO() {
+        }
+
+        public static final String USUARIO_ERROR_PROBLEMA_CREANDO_MOVIMIENTO_INVENTARIO = "Se ha presentado un problema tratando de registrar el movimiento de inventario. Por favor verifique que la clase de movimiento, el codigo y el lote existan, intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CREANDO_MOVIMIENTO_INVENTARIO = "Se ha presentado un problema NO CONTROLADO tratando de registrar el movimiento de inventario. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_MOVIMIENTO_INVENTARIO_POR_ID = "Se ha presentado un problema tratando de consultar la informacion de el movimiento de inventario deseado. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_MOVIMIENTO_INVENTARIO_POR_ID = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion de el movimiento de inventario deseado. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_MOVIMIENTO_INVENTARIO_POR_FILTRO = "Se ha presentado un problema tratando de consultar la informacion de los movimientos de inventario. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_MOVIMIENTO_INVENTARIO_POR_FILTRO = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion de los movimientos de inventario. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_TODOS_LOS_MOVIMIENTOS_INVENTARIO = "Se ha presentado un problema tratando de consultar todos los movimientos de inventario. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODOS_LOS_MOVIMIENTOS_INVENTARIO = "Se ha presentado un problema NO CONTROLADO tratando de consultar todos los movimientos de inventario. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+    }
+
     public static class DetalleRecetaNegocioImpl {
 
         private DetalleRecetaNegocioImpl() {
@@ -355,5 +415,4 @@ public class CatalogoMensajes {
 
         public static final String PRODUCTO_INTERNO_YA_REGISTRADO_EN_RECETA = "No es posible registrar el ingrediente porque el producto interno ya esta registrado en esta receta. Si necesita cambiar la cantidad, modifique el ingrediente existente";
     }
-
 }

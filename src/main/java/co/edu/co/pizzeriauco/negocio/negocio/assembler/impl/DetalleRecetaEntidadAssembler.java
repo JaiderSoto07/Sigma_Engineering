@@ -1,6 +1,6 @@
 package co.edu.co.pizzeriauco.negocio.negocio.assembler.impl;
 
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
 import co.edu.co.pizzeriauco.dominio.DetalleRecetaDominio;
 import co.edu.co.pizzeriauco.dominio.ProductoDominio;
 import co.edu.co.pizzeriauco.dominio.ProductoInternoDominio;

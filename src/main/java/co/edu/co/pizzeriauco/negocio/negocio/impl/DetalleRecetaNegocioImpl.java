@@ -1,10 +1,10 @@
 package co.edu.co.pizzeriauco.negocio.negocio.impl;
 
-import co.edu.co.pizzeriauco.crosscuting.catalogo.CatalogoMensajes;
-import co.edu.co.pizzeriauco.crosscuting.excepciones.PizzeriaNegocioExcepcion;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
+import co.edu.co.pizzeriauco.transversal.catalogo.CatalogoMensajes;
+import co.edu.co.pizzeriauco.transversal.excepciones.PizzeriaNegocioExcepcion;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilId;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilNumero;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
 import co.edu.co.pizzeriauco.dao.factoria.DAOFactory;
 import co.edu.co.pizzeriauco.dominio.DetalleRecetaDominio;
 import co.edu.co.pizzeriauco.entidad.DetalleRecetaEntidad;
