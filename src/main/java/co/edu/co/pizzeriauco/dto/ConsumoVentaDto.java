@@ -1,8 +1,8 @@
 package co.edu.co.pizzeriauco.dto;
 
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilId;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilNumero;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -19,7 +19,7 @@ public class ConsumoVentaDto {
     private TipoMovimientoDto tipoMovimiento;
 
     public ConsumoVentaDto() {
-        setId(id);
+        setId(UtilId.VALOR_DEFECTO);
         setDetalleVenta(new DetalleVentaDto());
         setProductoInterno(new ProductoInternoDto());
         setCantidad(BigDecimal.ZERO);

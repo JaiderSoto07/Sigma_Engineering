@@ -1,8 +1,8 @@
-package co.edu.co.pizzeriauco.crosscuting.excepciones;
+package co.edu.co.pizzeriauco.transversal.excepciones;
 
-import co.edu.co.pizzeriauco.crosscuting.excepciones.enums.Capa;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
+import co.edu.co.pizzeriauco.transversal.excepciones.enums.Capa;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilTexto;
 
 //clase padre de todas las excepciones de la pizzeria
 //las excepciones de cada capa heredan de ella y reutilizan sus atributos

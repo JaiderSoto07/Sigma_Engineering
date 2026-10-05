@@ -1,6 +1,6 @@
 package co.edu.co.pizzeriauco.dao.factoria;
 
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilSql;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilSql;
 import co.edu.co.pizzeriauco.dao.datos.entidad.CambioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.CompraDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.DetalleCompraDAO;

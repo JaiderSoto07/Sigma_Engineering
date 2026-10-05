@@ -1,9 +1,9 @@
 package co.edu.co.pizzeriauco.dto;
 
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilId;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilNumero;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilTexto;
 
 import java.util.UUID;
 
@@ -18,12 +18,11 @@ public class ProductoInternoDto {
     private boolean activo;
 
     public ProductoInternoDto() {
-        setId(id);
+        setId(UtilId.VALOR_DEFECTO);
         setNombre(UtilTexto.vacia);
         setPerecedero(false);
         setVidaUtil(UtilNumero.cero);
         setTipoMedida(new UnidadMedidaDto());
-        //todo producto interno nace activo
         setActivo(true);
     }
 

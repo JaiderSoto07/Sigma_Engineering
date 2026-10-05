@@ -1,7 +1,7 @@
 package co.edu.co.pizzeriauco.dto;
 
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilId;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilTexto;
 
 import java.util.UUID;
 
@@ -11,15 +11,13 @@ public class ProveedorDto {
     private String nombreEmpresa;
     private String nit;
     private String contacto;
-    //true = se le puede comprar; false = desactivado (retirado), se conserva su historial de compras
     private boolean activo;
 
     public ProveedorDto() {
-        setId(id);
+        setId(UtilId.VALOR_DEFECTO);
         setNombreEmpresa(UtilTexto.vacia);
         setNit(UtilTexto.vacia);
         setContacto(UtilTexto.vacia);
-        //todo proveedor nace activo
         setActivo(true);
     }
 
@@ -43,7 +41,6 @@ public class ProveedorDto {
         return nit;
     }
 
-    //NIT de la empresa (ej. 890904478-6) o cedula si el proveedor es persona natural
     public void setNit(String nit) {
         this.nit = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(nit);
     }

@@ -1,7 +1,7 @@
 package co.edu.co.pizzeriauco.dto;
 
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilId;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
 
 import java.util.UUID;
 
@@ -11,7 +11,7 @@ public class TipoMovimientoDto {
     private CategoriaOrigenDto categoriaOrigen;
 
     public TipoMovimientoDto() {
-        setId(id);
+        setId(UtilId.VALOR_DEFECTO);
         setCategoriaOrigen(new CategoriaOrigenDto());
     }
 

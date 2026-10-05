@@ -1,4 +1,4 @@
-package co.edu.co.pizzeriauco.crosscuting.catalogo;
+package co.edu.co.pizzeriauco.transversal.catalogo;
 
 //cada clase interna agrupa los mensajes de un tema
 //un buen mensaje dice que fallo, por que y que hacer

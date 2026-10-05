@@ -1,13 +1,11 @@
-package co.edu.co.pizzeriauco.crosscuting.utilitario;
+package co.edu.co.pizzeriauco.transversal.utilitario;
 
-import co.edu.co.pizzeriauco.crosscuting.catalogo.CatalogoMensajes;
-import co.edu.co.pizzeriauco.crosscuting.excepciones.PizzeriaTransversalExcepcion;
+import co.edu.co.pizzeriauco.transversal.catalogo.CatalogoMensajes;
+import co.edu.co.pizzeriauco.transversal.excepciones.PizzeriaTransversalExcepcion;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
-//no se instancia: todo lo que necesita lo recibe por parametro
-//en cada catch primero va la excepcion concreta (SQLException) y despues la general (Exception)
 public class UtilSql {
 
     private UtilSql() {
@@ -39,7 +37,6 @@ public class UtilSql {
             throw PizzeriaTransversalExcepcion.crear(mensajeUsuario);
         } else {
             try {
-                //sin guardado automatico, la base de datos espera a que yo confirme o cancele
                 conexion.setAutoCommit(false);
             } catch (SQLException exception) {
                 var mensajeUsuario = CatalogoMensajes.UtilSql.USUARIO_ERROR_PROBLEMA_INICIANDO_TRANSACCION_SQL;

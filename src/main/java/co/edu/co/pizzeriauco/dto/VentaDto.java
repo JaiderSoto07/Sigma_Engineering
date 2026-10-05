@@ -1,10 +1,10 @@
 package co.edu.co.pizzeriauco.dto;
 
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilFecha;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilFecha;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilId;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilNumero;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilTexto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,13 +16,12 @@ public class VentaDto {
     private UUID id;
     private LocalDate fecha;
     private LocalTime hora;
-    //consecutivo FV-000001, lo asigna el sistema al registrar la venta
     private String factura;
     private String cliente;
     private BigDecimal total;
 
     public VentaDto() {
-        setId(id);
+        setId(UtilId.VALOR_DEFECTO);
         setFecha(UtilFecha.FECHA_POR_DEFECTO);
         setHora(LocalTime.MIN);
         setFactura(UtilTexto.vacia);
@@ -67,9 +66,8 @@ public class VentaDto {
     }
 
     public void setCliente(String cliente) {
-        //si no me dicen el cliente (nulo o vacio), se usa el cliente por defecto
-        var clienteSaneado = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(cliente);
-        this.cliente = UtilTexto.getUtilTexto().esVacia(clienteSaneado) ? UtilTexto.CLIENTE_POR_DEFECTO : clienteSaneado;
+        var clienteLimpio = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(cliente);
+        this.cliente = UtilTexto.getUtilTexto().esVacia(clienteLimpio) ? UtilTexto.CLIENTE_POR_DEFECTO : clienteLimpio;
     }
 
     public BigDecimal getTotal() {

@@ -1,6 +1,6 @@
-package co.edu.co.pizzeriauco.crosscuting.excepciones;
+package co.edu.co.pizzeriauco.transversal.excepciones;
 
-import co.edu.co.pizzeriauco.crosscuting.excepciones.enums.Capa;
+import co.edu.co.pizzeriauco.transversal.excepciones.enums.Capa;
 
 public class PizzeriaDatosExcepcion extends PizzeriaExcepcion {
 

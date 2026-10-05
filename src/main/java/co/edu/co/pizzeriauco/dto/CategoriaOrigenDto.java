@@ -1,7 +1,7 @@
 package co.edu.co.pizzeriauco.dto;
 
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilId;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilTexto;
 
 import java.util.UUID;
 
@@ -11,7 +11,7 @@ public class CategoriaOrigenDto {
     private String nombre;
 
     public CategoriaOrigenDto() {
-        setId(id);
+        setId(UtilId.VALOR_DEFECTO);
         setNombre(UtilTexto.vacia);
     }
 

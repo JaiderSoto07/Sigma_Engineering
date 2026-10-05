@@ -1,8 +1,8 @@
 package co.edu.co.pizzeriauco.dto;
 
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilId;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilNumero;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -16,7 +16,7 @@ public class InventarioDto {
     private BigDecimal stockMinimo;
 
     public InventarioDto() {
-        setId(id);
+        setId(UtilId.VALOR_DEFECTO);
         setCantidadTotal(BigDecimal.ZERO);
         setProductoInterno(new ProductoInternoDto());
         setUnidadMedidaInventario(new UnidadMedidaDto());

@@ -1,7 +1,7 @@
 package co.edu.co.pizzeriauco.dto;
 
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilId;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilTexto;
 
 import java.util.UUID;
 
@@ -12,7 +12,7 @@ public class UnidadMedidaDto {
     private String tipoMedida;
 
     public UnidadMedidaDto() {
-        setId(id);
+        setId(UtilId.VALOR_DEFECTO);
         setUnidadMedida(UtilTexto.vacia);
         setTipoMedida(UtilTexto.vacia);
     }

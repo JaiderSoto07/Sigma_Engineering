@@ -1,9 +1,9 @@
 package co.edu.co.pizzeriauco.dto;
 
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilFecha;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilFecha;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilId;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilNumero;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,7 +18,7 @@ public class HistoricoPrecioDto {
     private LocalDate fechaFin;
 
     public HistoricoPrecioDto() {
-        setId(id);
+        setId(UtilId.VALOR_DEFECTO);
         setProducto(new ProductoDto());
         setPrecio(BigDecimal.ZERO);
         setFechaInicio(UtilFecha.FECHA_POR_DEFECTO);

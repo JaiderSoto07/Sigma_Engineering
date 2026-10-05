@@ -1,7 +1,7 @@
 package co.edu.co.pizzeriauco.dao.factoria.impl;
 
-import co.edu.co.pizzeriauco.crosscuting.catalogo.CatalogoMensajes;
-import co.edu.co.pizzeriauco.crosscuting.excepciones.PizzeriaDatosExcepcion;
+import co.edu.co.pizzeriauco.transversal.catalogo.CatalogoMensajes;
+import co.edu.co.pizzeriauco.transversal.excepciones.PizzeriaDatosExcepcion;
 import co.edu.co.pizzeriauco.dao.datos.entidad.CambioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.CompraDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.DetalleCompraDAO;

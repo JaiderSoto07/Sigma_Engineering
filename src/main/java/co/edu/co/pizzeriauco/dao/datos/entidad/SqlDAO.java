@@ -1,6 +1,6 @@
 package co.edu.co.pizzeriauco.dao.datos.entidad;
 
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilSql;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilSql;
 
 import java.sql.Connection;
 

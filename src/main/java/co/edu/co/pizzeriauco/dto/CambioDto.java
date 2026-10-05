@@ -1,9 +1,9 @@
 package co.edu.co.pizzeriauco.dto;
 
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilFecha;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilFecha;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilId;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilNumero;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,7 +21,7 @@ public class CambioDto {
     private TipoMovimientoDto tipoMovimiento;
 
     public CambioDto() {
-        setId(id);
+        setId(UtilId.VALOR_DEFECTO);
         setProductoCambio(new ProductoInternoDto());
         setCantidad(BigDecimal.ZERO);
         setUnidadMedida(new UnidadMedidaDto());

@@ -1,9 +1,9 @@
 package co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver;
 
-import co.edu.co.pizzeriauco.crosscuting.catalogo.CatalogoMensajes;
-import co.edu.co.pizzeriauco.crosscuting.excepciones.PizzeriaDatosExcepcion;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
+import co.edu.co.pizzeriauco.transversal.catalogo.CatalogoMensajes;
+import co.edu.co.pizzeriauco.transversal.excepciones.PizzeriaDatosExcepcion;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilId;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilTexto;
 import co.edu.co.pizzeriauco.dao.datos.entidad.TipoProductoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.TipoProductoEntidad;

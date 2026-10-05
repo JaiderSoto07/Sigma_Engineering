@@ -1,10 +1,10 @@
 package co.edu.co.pizzeriauco.dto;
 
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilFecha;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilFecha;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilId;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilNumero;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilTexto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,7 +19,7 @@ public class CompraDto {
     private BigDecimal total;
 
     public CompraDto() {
-        setId(id);
+        setId(UtilId.VALOR_DEFECTO);
         setProveedor(new ProveedorDto());
         setFechaCompra(UtilFecha.FECHA_POR_DEFECTO);
         setNumeroFactura(UtilTexto.vacia);

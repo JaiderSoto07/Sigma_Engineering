@@ -1,9 +1,9 @@
 package co.edu.co.pizzeriauco.dto;
 
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilId;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilNumero;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilObjeto;
-import co.edu.co.pizzeriauco.crosscuting.utilitario.UtilTexto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilId;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilNumero;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilTexto;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -14,22 +14,18 @@ public class ProductoDto {
     private String nombre;
     private TipoProductoDto tipoProducto;
     private TamanoDto tamano;
-    //se calcula solo: es producto interno si tiene un insumo de bodega asociado
     private boolean productoInterno;
-    //insumo de bodega que se vende directo (ej. la bebida); vacio si se vende por receta
     private ProductoInternoDto productoInternoAsociado;
     private BigDecimal precio;
-    //true = esta en el menu; false = desactivado (retirado de la venta), se conserva su historial
     private boolean activo;
 
     public ProductoDto() {
-        setId(id);
+        setId(UtilId.VALOR_DEFECTO);
         setNombre(UtilTexto.vacia);
         setTipoProducto(new TipoProductoDto());
         setTamano(new TamanoDto());
         setProductoInternoAsociado(new ProductoInternoDto());
         setPrecio(BigDecimal.ZERO);
-        //todo producto nace activo (en el menu)
         setActivo(true);
     }
 
