@@ -61,7 +61,7 @@ public class DetalleVentaEntidad {
         public Builder() {
             id = UtilId.valorDefecto(id);
             venta = new VentaEntidad.Builder().build();
-            cantidad = 0;
+            cantidad = UtilNumero.cero;
             producto = new ProductoEntidad.Builder().build();
             precioProducto = BigDecimal.ZERO;
             subtotal = BigDecimal.ZERO;
@@ -73,11 +73,9 @@ public class DetalleVentaEntidad {
         }
 
         public Builder venta(VentaEntidad venta) {
-            this.venta = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.venta = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             venta,
-                            new VentaEntidad.Builder().build()
-                    );
+                            new VentaEntidad.Builder().build());
             return this;
         }
 
@@ -87,11 +85,9 @@ public class DetalleVentaEntidad {
         }
 
         public Builder producto(ProductoEntidad producto) {
-            this.producto = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.producto = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             producto,
-                            new ProductoEntidad.Builder().build()
-                    );
+                            new ProductoEntidad.Builder().build());
             return this;
         }
 

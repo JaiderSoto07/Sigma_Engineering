@@ -13,12 +13,9 @@ public class MovimientoInventarioDominio {
 
     private UUID id;
     private ClaseMovimientoDominio claseMovimiento;
-    //codigo de la operacion que causo el movimiento: lo comparte con su renglon de compra, consumo de venta o cambio
-    //(la categoria de origen se sabe por el codigo)
     private TipoMovimientoDominio tipoMovimiento;
     private BigDecimal cantidad;
     private LocalDate fechaMovimiento;
-    //entrada: el lote que se crea con esa compra o cambio; salida: el lote del que se saca
     private LoteDominio lote;
 
     private MovimientoInventarioDominio(Builder builder) {
@@ -77,24 +74,19 @@ public class MovimientoInventarioDominio {
             return this;
         }
 
-        public Builder claseMovimiento(
-                ClaseMovimientoDominio claseMovimiento) {
+        public Builder claseMovimiento(ClaseMovimientoDominio claseMovimiento) {
 
-            this.claseMovimiento = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.claseMovimiento = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             claseMovimiento,
-                            new ClaseMovimientoDominio.Builder().build()
-                    );
+                            new ClaseMovimientoDominio.Builder().build());
 
             return this;
         }
 
         public Builder tipoMovimiento(TipoMovimientoDominio tipoMovimiento) {
-            this.tipoMovimiento = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.tipoMovimiento = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             tipoMovimiento,
-                            new TipoMovimientoDominio.Builder().build()
-                    );
+                            new TipoMovimientoDominio.Builder().build());
 
             return this;
         }
@@ -112,11 +104,9 @@ public class MovimientoInventarioDominio {
         }
 
         public Builder lote(LoteDominio lote) {
-            this.lote = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.lote = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             lote,
-                            new LoteDominio.Builder().build()
-                    );
+                            new LoteDominio.Builder().build());
             return this;
         }
 

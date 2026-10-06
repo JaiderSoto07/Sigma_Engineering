@@ -55,10 +55,8 @@ public class InventarioEntidad {
         public Builder() {
             id = UtilId.valorDefecto(id);
             cantidadTotal = BigDecimal.ZERO;
-            productoInterno =
-                    new ProductoInternoEntidad.Builder().build();
-            unidadMedidaInventario =
-                    new UnidadMedidaEntidad.Builder().build();
+            productoInterno = new ProductoInternoEntidad.Builder().build();
+            unidadMedidaInventario = new UnidadMedidaEntidad.Builder().build();
             stockMinimo = UtilNumero.STOCK_MINIMO_POR_DEFECTO;
         }
 
@@ -72,25 +70,19 @@ public class InventarioEntidad {
             return this;
         }
 
-        public Builder productoInterno(
-                ProductoInternoEntidad productoInterno) {
+        public Builder productoInterno(ProductoInternoEntidad productoInterno) {
 
-            this.productoInterno = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.productoInterno = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             productoInterno,
-                            new ProductoInternoEntidad.Builder().build()
-                    );
+                            new ProductoInternoEntidad.Builder().build());
             return this;
         }
 
-        public Builder unidadMedidaInventario(
-                UnidadMedidaEntidad unidadMedidaInventario) {
+        public Builder unidadMedidaInventario(UnidadMedidaEntidad unidadMedidaInventario) {
 
-            this.unidadMedidaInventario = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.unidadMedidaInventario = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             unidadMedidaInventario,
-                            new UnidadMedidaEntidad.Builder().build()
-                    );
+                            new UnidadMedidaEntidad.Builder().build());
             return this;
         }
 

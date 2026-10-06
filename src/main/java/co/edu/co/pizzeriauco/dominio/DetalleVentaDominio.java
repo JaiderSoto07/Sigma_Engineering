@@ -61,7 +61,7 @@ public class DetalleVentaDominio {
         public Builder() {
             id = UtilId.valorDefecto(id);
             venta = new VentaDominio.Builder().build();
-            cantidad = 0;
+            cantidad = UtilNumero.cero;
             producto = new ProductoDominio.Builder().build();
             precioProducto = BigDecimal.ZERO;
             subtotal = BigDecimal.ZERO;
@@ -73,11 +73,9 @@ public class DetalleVentaDominio {
         }
 
         public Builder venta(VentaDominio venta) {
-            this.venta = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.venta = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             venta,
-                            new VentaDominio.Builder().build()
-                    );
+                            new VentaDominio.Builder().build());
             return this;
         }
 
@@ -87,11 +85,9 @@ public class DetalleVentaDominio {
         }
 
         public Builder producto(ProductoDominio producto) {
-            this.producto = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.producto = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             producto,
-                            new ProductoDominio.Builder().build()
-                    );
+                            new ProductoDominio.Builder().build());
             return this;
         }
 

@@ -48,15 +48,13 @@ public class UnidadMedidaEntidad {
 
         public Builder unidadMedida(String unidadMedida) {
             this.unidadMedida =
-                    UtilTexto.getUtilTexto()
-                            .quitarEspaciosEnBlanco(unidadMedida);
+                    UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(unidadMedida);
             return this;
         }
 
         public Builder tipoMedida(String tipoMedida) {
             this.tipoMedida =
-                    UtilTexto.getUtilTexto()
-                            .quitarEspaciosEnBlanco(tipoMedida);
+                    UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(tipoMedida);
             return this;
         }
 

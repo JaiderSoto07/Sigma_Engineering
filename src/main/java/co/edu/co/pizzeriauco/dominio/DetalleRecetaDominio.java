@@ -65,11 +65,9 @@ public class DetalleRecetaDominio {
         }
 
         public Builder productoInterno(ProductoInternoDominio productoInterno) {
-            this.productoInterno = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.productoInterno = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             productoInterno,
-                            new ProductoInternoDominio.Builder().build()
-                    );
+                            new ProductoInternoDominio.Builder().build());
             return this;
         }
 
@@ -79,20 +77,16 @@ public class DetalleRecetaDominio {
         }
 
         public Builder unidadMedida(UnidadMedidaDominio unidadMedida) {
-            this.unidadMedida = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.unidadMedida = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             unidadMedida,
-                            new UnidadMedidaDominio.Builder().build()
-                    );
+                            new UnidadMedidaDominio.Builder().build());
             return this;
         }
 
         public Builder producto(ProductoDominio producto) {
-            this.producto = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.producto = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             producto,
-                            new ProductoDominio.Builder().build()
-                    );
+                            new ProductoDominio.Builder().build());
             return this;
         }
 

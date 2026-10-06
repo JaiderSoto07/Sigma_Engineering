@@ -12,10 +12,8 @@ public class ProductoInternoDominio {
     private UUID id;
     private String nombre;
     private boolean perecedero;
-    //no es obligatoria, por eso es Integer y su valor por defecto es 0
     private Integer vidaUtil;
     private UnidadMedidaDominio tipoMedida;
-    //true = se puede usar en compras y recetas; false = desactivado (descontinuado), se conserva su historial
     private boolean activo;
 
     private ProductoInternoDominio(Builder builder) {
@@ -66,7 +64,6 @@ public class ProductoInternoDominio {
             perecedero = false;
             vidaUtil = UtilNumero.cero;
             tipoMedida = new UnidadMedidaDominio.Builder().build();
-            //todo producto interno nace activo
             activo = true;
         }
 

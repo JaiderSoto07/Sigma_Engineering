@@ -17,7 +17,6 @@ public class CambioEntidad {
     private UnidadMedidaEntidad unidadMedida;
     private LocalDate fechaVencimiento;
     private LocalDate fechaCambio;
-    //codigo de la operacion: lo comparte con su movimiento de entrada
     private TipoMovimientoEntidad tipoMovimiento;
 
     private CambioEntidad(Builder builder) {
@@ -84,11 +83,9 @@ public class CambioEntidad {
         }
 
         public Builder productoCambio(ProductoInternoEntidad productoCambio) {
-            this.productoCambio = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.productoCambio = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             productoCambio,
-                            new ProductoInternoEntidad.Builder().build()
-                    );
+                            new ProductoInternoEntidad.Builder().build());
             return this;
         }
 
@@ -98,11 +95,9 @@ public class CambioEntidad {
         }
 
         public Builder unidadMedida(UnidadMedidaEntidad unidadMedida) {
-            this.unidadMedida = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.unidadMedida = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             unidadMedida,
-                            new UnidadMedidaEntidad.Builder().build()
-                    );
+                            new UnidadMedidaEntidad.Builder().build());
             return this;
         }
 
@@ -117,11 +112,9 @@ public class CambioEntidad {
         }
 
         public Builder tipoMovimiento(TipoMovimientoEntidad tipoMovimiento) {
-            this.tipoMovimiento = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.tipoMovimiento = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             tipoMovimiento,
-                            new TipoMovimientoEntidad.Builder().build()
-                    );
+                            new TipoMovimientoEntidad.Builder().build());
             return this;
         }
 

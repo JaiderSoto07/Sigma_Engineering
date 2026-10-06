@@ -18,7 +18,6 @@ public class DetalleCompraDominio {
     private BigDecimal precioCompra;
     private LocalDate fechaVencimiento;
     private CompraDominio compra;
-    //codigo de la operacion: lo comparte con su movimiento de entrada
     private TipoMovimientoDominio tipoMovimiento;
 
     private DetalleCompraDominio(Builder builder) {
@@ -92,11 +91,9 @@ public class DetalleCompraDominio {
         }
 
         public Builder productoInterno(ProductoInternoDominio productoInterno) {
-            this.productoInterno = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.productoInterno = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             productoInterno,
-                            new ProductoInternoDominio.Builder().build()
-                    );
+                            new ProductoInternoDominio.Builder().build());
             return this;
         }
 
@@ -106,11 +103,9 @@ public class DetalleCompraDominio {
         }
 
         public Builder unidadMedida(UnidadMedidaDominio unidadMedida) {
-            this.unidadMedida = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.unidadMedida = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             unidadMedida,
-                            new UnidadMedidaDominio.Builder().build()
-                    );
+                            new UnidadMedidaDominio.Builder().build());
             return this;
         }
 
@@ -125,20 +120,16 @@ public class DetalleCompraDominio {
         }
 
         public Builder compra(CompraDominio compra) {
-            this.compra = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.compra = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             compra,
-                            new CompraDominio.Builder().build()
-                    );
+                            new CompraDominio.Builder().build());
             return this;
         }
 
         public Builder tipoMovimiento(TipoMovimientoDominio tipoMovimiento) {
-            this.tipoMovimiento = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.tipoMovimiento = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             tipoMovimiento,
-                            new TipoMovimientoDominio.Builder().build()
-                    );
+                            new TipoMovimientoDominio.Builder().build());
             return this;
         }
 

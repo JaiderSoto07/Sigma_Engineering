@@ -16,7 +16,6 @@ public class VentaEntidad {
     private UUID id;
     private LocalDate fecha;
     private LocalTime hora;
-    //consecutivo FV-000001, lo asigna el sistema al registrar la venta
     private String factura;
     private String cliente;
     private BigDecimal total;
@@ -83,11 +82,9 @@ public class VentaEntidad {
         }
 
         public Builder hora(LocalTime hora) {
-            this.hora = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.hora = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             hora,
-                            LocalTime.MIN
-                    );
+                            LocalTime.MIN);
             return this;
         }
 
@@ -97,11 +94,10 @@ public class VentaEntidad {
         }
 
         public Builder cliente(String cliente) {
-            //si no me dicen el cliente (nulo o vacio), se usa el cliente por defecto
-            var clienteSaneado = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(cliente);
-            this.cliente = UtilTexto.getUtilTexto().esVacia(clienteSaneado)
+            var clienteLimpio = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(cliente);
+            this.cliente = UtilTexto.getUtilTexto().esVacia(clienteLimpio)
                     ? UtilTexto.CLIENTE_POR_DEFECTO
-                    : clienteSaneado;
+                    : clienteLimpio;
             return this;
         }
 

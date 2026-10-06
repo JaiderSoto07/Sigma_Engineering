@@ -12,10 +12,8 @@ public class ProductoInternoEntidad {
     private UUID id;
     private String nombre;
     private boolean perecedero;
-    //no es obligatoria, por eso es Integer y su valor por defecto es 0
     private Integer vidaUtil;
     private UnidadMedidaEntidad tipoMedida;
-    //true = se puede usar en compras y recetas; false = desactivado (descontinuado), se conserva su historial
     private boolean activo;
 
     private ProductoInternoEntidad(Builder builder) {
@@ -66,7 +64,6 @@ public class ProductoInternoEntidad {
             perecedero = false;
             vidaUtil = UtilNumero.cero;
             tipoMedida = new UnidadMedidaEntidad.Builder().build();
-            //todo producto interno nace activo
             activo = true;
         }
 
@@ -76,9 +73,7 @@ public class ProductoInternoEntidad {
         }
 
         public Builder nombre(String nombre) {
-            this.nombre =
-                    UtilTexto.getUtilTexto()
-                            .quitarEspaciosEnBlanco(nombre);
+            this.nombre = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(nombre);
             return this;
         }
 
@@ -93,11 +88,9 @@ public class ProductoInternoEntidad {
         }
 
         public Builder tipoMedida(UnidadMedidaEntidad tipoMedida) {
-            this.tipoMedida =
-                    UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
+            this.tipoMedida = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             tipoMedida,
-                            new UnidadMedidaEntidad.Builder().build()
-                    );
+                            new UnidadMedidaEntidad.Builder().build());
             return this;
         }
 

@@ -18,8 +18,8 @@ public class DetalleVentaDto {
 
     public DetalleVentaDto() {
         setId(UtilId.VALOR_DEFECTO);
+        setVenta(new VentaDto());
         setCantidad(UtilNumero.cero);
-        setCantidad(0);
         setProducto(new ProductoDto());
         setPrecioProducto(BigDecimal.ZERO);
         setSubtotal(BigDecimal.ZERO);

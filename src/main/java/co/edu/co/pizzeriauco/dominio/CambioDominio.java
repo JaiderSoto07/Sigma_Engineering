@@ -17,7 +17,6 @@ public class CambioDominio {
     private UnidadMedidaDominio unidadMedida;
     private LocalDate fechaVencimiento;
     private LocalDate fechaCambio;
-    //codigo de la operacion: lo comparte con su movimiento de entrada
     private TipoMovimientoDominio tipoMovimiento;
 
     private CambioDominio(Builder builder) {
@@ -84,11 +83,9 @@ public class CambioDominio {
         }
 
         public Builder productoCambio(ProductoInternoDominio productoCambio) {
-            this.productoCambio = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.productoCambio = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             productoCambio,
-                            new ProductoInternoDominio.Builder().build()
-                    );
+                            new ProductoInternoDominio.Builder().build());
             return this;
         }
 
@@ -98,8 +95,7 @@ public class CambioDominio {
         }
 
         public Builder unidadMedida(UnidadMedidaDominio unidadMedida) {
-            this.unidadMedida = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.unidadMedida = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             unidadMedida,
                             new UnidadMedidaDominio.Builder().build()
                     );
@@ -117,11 +113,9 @@ public class CambioDominio {
         }
 
         public Builder tipoMovimiento(TipoMovimientoDominio tipoMovimiento) {
-            this.tipoMovimiento = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.tipoMovimiento = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             tipoMovimiento,
-                            new TipoMovimientoDominio.Builder().build()
-                    );
+                            new TipoMovimientoDominio.Builder().build());
             return this;
         }
 

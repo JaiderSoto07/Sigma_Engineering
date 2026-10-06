@@ -11,7 +11,6 @@ public class ProveedorEntidad {
     private String nombreEmpresa;
     private String nit;
     private String contacto;
-    //true = se le puede comprar; false = desactivado (retirado), se conserva su historial de compras
     private boolean activo;
 
     private ProveedorEntidad(Builder builder) {
@@ -55,7 +54,6 @@ public class ProveedorEntidad {
             nombreEmpresa = UtilTexto.vacia;
             nit = UtilTexto.vacia;
             contacto = UtilTexto.vacia;
-            //todo proveedor nace activo
             activo = true;
         }
 
@@ -65,21 +63,18 @@ public class ProveedorEntidad {
         }
 
         public Builder nombreEmpresa(String nombreEmpresa) {
-            this.nombreEmpresa = UtilTexto.getUtilTexto()
-                    .quitarEspaciosEnBlanco(nombreEmpresa);
+            this.nombreEmpresa = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(nombreEmpresa);
             return this;
         }
 
-        //NIT de la empresa (ej. 890904478-6) o cedula si el proveedor es persona natural
+
         public Builder nit(String nit) {
-            this.nit = UtilTexto.getUtilTexto()
-                    .quitarEspaciosEnBlanco(nit);
+            this.nit = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(nit);
             return this;
         }
 
         public Builder contacto(String contacto) {
-            this.contacto = UtilTexto.getUtilTexto()
-                    .quitarEspaciosEnBlanco(contacto);
+            this.contacto = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(contacto);
             return this;
         }
 

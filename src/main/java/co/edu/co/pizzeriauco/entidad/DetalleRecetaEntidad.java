@@ -65,11 +65,9 @@ public class DetalleRecetaEntidad {
         }
 
         public Builder productoInterno(ProductoInternoEntidad productoInterno) {
-            this.productoInterno = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.productoInterno = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             productoInterno,
-                            new ProductoInternoEntidad.Builder().build()
-                    );
+                            new ProductoInternoEntidad.Builder().build());
             return this;
         }
 
@@ -79,20 +77,16 @@ public class DetalleRecetaEntidad {
         }
 
         public Builder unidadMedida(UnidadMedidaEntidad unidadMedida) {
-            this.unidadMedida = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.unidadMedida = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             unidadMedida,
-                            new UnidadMedidaEntidad.Builder().build()
-                    );
+                            new UnidadMedidaEntidad.Builder().build());
             return this;
         }
 
         public Builder producto(ProductoEntidad producto) {
-            this.producto = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.producto = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             producto,
-                            new ProductoEntidad.Builder().build()
-                    );
+                            new ProductoEntidad.Builder().build());
             return this;
         }
 

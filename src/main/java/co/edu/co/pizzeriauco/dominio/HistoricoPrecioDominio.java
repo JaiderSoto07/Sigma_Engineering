@@ -67,11 +67,9 @@ public class HistoricoPrecioDominio {
         }
 
         public Builder producto(ProductoDominio producto) {
-            this.producto =
-                    UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
+            this.producto = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             producto,
-                            new ProductoDominio.Builder().build()
-                    );
+                            new ProductoDominio.Builder().build());
             return this;
         }
 
@@ -81,14 +79,12 @@ public class HistoricoPrecioDominio {
         }
 
         public Builder fechaInicio(LocalDate fechaInicio) {
-            this.fechaInicio =
-                    UtilFecha.valorDefecto(fechaInicio);
+            this.fechaInicio = UtilFecha.valorDefecto(fechaInicio);
             return this;
         }
 
         public Builder fechaFin(LocalDate fechaFin) {
-            this.fechaFin =
-                    UtilFecha.valorDefecto(fechaFin);
+            this.fechaFin = UtilFecha.valorDefecto(fechaFin);
             return this;
         }
 

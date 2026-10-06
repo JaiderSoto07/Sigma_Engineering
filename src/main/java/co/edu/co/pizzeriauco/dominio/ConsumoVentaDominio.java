@@ -7,16 +7,13 @@ import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-//cada renglon de venta se abre en los insumos de su receta: un consumo por insumo, cada uno con su codigo
 public class ConsumoVentaDominio {
 
     private UUID id;
     private DetalleVentaDominio detalleVenta;
     private ProductoInternoDominio productoInterno;
-    //cantidad vendida por la cantidad de la receta, en la unidad de la receta
     private BigDecimal cantidad;
     private UnidadMedidaDominio unidadMedida;
-    //codigo de la operacion: lo comparte con sus movimientos de salida
     private TipoMovimientoDominio tipoMovimiento;
 
     private ConsumoVentaDominio(Builder builder) {
@@ -76,20 +73,16 @@ public class ConsumoVentaDominio {
         }
 
         public Builder detalleVenta(DetalleVentaDominio detalleVenta) {
-            this.detalleVenta = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.detalleVenta = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             detalleVenta,
-                            new DetalleVentaDominio.Builder().build()
-                    );
+                            new DetalleVentaDominio.Builder().build());
             return this;
         }
 
         public Builder productoInterno(ProductoInternoDominio productoInterno) {
-            this.productoInterno = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.productoInterno = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             productoInterno,
-                            new ProductoInternoDominio.Builder().build()
-                    );
+                            new ProductoInternoDominio.Builder().build());
             return this;
         }
 
@@ -99,20 +92,16 @@ public class ConsumoVentaDominio {
         }
 
         public Builder unidadMedida(UnidadMedidaDominio unidadMedida) {
-            this.unidadMedida = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.unidadMedida = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             unidadMedida,
-                            new UnidadMedidaDominio.Builder().build()
-                    );
+                            new UnidadMedidaDominio.Builder().build());
             return this;
         }
 
         public Builder tipoMovimiento(TipoMovimientoDominio tipoMovimiento) {
-            this.tipoMovimiento = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.tipoMovimiento = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             tipoMovimiento,
-                            new TipoMovimientoDominio.Builder().build()
-                    );
+                            new TipoMovimientoDominio.Builder().build());
             return this;
         }
 

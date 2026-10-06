@@ -13,12 +13,9 @@ public class MovimientoInventarioEntidad {
 
     private UUID id;
     private ClaseMovimientoEntidad claseMovimiento;
-    //codigo de la operacion que causo el movimiento: lo comparte con su renglon de compra, consumo de venta o cambio
-    //(la categoria de origen se sabe por el codigo)
     private TipoMovimientoEntidad tipoMovimiento;
     private BigDecimal cantidad;
     private LocalDate fechaMovimiento;
-    //entrada: el lote que se crea con esa compra o cambio; salida: el lote del que se saca
     private LoteEntidad lote;
 
     private MovimientoInventarioEntidad(Builder builder) {
@@ -80,43 +77,35 @@ public class MovimientoInventarioEntidad {
         public Builder claseMovimiento(
                 ClaseMovimientoEntidad claseMovimiento) {
 
-            this.claseMovimiento = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.claseMovimiento = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             claseMovimiento,
-                            new ClaseMovimientoEntidad.Builder().build()
-                    );
+                            new ClaseMovimientoEntidad.Builder().build());
 
             return this;
         }
 
         public Builder tipoMovimiento(TipoMovimientoEntidad tipoMovimiento) {
-            this.tipoMovimiento = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.tipoMovimiento = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             tipoMovimiento,
-                            new TipoMovimientoEntidad.Builder().build()
-                    );
+                            new TipoMovimientoEntidad.Builder().build());
 
             return this;
         }
 
         public Builder cantidad(BigDecimal cantidad) {
             this.cantidad = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(cantidad, BigDecimal.ZERO);
-
             return this;
         }
 
         public Builder fechaMovimiento(LocalDate fechaMovimiento) {
             this.fechaMovimiento = UtilFecha.valorDefecto(fechaMovimiento);
-
             return this;
         }
 
         public Builder lote(LoteEntidad lote) {
-            this.lote = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.lote = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             lote,
-                            new LoteEntidad.Builder().build()
-                    );
+                            new LoteEntidad.Builder().build());
             return this;
         }
 

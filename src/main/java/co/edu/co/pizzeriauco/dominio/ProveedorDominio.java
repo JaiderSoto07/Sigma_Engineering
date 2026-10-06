@@ -11,7 +11,6 @@ public class ProveedorDominio {
     private String nombreEmpresa;
     private String nit;
     private String contacto;
-    //true = se le puede comprar; false = desactivado (retirado), se conserva su historial de compras
     private boolean activo;
 
     private ProveedorDominio(Builder builder) {
@@ -55,7 +54,6 @@ public class ProveedorDominio {
             nombreEmpresa = UtilTexto.vacia;
             nit = UtilTexto.vacia;
             contacto = UtilTexto.vacia;
-            //todo proveedor nace activo
             activo = true;
         }
 
@@ -70,7 +68,6 @@ public class ProveedorDominio {
             return this;
         }
 
-        //NIT de la empresa (ej. 890904478-6) o cedula si el proveedor es persona natural
         public Builder nit(String nit) {
             this.nit = UtilTexto.getUtilTexto()
                     .quitarEspaciosEnBlanco(nit);

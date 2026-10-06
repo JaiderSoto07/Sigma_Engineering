@@ -5,7 +5,7 @@ import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
 
 import java.util.UUID;
 
-//es el codigo de cada operacion: lo comparten el renglon que la genero y sus movimientos
+
 public class TipoMovimientoDominio {
 
     private UUID id;

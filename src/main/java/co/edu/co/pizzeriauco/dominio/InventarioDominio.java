@@ -5,7 +5,6 @@ import co.edu.co.pizzeriauco.transversal.utilitario.UtilNumero;
 import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 public class InventarioDominio {
@@ -44,24 +43,6 @@ public class InventarioDominio {
         return stockMinimo;
     }
 
-    //el inventario es la suma de los saldos de todos los lotes de ese producto interno
-    //los lotes de otros productos no se cuentan
-    public static BigDecimal calcularCantidadTotal(ProductoInternoDominio productoInterno, List<LoteDominio> lotes) {
-        var productoSaneado = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
-                productoInterno, new ProductoInternoDominio.Builder().build());
-        var lotesSaneados = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
-                lotes, List.<LoteDominio>of());
-
-        var cantidadTotal = BigDecimal.ZERO;
-        for (var lote : lotesSaneados) {
-            if (!UtilObjeto.esNulo(lote)
-                    && lote.getProductoInterno().getId().equals(productoSaneado.getId())) {
-                cantidadTotal = cantidadTotal.add(lote.getSaldo());
-            }
-        }
-        return cantidadTotal;
-    }
-
     public static class Builder {
 
         private UUID id;
@@ -73,10 +54,8 @@ public class InventarioDominio {
         public Builder() {
             id = UtilId.valorDefecto(id);
             cantidadTotal = BigDecimal.ZERO;
-            productoInterno =
-                    new ProductoInternoDominio.Builder().build();
-            unidadMedidaInventario =
-                    new UnidadMedidaDominio.Builder().build();
+            productoInterno = new ProductoInternoDominio.Builder().build();
+            unidadMedidaInventario = new UnidadMedidaDominio.Builder().build();
             stockMinimo = UtilNumero.STOCK_MINIMO_POR_DEFECTO;
         }
 
@@ -90,25 +69,16 @@ public class InventarioDominio {
             return this;
         }
 
-        public Builder productoInterno(
-                ProductoInternoDominio productoInterno) {
+        public Builder productoInterno(ProductoInternoDominio productoInterno) {
 
-            this.productoInterno = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            productoInterno,
-                            new ProductoInternoDominio.Builder().build()
-                    );
+            this.productoInterno = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(productoInterno,
+                            new ProductoInternoDominio.Builder().build());
             return this;
         }
 
-        public Builder unidadMedidaInventario(
-                UnidadMedidaDominio unidadMedidaInventario) {
+        public Builder unidadMedidaInventario(UnidadMedidaDominio unidadMedidaInventario) {
 
-            this.unidadMedidaInventario = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
-                            unidadMedidaInventario,
-                            new UnidadMedidaDominio.Builder().build()
-                    );
+            this.unidadMedidaInventario = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(unidadMedidaInventario, new UnidadMedidaDominio.Builder().build());
             return this;
         }
 

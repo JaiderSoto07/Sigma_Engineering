@@ -68,11 +68,9 @@ public class CompraEntidad {
         }
 
         public Builder proveedor(ProveedorEntidad proveedor) {
-            this.proveedor = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.proveedor = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             proveedor,
-                            new ProveedorEntidad.Builder().build()
-                    );
+                            new ProveedorEntidad.Builder().build());
             return this;
         }
 
@@ -82,8 +80,7 @@ public class CompraEntidad {
         }
 
         public Builder numeroFactura(String numeroFactura) {
-            this.numeroFactura = UtilTexto.getUtilTexto()
-                    .quitarEspaciosEnBlanco(numeroFactura);
+            this.numeroFactura = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(numeroFactura);
             return this;
         }
 

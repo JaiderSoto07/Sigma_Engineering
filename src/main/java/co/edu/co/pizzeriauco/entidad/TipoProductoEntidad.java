@@ -39,8 +39,7 @@ public class TipoProductoEntidad {
         }
 
         public Builder nombre(String nombre) {
-            this.nombre =
-                    UtilTexto.getUtilTexto().primeraLetraMayuscula(nombre);
+            this.nombre = UtilTexto.getUtilTexto().primeraLetraMayuscula(nombre);
             return this;
         }
 

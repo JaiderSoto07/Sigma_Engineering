@@ -15,10 +15,8 @@ public class ProductoEntidad {
     private TipoProductoEntidad tipoProducto;
     private TamanoEntidad tamano;
     private boolean productoInterno;
-    //insumo de bodega que se vende directo (ej. la bebida); vacio si se vende por receta
     private ProductoInternoEntidad productoInternoAsociado;
     private BigDecimal precio;
-    //true = esta en el menu; false = desactivado (retirado de la venta), se conserva su historial
     private boolean activo;
 
     private ProductoEntidad(Builder builder) {
@@ -83,7 +81,6 @@ public class ProductoEntidad {
             productoInterno = false;
             productoInternoAsociado = new ProductoInternoEntidad.Builder().build();
             precio = BigDecimal.ZERO;
-            //todo producto nace activo (en el menu)
             activo = true;
         }
 
@@ -93,27 +90,21 @@ public class ProductoEntidad {
         }
 
         public Builder nombre(String nombre) {
-            this.nombre =
-                    UtilTexto.getUtilTexto()
-                            .quitarEspaciosEnBlanco(nombre);
+            this.nombre = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(nombre);
             return this;
         }
 
         public Builder tipoProducto(TipoProductoEntidad tipoProducto) {
-            this.tipoProducto =
-                    UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
+            this.tipoProducto = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             tipoProducto,
-                            new TipoProductoEntidad.Builder().build()
-                    );
+                            new TipoProductoEntidad.Builder().build());
             return this;
         }
 
         public Builder tamano(TamanoEntidad tamano) {
-            this.tamano =
-                    UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
+            this.tamano = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             tamano,
-                            new TamanoEntidad.Builder().build()
-                    );
+                            new TamanoEntidad.Builder().build());
             return this;
         }
 
@@ -123,11 +114,9 @@ public class ProductoEntidad {
         }
 
         public Builder productoInternoAsociado(ProductoInternoEntidad productoInternoAsociado) {
-            this.productoInternoAsociado =
-                    UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
+            this.productoInternoAsociado = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             productoInternoAsociado,
-                            new ProductoInternoEntidad.Builder().build()
-                    );
+                            new ProductoInternoEntidad.Builder().build());
             return this;
         }
 

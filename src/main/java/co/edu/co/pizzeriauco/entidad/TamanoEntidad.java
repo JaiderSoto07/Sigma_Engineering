@@ -39,8 +39,7 @@ public class TamanoEntidad {
         }
 
         public Builder tamano(String tamano) {
-            this.tamano =
-                    UtilTexto.getUtilTexto().primeraLetraMayuscula(tamano);
+            this.tamano = UtilTexto.getUtilTexto().primeraLetraMayuscula(tamano);
             return this;
         }
 

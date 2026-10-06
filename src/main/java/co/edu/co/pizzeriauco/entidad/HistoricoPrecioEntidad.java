@@ -67,11 +67,9 @@ public class HistoricoPrecioEntidad {
         }
 
         public Builder producto(ProductoEntidad producto) {
-            this.producto =
-                    UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
+            this.producto = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             producto,
-                            new ProductoEntidad.Builder().build()
-                    );
+                            new ProductoEntidad.Builder().build());
             return this;
         }
 
@@ -81,14 +79,12 @@ public class HistoricoPrecioEntidad {
         }
 
         public Builder fechaInicio(LocalDate fechaInicio) {
-            this.fechaInicio =
-                    UtilFecha.valorDefecto(fechaInicio);
+            this.fechaInicio = UtilFecha.valorDefecto(fechaInicio);
             return this;
         }
 
         public Builder fechaFin(LocalDate fechaFin) {
-            this.fechaFin =
-                    UtilFecha.valorDefecto(fechaFin);
+            this.fechaFin = UtilFecha.valorDefecto(fechaFin);
             return this;
         }
 

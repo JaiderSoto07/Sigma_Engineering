@@ -9,13 +9,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-//lo que la persona saca por la alerta de vencimiento del lote; no genera codigo ni movimiento
 public class SalidaLoteDominio {
 
     private UUID id;
-    //un lote se saca una sola vez y completo
     private LoteDominio lote;
-    //el saldo que tenia el lote justo antes de sacarlo (unidad del lote)
     private BigDecimal cantidad;
     private LocalDate fechaMovimiento;
 
@@ -62,11 +59,9 @@ public class SalidaLoteDominio {
         }
 
         public Builder lote(LoteDominio lote) {
-            this.lote = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.lote = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             lote,
-                            new LoteDominio.Builder().build()
-                    );
+                            new LoteDominio.Builder().build());
             return this;
         }
 

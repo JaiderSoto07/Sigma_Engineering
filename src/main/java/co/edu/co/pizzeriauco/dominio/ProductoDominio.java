@@ -15,10 +15,8 @@ public class ProductoDominio {
     private TipoProductoDominio tipoProducto;
     private TamanoDominio tamano;
     private boolean productoInterno;
-    //insumo de bodega que se vende directo (ej. la bebida); vacio si se vende por receta
     private ProductoInternoDominio productoInternoAsociado;
     private BigDecimal precio;
-    //true = esta en el menu; false = desactivado (retirado de la venta), se conserva su historial
     private boolean activo;
 
     private ProductoDominio(Builder builder) {
@@ -83,7 +81,6 @@ public class ProductoDominio {
             productoInterno = false;
             productoInternoAsociado = new ProductoInternoDominio.Builder().build();
             precio = BigDecimal.ZERO;
-            //todo producto nace activo (en el menu)
             activo = true;
         }
 

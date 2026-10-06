@@ -82,7 +82,7 @@ public class LoteEntidad {
             cantidad = BigDecimal.ZERO;
             saldo = BigDecimal.ZERO;
             unidadMedidaInventario = new UnidadMedidaEntidad.Builder().build();
-            numeroLote = 0;
+            numeroLote = UtilNumero.cero;
         }
 
         public Builder id(UUID id) {
@@ -100,14 +100,11 @@ public class LoteEntidad {
             return this;
         }
 
-        public Builder productoInterno(
-                ProductoInternoEntidad productoInterno) {
+        public Builder productoInterno(ProductoInternoEntidad productoInterno) {
 
-            this.productoInterno = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.productoInterno = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             productoInterno,
-                            new ProductoInternoEntidad.Builder().build()
-                    );
+                            new ProductoInternoEntidad.Builder().build());
             return this;
         }
 
@@ -116,20 +113,17 @@ public class LoteEntidad {
             return this;
         }
 
-        //lo que todavia queda del lote
+
         public Builder saldo(BigDecimal saldo) {
             this.saldo = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(saldo, BigDecimal.ZERO);
             return this;
         }
 
-        public Builder unidadMedidaInventario(
-                UnidadMedidaEntidad unidadMedidaInventario) {
+        public Builder unidadMedidaInventario(UnidadMedidaEntidad unidadMedidaInventario) {
 
-            this.unidadMedidaInventario = UtilObjeto
-                    .obtenerValorDefectoSiValorOriginalEsNulo(
+            this.unidadMedidaInventario = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
                             unidadMedidaInventario,
-                            new UnidadMedidaEntidad.Builder().build()
-                    );
+                            new UnidadMedidaEntidad.Builder().build());
             return this;
         }
 
