@@ -274,4 +274,21 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
             throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
         }
     }
+
+    @Override
+    public void eliminar(UUID id) {
+        var sentenciaSql = "delete from lote where id_lote = ?";
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+            sentencia.setObject(1, id);
+            sentencia.executeUpdate();
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.LoteSqlServerDAO.USUARIO_ERROR_PROBLEMA_ELIMINANDO_LOTE;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.LoteSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_ELIMINANDO_LOTE;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
+    }
 }

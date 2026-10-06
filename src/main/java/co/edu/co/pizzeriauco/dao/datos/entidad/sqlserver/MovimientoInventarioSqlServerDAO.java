@@ -276,4 +276,21 @@ public class MovimientoInventarioSqlServerDAO extends SqlDAO implements Movimien
         }
         return movimientosEncontrados;
     }
+
+    @Override
+    public void eliminar(UUID id) {
+        var sentenciaSql = "delete from movimiento_inventario where id_movimiento_inventario = ?";
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+            sentencia.setObject(1, id);
+            sentencia.executeUpdate();
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.MovimientoInventarioSqlServerDAO.USUARIO_ERROR_PROBLEMA_ELIMINANDO_MOVIMIENTO_INVENTARIO;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.MovimientoInventarioSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_ELIMINANDO_MOVIMIENTO_INVENTARIO;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
+    }
 }

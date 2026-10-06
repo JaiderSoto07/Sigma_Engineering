@@ -32,9 +32,7 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
         var sentenciaSql = "insert into cambio(id_cambio, id_producto_interno, cantidad, id_unidad_medida, fecha_vencimiento, fecha_cambio, "
                 + "id_tipo_movimiento) values(?, ?, ?, ?, ?, ?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
-            //se llenan los datos en el mismo orden de los ?
             sentencia.setObject(1, entidad.getId());
-            //del producto interno, la unidad y el codigo solo se guarda su id (llaves foraneas)
             sentencia.setObject(2, entidad.getProductoCambio().getId());
             sentencia.setBigDecimal(3, entidad.getCantidad());
             sentencia.setObject(4, entidad.getUnidadMedida().getId());
@@ -65,15 +63,13 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
                 + "inner join unidad_medida as um on ca.id_unidad_medida = um.id_unidad_medida "
                 + "inner join tipo_movimiento as tm on ca.id_tipo_movimiento = tm.id_tipo_movimiento "
                 + "where ca.id_cambio = ?";
-        //si no se encuentra, se devuelve el cambio por defecto (nunca nulo)
+
         var cambioEncontrado = new CambioEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
 
             var resultado = sentencia.executeQuery();
             if (resultado.next()) {
-                //primero se arman los padres (producto interno, unidad y codigo) para luego asignarlos al cambio
-                //de la categoria del codigo ("abuelo") solo se trae el id
                 var productoCambio = new ProductoInternoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto_interno")))
                         .nombre(resultado.getString("nombre_producto_interno"))
@@ -129,7 +125,6 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
                 + "inner join tipo_movimiento as tm on ca.id_tipo_movimiento = tm.id_tipo_movimiento "
                 + "where 1=1";
         var parametros = new ArrayList<Object>();
-        //estos los del cambio
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
             sentenciaSql = sentenciaSql + " and ca.id_cambio = ?";
             parametros.add(filtro.getId());
@@ -138,7 +133,7 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
             sentenciaSql = sentenciaSql + " and ca.fecha_cambio = ?";
             parametros.add(filtro.getFechaCambio());
         }
-        //estos los del producto interno (historia de cambios de un insumo)
+
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getProductoCambio().getId())) {
             sentenciaSql = sentenciaSql + " and pi.id_producto_interno = ?";
             parametros.add(filtro.getProductoCambio().getId());
@@ -147,17 +142,16 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
             sentenciaSql = sentenciaSql + " and pi.nombre = ?";
             parametros.add(filtro.getProductoCambio().getNombre());
         }
-        //este el de la unidad de medida
+
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getUnidadMedida().getId())) {
             sentenciaSql = sentenciaSql + " and um.id_unidad_medida = ?";
             parametros.add(filtro.getUnidadMedida().getId());
         }
-        //este el del codigo (para llegar al cambio desde su movimiento)
+
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getTipoMovimiento().getId())) {
             sentenciaSql = sentenciaSql + " and tm.id_tipo_movimiento = ?";
             parametros.add(filtro.getTipoMovimiento().getId());
         }
-        // el orden va siempre al final: los cambios mas recientes primero
         sentenciaSql = sentenciaSql + " order by ca.fecha_cambio desc, pi.nombre asc";
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -167,10 +161,10 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
             }
 
             var resultado = sentencia.executeQuery();
-            // por cada fila que llego, se arma un cambio y se agrega a la lista
+
             while (resultado.next()) {
-                //primero se arman los padres (producto interno, unidad y codigo) para luego asignarlos al cambio
-                //de la categoria del codigo ("abuelo") solo se trae el id
+
+
                 var productoCambio = new ProductoInternoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto_interno")))
                         .nombre(resultado.getString("nombre_producto_interno"))
@@ -232,8 +226,8 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
 
             var resultado = sentencia.executeQuery();
             while (resultado.next()) {
-                //primero se arman los padres (producto interno, unidad y codigo) para luego asignarlos al cambio
-                //de la categoria del codigo ("abuelo") solo se trae el id
+
+
                 var productoCambio = new ProductoInternoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto_interno")))
                         .nombre(resultado.getString("nombre_producto_interno"))
@@ -276,8 +270,8 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
         return cambiosEncontrados;
     }
 
-    //negocio solo lo permite mientras el lote que creo el cambio este intacto (saldo = cantidad)
-    //el codigo (id_tipo_movimiento) no se actualiza: el cambio conserva siempre el mismo
+
+
     @Override
     public void actualizar(UUID id, CambioEntidad entidad) {
         var sentenciaSql = "update cambio set id_producto_interno = ?, cantidad = ?, id_unidad_medida = ?, "
@@ -301,7 +295,7 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
         }
     }
 
-    //negocio solo lo permite mientras el lote que creo el cambio este intacto (saldo = cantidad)
+
     @Override
     public void eliminar(UUID id) {
         var sentenciaSql = "delete from cambio where id_cambio = ?";

@@ -8,8 +8,7 @@ import co.edu.co.pizzeriauco.entidad.CambioEntidad;
 
 import java.util.UUID;
 
-//actualizar y eliminar solo mientras el lote que creo el cambio este intacto (saldo = cantidad),
-//igual que un renglon de compra
+
 public interface CambioDAO extends CrearDAO<CambioEntidad>, ConsultarDAO<CambioEntidad, UUID>,
         ActualizarDAO<CambioEntidad, UUID>, EliminarDAO<UUID> {
 }

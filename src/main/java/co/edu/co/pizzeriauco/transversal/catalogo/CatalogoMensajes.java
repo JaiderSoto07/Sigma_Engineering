@@ -263,6 +263,8 @@ public class CatalogoMensajes {
         public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODOS_LOS_LOTES = "Se ha presentado un problema NO CONTROLADO tratando de consultar todos los lotes. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
         public static final String USUARIO_ERROR_PROBLEMA_ACTUALIZANDO_LOTE = "Se ha presentado un problema tratando de actualizar el lote. Por favor verifique que el movimiento, el producto interno y la unidad de medida existan, que el numero de lote no este repetido para ese insumo y que el saldo este entre cero y la cantidad del lote, intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
         public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_ACTUALIZANDO_LOTE = "Se ha presentado un problema NO CONTROLADO tratando de actualizar el lote. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_ELIMINANDO_LOTE = "Se ha presentado un problema tratando de eliminar el lote. Por favor verifique que el lote no tenga movimientos registrados, intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_ELIMINANDO_LOTE = "Se ha presentado un problema NO CONTROLADO tratando de eliminar el lote. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
     }
 
     public static class InventarioSqlServerDAO {
@@ -391,13 +393,14 @@ public class CatalogoMensajes {
         public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_MOVIMIENTO_INVENTARIO_POR_FILTRO = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion de los movimientos de inventario. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
         public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_TODOS_LOS_MOVIMIENTOS_INVENTARIO = "Se ha presentado un problema tratando de consultar todos los movimientos de inventario. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
         public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODOS_LOS_MOVIMIENTOS_INVENTARIO = "Se ha presentado un problema NO CONTROLADO tratando de consultar todos los movimientos de inventario. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_ELIMINANDO_MOVIMIENTO_INVENTARIO = "Se ha presentado un problema tratando de eliminar el movimiento de inventario. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_ELIMINANDO_MOVIMIENTO_INVENTARIO = "Se ha presentado un problema NO CONTROLADO tratando de eliminar el movimiento de inventario. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
     }
 
     public static class DetalleRecetaNegocioImpl {
 
         private DetalleRecetaNegocioImpl() {
         }
-
 
         public static final String DATOS_DETALLE_RECETA_OBLIGATORIOS = "No es posible registrar el ingrediente de la receta porque no se recibio su informacion. Por favor diligencie los datos del ingrediente e intente de nuevo";
         public static final String PRODUCTO_DETALLE_RECETA_OBLIGATORIO = "No es posible registrar el ingrediente de la receta porque no se indico el producto (receta) al que pertenece. Por favor seleccione el producto e intente de nuevo";

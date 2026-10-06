@@ -6,7 +6,5 @@ import co.edu.co.pizzeriauco.entidad.VentaEntidad;
 
 import java.util.UUID;
 
-//sin actualizar ni eliminar: una venta registrada ya desconto inventario y uso un numero de factura,
-//por eso no se modifica ni se borra (si hace falta deshacerla, sera una futura "Anular venta")
 public interface VentaDAO extends CrearDAO<VentaEntidad>, ConsultarDAO<VentaEntidad, UUID> {
 }

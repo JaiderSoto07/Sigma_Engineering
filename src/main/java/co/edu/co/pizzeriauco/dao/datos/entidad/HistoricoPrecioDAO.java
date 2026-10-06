@@ -7,8 +7,7 @@ import co.edu.co.pizzeriauco.entidad.HistoricoPrecioEntidad;
 
 import java.util.UUID;
 
-//sin eliminar: el historico de precios nunca se borra
-//actualizar solo se usa para cerrar el precio vigente (fecha fin) o corregir el precio de hoy
+
 public interface HistoricoPrecioDAO extends CrearDAO<HistoricoPrecioEntidad>, ConsultarDAO<HistoricoPrecioEntidad, UUID>,
         ActualizarDAO<HistoricoPrecioEntidad, UUID> {
 }
