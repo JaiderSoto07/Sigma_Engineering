@@ -38,6 +38,6 @@ public class UnidadMedidaDto {
     }
 
     public void setTipoMedida(String tipoMedida) {
-        this.tipoMedida = UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(tipoMedida);
+        this.tipoMedida = UtilTexto.getUtilTexto().primeraLetraMayuscula(tipoMedida);
     }
 }

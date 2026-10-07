@@ -56,7 +56,7 @@ public class UnidadMedidaDominio {
         public Builder tipoMedida(String tipoMedida) {
             this.tipoMedida =
                     UtilTexto.getUtilTexto()
-                            .quitarEspaciosEnBlanco(tipoMedida);
+                            .primeraLetraMayuscula(tipoMedida);
             return this;
         }
 

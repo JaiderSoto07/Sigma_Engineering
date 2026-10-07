@@ -54,7 +54,7 @@ public class UnidadMedidaEntidad {
 
         public Builder tipoMedida(String tipoMedida) {
             this.tipoMedida =
-                    UtilTexto.getUtilTexto().quitarEspaciosEnBlanco(tipoMedida);
+                    UtilTexto.getUtilTexto().primeraLetraMayuscula(tipoMedida);
             return this;
         }
 

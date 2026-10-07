@@ -46,8 +46,10 @@ import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.UnidadMedidaSqlServerDA
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.VentaSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.factoria.DAOFactory;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class SqlServerDAOFactory extends DAOFactory {
@@ -57,12 +59,25 @@ public class SqlServerDAOFactory extends DAOFactory {
     private static final String USUARIO = "pizzeriaUser";
     private static final String CLAVE = "Pizza2026*";
 
+    private static final HikariDataSource POOL = crearPool();
+
+    private static HikariDataSource crearPool() {
+        HikariConfig configuracion = new HikariConfig();
+        configuracion.setJdbcUrl(URL);
+        configuracion.setUsername(USUARIO);
+        configuracion.setPassword(CLAVE);
+        configuracion.setMaximumPoolSize(10);
+        //si SQL Server no está disponible, no falla al crear el pool sino al pedir la conexión (dentro del try)
+        configuracion.setInitializationFailTimeout(-1);
+        return new HikariDataSource(configuracion);
+    }
+
     @Override
     protected void abrirConexion() {
-        //como abrir la conexion con SQL Server desde Java
+        //como abrir la conexion con SQL Server desde Java: se pide prestada una conexión del pool
         Connection conexion;
         try {
-            conexion = DriverManager.getConnection(URL, USUARIO, CLAVE);
+            conexion = POOL.getConnection();
         } catch (SQLException exception) {
             var mensajeUsuario = CatalogoMensajes.SqlServerDAOFactory.USUARIO_ERROR_PROBLEMA_ABRIENDO_CONEXION_SQL_SERVER;
             throw PizzeriaDatosExcepcion.crear(mensajeUsuario, exception.getMessage(), exception);

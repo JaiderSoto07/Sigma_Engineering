@@ -2,10 +2,6 @@
 use Pizzeria;
 go
 
--- ============================================================
--- Catalogos
--- ============================================================
-
 create table unidad_medida (
 id_unidad_medida uniqueidentifier primary key default newid(),
 unidad_medida varchar(4) not null unique,
@@ -46,13 +42,9 @@ id_proveedor uniqueidentifier primary key default newid(),
 nombre_empresa varchar(60) not null unique,
 nit varchar(15) not null unique,
 contacto varchar(10) not null,
--- 1 = se le puede comprar; 0 = desactivado (retirado), se conserva su historial
 activo bit not null default 1
 );
 
--- ============================================================
--- Productos
--- ============================================================
 
 create table producto_interno (
 id_producto_interno uniqueidentifier primary key default newid(),
@@ -60,7 +52,6 @@ nombre varchar(40) not null unique,
 perecedero bit not null,
 vida_util int not null default 0,
 id_unidad_medida uniqueidentifier not null,
--- 1 = se puede usar en compras y recetas; 0 = desactivado (descontinuado), se conserva su historial
 activo bit not null default 1,
 
 constraint fk_producto_interno_id_unidad_medida

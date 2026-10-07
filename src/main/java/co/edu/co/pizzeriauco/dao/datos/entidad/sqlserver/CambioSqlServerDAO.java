@@ -26,7 +26,6 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
         super(conexion);
     }
 
-    //el cambio es solo la ENTRADA del producto nuevo; la salida del lote viejo va aparte en SalidaLote
     @Override
     public void crear(CambioEntidad entidad) {
         var sentenciaSql = "insert into cambio(id_cambio, id_producto_interno, cantidad, id_unidad_medida, fecha_vencimiento, fecha_cambio, "
