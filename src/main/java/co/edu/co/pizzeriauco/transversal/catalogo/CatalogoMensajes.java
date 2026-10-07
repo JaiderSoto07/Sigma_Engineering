@@ -417,5 +417,7 @@ public class CatalogoMensajes {
         public static final String PRODUCTO_INTERNO_DETALLE_RECETA_NO_EXISTE = "No es posible registrar el ingrediente porque el producto interno seleccionado no existe. Por favor verifique el producto interno e intente de nuevo";
 
         public static final String PRODUCTO_INTERNO_YA_REGISTRADO_EN_RECETA = "No es posible registrar el ingrediente porque el producto interno ya esta registrado en esta receta. Si necesita cambiar la cantidad, modifique el ingrediente existente";
+
+        public static final String ID_DETALLE_RECETA_YA_EXISTE = "No es posible registrar el ingrediente de la receta porque el identificador generado ya esta en uso. Por favor intente de nuevo y si el problema persiste contacte al administrador";
     }
 }
