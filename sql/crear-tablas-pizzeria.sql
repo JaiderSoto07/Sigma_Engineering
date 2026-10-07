@@ -66,12 +66,9 @@ id_producto uniqueidentifier primary key default newid(),
 nombre varchar(40) not null,
 id_tipo_producto uniqueidentifier not null,
 id_tamano uniqueidentifier not null,
--- insumo de bodega que se vende directo (ej. la bebida); null si se vende por receta
-id_producto_interno uniqueidentifier null,
--- automatica: 1 si tiene insumo asociado, 0 si no (nadie la escribe)
-producto_interno as (case when id_producto_interno is null then 0 else 1 end),
+id_producto_interno uniqueidentifier not null,
+producto_interno as (case when id_producto_interno = '00000000-0000-0000-0000-000000000000' then 0 else 1 end),
 precio decimal(18,2) not null,
--- 1 = esta en el menu; 0 = desactivado (retirado de la venta), se conserva su historial
 activo bit not null default 1,
 
 constraint fk_producto_id_tipo_producto
