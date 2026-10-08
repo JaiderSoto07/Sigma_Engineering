@@ -8,6 +8,8 @@ public class UtilTexto {
 
     public static final String CLIENTE_POR_DEFECTO = "2222222222";
 
+    public static final String SOLO_LETRAS_ESPACIOS = "^[a-zA-Z ñÑáÁéÉíÍóÓúÚ]*$";
+
     private UtilTexto() {
     }
 
@@ -62,6 +64,10 @@ public class UtilTexto {
         var valorSanitizado = quitarEspaciosEnBlanco ? quitarEspaciosEnBlanco(valor): valor;
 
         return obtenerLongitudCadena(valorSanitizado)>= longitudInicial && obtenerLongitudCadena(valorSanitizado)<=longitudFinal;
+    }
+
+    public boolean formatoEsValido(String valor, String patron){
+        return obtenerValorDefecto(valor).matches(obtenerValorDefecto(patron));
     }
 
 }
