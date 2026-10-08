@@ -31,7 +31,6 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
         var sentenciaSql = "insert into historico_precio(id_historico_precio, id_producto, precio, fecha_inicio, fecha_fin) "
                 + "values(?, ?, ?, ?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
-            //se llenan los datos en el mismo orden de los ?
             sentencia.setObject(1, entidad.getId());
             //del producto solo se guarda su id (llave foranea)
             sentencia.setObject(2, entidad.getProducto().getId());
@@ -68,7 +67,6 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
             if (resultado.next()) {
                 //primero se arma el producto para luego poderlo asignar al historico
                 //de sus padres (tipo, tamano e insumo asociado) solo se trae el id
-                var idInsumoAsociado = resultado.getString("id_producto_interno_asociado");
                 var producto = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
                         .nombre(resultado.getString("nombre_producto"))
@@ -77,7 +75,7 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
                         .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(idInsumoAsociado == null ? null : UUID.fromString(idInsumoAsociado)).build())
+                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio_producto"))
                         .activo(resultado.getBoolean("activo"))
                         .build();
@@ -144,7 +142,6 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
             // por cada fila que llego, se arma un historico y se agrega a la lista
             while (resultado.next()) {
                 //primero se arma el producto para luego poderlo asignar al historico
-                var idInsumoAsociado = resultado.getString("id_producto_interno_asociado");
                 var producto = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
                         .nombre(resultado.getString("nombre_producto"))
@@ -153,7 +150,7 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
                         .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(idInsumoAsociado == null ? null : UUID.fromString(idInsumoAsociado)).build())
+                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio_producto"))
                         .activo(resultado.getBoolean("activo"))
                         .build();
@@ -194,7 +191,6 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
             var resultado = sentencia.executeQuery();
             while (resultado.next()) {
                 //primero se arma el producto para luego poderlo asignar al historico
-                var idInsumoAsociado = resultado.getString("id_producto_interno_asociado");
                 var producto = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
                         .nombre(resultado.getString("nombre_producto"))
@@ -203,7 +199,7 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
                         .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(idInsumoAsociado == null ? null : UUID.fromString(idInsumoAsociado)).build())
+                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio_producto"))
                         .activo(resultado.getBoolean("activo"))
                         .build();

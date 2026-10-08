@@ -159,6 +159,37 @@ public class ProveedorSqlServerDAO extends SqlDAO implements ProveedorDAO {
         }
         return proveedoresEncontrados;
     }
+    @Override
+    public List<ProveedorEntidad> consultarActivos() {
+        var sentenciaSql = "select id_proveedor, nombre_empresa, nit, contacto, activo from proveedor"
+        +" where activo=1 order by nombre_empresa asc";
+        var proveedoresEncontrados = new ArrayList<ProveedorEntidad>();
+
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+
+
+            var resultado = sentencia.executeQuery();
+            while (resultado.next()) {
+                var proveedor = new ProveedorEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_proveedor")))
+                        .nombreEmpresa(resultado.getString("nombre_empresa"))
+                        .nit(resultado.getString("nit"))
+                        .contacto(resultado.getString("contacto"))
+                        .activo(resultado.getBoolean("activo"))
+                        .build();
+                proveedoresEncontrados.add(proveedor);
+            }
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.ProveedorSqlServerDAO.USUARIO_ERROR_PROBLEMA_CONSULTANDO_PROVEEDORES_ACTIVOS;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.ProveedorSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_PROVEEDORES_ACTIVOS;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
+        return proveedoresEncontrados;
+    }
 
     //tambien guarda activo: desactivar un proveedor (retirarlo) es actualizarlo con activo = false
     @Override
@@ -200,4 +231,5 @@ public class ProveedorSqlServerDAO extends SqlDAO implements ProveedorDAO {
             throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
         }
     }
+
 }

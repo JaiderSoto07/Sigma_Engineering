@@ -240,7 +240,7 @@ constraint fk_detalle_compra_id_tipo_movimiento
 constraint uk_detalle_compra_compra_producto_fecha
   unique (id_compra, id_producto_interno, fecha_vencimiento),
 constraint ck_detalle_compra_cantidad
-  check (cantidad > 0 and cantidad <= 10000),
+  check (cantidad > 0 and cantidad <= 100000),
 constraint ck_detalle_compra_precio_compra
   check (precio_compra >= 0 and precio_compra <= 5000000)
 );

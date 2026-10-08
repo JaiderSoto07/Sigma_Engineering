@@ -92,9 +92,9 @@ public class ProductoInternoSqlServerDAO extends SqlDAO implements ProductoInter
         var sentenciaSql = "select pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
                 + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
                 + "from producto_interno as pi inner join unidad_medida as um on pi.id_unidad_medida = um.id_unidad_medida "
-                + "where 1=1";
+                + "where pi.id_producto_interno <> ?";
         var parametros = new ArrayList<Object>();
-        //este seria el del producto interno
+        parametros.add(UtilId.VALOR_DEFECTO); // para que el priemr valor me quede con el comodin
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
             sentenciaSql = sentenciaSql + " and pi.id_producto_interno = ?";
             parametros.add(filtro.getId());
@@ -162,14 +162,15 @@ public class ProductoInternoSqlServerDAO extends SqlDAO implements ProductoInter
         var sentenciaSql = "select pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
                 + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
                 + "from producto_interno as pi inner join unidad_medida as um on pi.id_unidad_medida = um.id_unidad_medida "
+                + "where pi.id_producto_interno <> ? "
                 + "order by pi.nombre asc";
         var productosInternosEncontrados = new ArrayList<ProductoInternoEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
-
+            sentencia.setObject(1, UtilId.VALOR_DEFECTO);
             var resultado = sentencia.executeQuery();
             while (resultado.next()) {
-                //primero se arma la unidad de medida para luego poderla asignar al producto interno
+
                 var unidadMedida = new UnidadMedidaEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_unidad_medida")))
                         .unidadMedida(resultado.getString("unidad_medida"))
@@ -192,6 +193,49 @@ public class ProductoInternoSqlServerDAO extends SqlDAO implements ProductoInter
         } catch (Exception excepcion) {
             //no controlado
             var mensajeUsuario = CatalogoMensajes.ProductoInternoSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODOS_LOS_PRODUCTOS_INTERNOS;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
+        return productosInternosEncontrados;
+    }
+
+    @Override
+    public List<ProductoInternoEntidad> consultarActivos() {
+
+        var sentenciaSql = "select pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
+                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
+                + "from producto_interno as pi inner join unidad_medida as um on pi.id_unidad_medida = um.id_unidad_medida "
+                + "where pi.id_producto_interno <> ? and pi.activo=1 "
+                + "order by pi.nombre asc";
+
+        var productosInternosEncontrados = new ArrayList<ProductoInternoEntidad>();
+
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+            sentencia.setObject(1, UtilId.VALOR_DEFECTO);
+            var resultado = sentencia.executeQuery();
+            while (resultado.next()) {
+
+                var unidadMedida = new UnidadMedidaEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_unidad_medida")))
+                        .unidadMedida(resultado.getString("unidad_medida"))
+                        .tipoMedida(resultado.getString("tipo_medida"))
+                        .build();
+                var productoInterno = new ProductoInternoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_producto_interno")))
+                        .nombre(resultado.getString("nombre_producto_interno"))
+                        .perecedero(resultado.getBoolean("perecedero"))
+                        .vidaUtil(resultado.getInt("vida_util"))
+                        .tipoMedida(unidadMedida)
+                        .activo(resultado.getBoolean("activo"))
+                        .build();
+                productosInternosEncontrados.add(productoInterno);
+            }
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.ProductoInternoSqlServerDAO.USUARIO_ERROR_PROBLEMA_CONSULTANDO_PRODUCTOS_INTERNOS_ACTIVOS;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.ProductoInternoSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_PRODUCTOS_INTERNOS_ACTIVOS;
             throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
         }
         return productosInternosEncontrados;

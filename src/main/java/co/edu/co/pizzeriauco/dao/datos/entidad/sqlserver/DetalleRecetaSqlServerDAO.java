@@ -70,7 +70,6 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
             if (resultado.next()) {
                 //primero se arman los padres (producto, producto interno y unidad) para luego asignarlos al detalle
                 //de los "abuelos" (tipo, tamano e insumo del producto; unidad del producto interno) solo se trae el id
-                var idInsumoAsociado = resultado.getString("id_producto_interno_asociado");
                 var producto = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
                         .nombre(resultado.getString("nombre_producto"))
@@ -79,7 +78,7 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
                         .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(idInsumoAsociado == null ? null : UUID.fromString(idInsumoAsociado)).build())
+                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo_producto"))
                         .build();
@@ -172,7 +171,6 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
             // por cada fila que llego, se arma un detalle y se agrega a la lista
             while (resultado.next()) {
                 //primero se arman los padres (producto, producto interno y unidad) para luego asignarlos al detalle
-                var idInsumoAsociado = resultado.getString("id_producto_interno_asociado");
                 var producto = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
                         .nombre(resultado.getString("nombre_producto"))
@@ -181,7 +179,7 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
                         .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(idInsumoAsociado == null ? null : UUID.fromString(idInsumoAsociado)).build())
+                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo_producto"))
                         .build();
@@ -240,7 +238,6 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
             var resultado = sentencia.executeQuery();
             while (resultado.next()) {
                 //primero se arman los padres (producto, producto interno y unidad) para luego asignarlos al detalle
-                var idInsumoAsociado = resultado.getString("id_producto_interno_asociado");
                 var producto = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
                         .nombre(resultado.getString("nombre_producto"))
@@ -249,7 +246,7 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
                         .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(idInsumoAsociado == null ? null : UUID.fromString(idInsumoAsociado)).build())
+                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo_producto"))
                         .build();

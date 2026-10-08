@@ -80,7 +80,6 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
                         .cliente(resultado.getString("cliente"))
                         .total(resultado.getBigDecimal("total"))
                         .build();
-                var idInsumoAsociado = resultado.getString("id_producto_interno_asociado");
                 var producto = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
                         .nombre(resultado.getString("nombre_producto"))
@@ -89,7 +88,7 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
                         .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(idInsumoAsociado == null ? null : UUID.fromString(idInsumoAsociado)).build())
+                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo"))
                         .build();
@@ -171,7 +170,6 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
                         .cliente(resultado.getString("cliente"))
                         .total(resultado.getBigDecimal("total"))
                         .build();
-                var idInsumoAsociado = resultado.getString("id_producto_interno_asociado");
                 var producto = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
                         .nombre(resultado.getString("nombre_producto"))
@@ -180,7 +178,7 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
                         .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(idInsumoAsociado == null ? null : UUID.fromString(idInsumoAsociado)).build())
+                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo"))
                         .build();
@@ -232,7 +230,6 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
                         .cliente(resultado.getString("cliente"))
                         .total(resultado.getBigDecimal("total"))
                         .build();
-                var idInsumoAsociado = resultado.getString("id_producto_interno_asociado");
                 var producto = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
                         .nombre(resultado.getString("nombre_producto"))
@@ -241,7 +238,7 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
                         .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(idInsumoAsociado == null ? null : UUID.fromString(idInsumoAsociado)).build())
+                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo"))
                         .build();
