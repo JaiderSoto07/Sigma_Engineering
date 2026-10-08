@@ -88,7 +88,6 @@ id_historico_precio uniqueidentifier primary key default newid(),
 id_producto uniqueidentifier not null,
 precio decimal(18,2) not null,
 fecha_inicio date not null,
--- 01/01/1000 = precio vigente (todavia no se ha cerrado)
 fecha_fin date not null default '1000-01-01',
 
 constraint fk_historico_precio_id_producto
@@ -100,6 +99,8 @@ constraint ck_historico_precio_precio
 constraint ck_historico_precio_fechas
   check (fecha_fin = '1000-01-01' or fecha_fin >= fecha_inicio)
 );
+
+
 
 create table detalle_receta (
 id_detalle_receta uniqueidentifier primary key default newid(),
