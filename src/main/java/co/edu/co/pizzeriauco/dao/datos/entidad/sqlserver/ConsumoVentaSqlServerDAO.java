@@ -27,15 +27,12 @@ public class ConsumoVentaSqlServerDAO extends SqlDAO implements ConsumoVentaDAO 
         super(conexion);
     }
 
-    //negocio lo crea al registrar la venta: un consumo por cada insumo de la receta del producto vendido
     @Override
     public void crear(ConsumoVentaEntidad entidad) {
         var sentenciaSql = "insert into consumo_venta(id_consumo_venta, id_detalle_venta, id_producto_interno, cantidad, "
                 + "id_unidad_medida, id_tipo_movimiento) values(?, ?, ?, ?, ?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
-            //se llenan los datos en el mismo orden de los ?
             sentencia.setObject(1, entidad.getId());
-            //del renglon de venta, el insumo, la unidad y el codigo solo se guarda su id (llaves foraneas)
             sentencia.setObject(2, entidad.getDetalleVenta().getId());
             sentencia.setObject(3, entidad.getProductoInterno().getId());
             sentencia.setBigDecimal(4, entidad.getCantidad());
@@ -67,15 +64,13 @@ public class ConsumoVentaSqlServerDAO extends SqlDAO implements ConsumoVentaDAO 
                 + "inner join unidad_medida as um on cv.id_unidad_medida = um.id_unidad_medida "
                 + "inner join tipo_movimiento as tm on cv.id_tipo_movimiento = tm.id_tipo_movimiento "
                 + "where cv.id_consumo_venta = ?";
-        //si no se encuentra, se devuelve el consumo por defecto (nunca nulo)
+
         var consumoVentaEncontrado = new ConsumoVentaEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
 
             var resultado = sentencia.executeQuery();
             if (resultado.next()) {
-                //primero se arman los padres (renglon de venta, insumo, unidad y codigo) para luego asignarlos al consumo
-                //de los "abuelos" (venta y producto del renglon, unidad del insumo, categoria del codigo) solo se trae el id
                 var detalleVenta = new DetalleVentaEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_detalle_venta")))
                         .venta(new VentaEntidad.Builder()
@@ -146,7 +141,6 @@ public class ConsumoVentaSqlServerDAO extends SqlDAO implements ConsumoVentaDAO 
             sentenciaSql = sentenciaSql + " and cv.id_consumo_venta = ?";
             parametros.add(filtro.getId());
         }
-        //estos los del renglon de venta (los insumos de un renglon, o de toda una venta)
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getDetalleVenta().getId())) {
             sentenciaSql = sentenciaSql + " and dv.id_detalle_venta = ?";
             parametros.add(filtro.getDetalleVenta().getId());
@@ -155,7 +149,6 @@ public class ConsumoVentaSqlServerDAO extends SqlDAO implements ConsumoVentaDAO 
             sentenciaSql = sentenciaSql + " and dv.id_venta = ?";
             parametros.add(filtro.getDetalleVenta().getVenta().getId());
         }
-        //estos los del insumo
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getProductoInterno().getId())) {
             sentenciaSql = sentenciaSql + " and pi.id_producto_interno = ?";
             parametros.add(filtro.getProductoInterno().getId());
@@ -164,12 +157,10 @@ public class ConsumoVentaSqlServerDAO extends SqlDAO implements ConsumoVentaDAO 
             sentenciaSql = sentenciaSql + " and pi.nombre = ?";
             parametros.add(filtro.getProductoInterno().getNombre());
         }
-        //este el del codigo (para llegar al consumo desde sus movimientos)
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getTipoMovimiento().getId())) {
             sentenciaSql = sentenciaSql + " and tm.id_tipo_movimiento = ?";
             parametros.add(filtro.getTipoMovimiento().getId());
         }
-        // el orden va siempre al final
         sentenciaSql = sentenciaSql + " order by pi.nombre asc";
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -179,10 +170,8 @@ public class ConsumoVentaSqlServerDAO extends SqlDAO implements ConsumoVentaDAO 
             }
 
             var resultado = sentencia.executeQuery();
-            // por cada fila que llego, se arma un consumo y se agrega a la lista
+
             while (resultado.next()) {
-                //primero se arman los padres (renglon de venta, insumo, unidad y codigo) para luego asignarlos al consumo
-                //de los "abuelos" (venta y producto del renglon, unidad del insumo, categoria del codigo) solo se trae el id
                 var detalleVenta = new DetalleVentaEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_detalle_venta")))
                         .venta(new VentaEntidad.Builder()
@@ -254,8 +243,6 @@ public class ConsumoVentaSqlServerDAO extends SqlDAO implements ConsumoVentaDAO 
 
             var resultado = sentencia.executeQuery();
             while (resultado.next()) {
-                //primero se arman los padres (renglon de venta, insumo, unidad y codigo) para luego asignarlos al consumo
-                //de los "abuelos" (venta y producto del renglon, unidad del insumo, categoria del codigo) solo se trae el id
                 var detalleVenta = new DetalleVentaEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_detalle_venta")))
                         .venta(new VentaEntidad.Builder()

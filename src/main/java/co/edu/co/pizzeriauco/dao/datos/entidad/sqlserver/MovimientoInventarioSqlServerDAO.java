@@ -27,16 +27,14 @@ public class MovimientoInventarioSqlServerDAO extends SqlDAO implements Movimien
         super(conexion);
     }
 
-    //entrada: el lote ya fue creado (en 0) y negocio lo llena con esta cantidad;
-    //salida: negocio descuenta esta cantidad del saldo del lote. En los dos casos tambien ajusta el inventario
     @Override
     public void crear(MovimientoInventarioEntidad entidad) {
         var sentenciaSql = "insert into movimiento_inventario(id_movimiento_inventario, id_clase_movimiento, id_tipo_movimiento, "
                 + "cantidad, fecha_movimiento, id_lote) values(?, ?, ?, ?, ?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
-            //se llenan los datos en el mismo orden de los ?
+
             sentencia.setObject(1, entidad.getId());
-            //de la clase, el codigo y el lote solo se guarda su id (llaves foraneas)
+
             sentencia.setObject(2, entidad.getClaseMovimiento().getId());
             sentencia.setObject(3, entidad.getTipoMovimiento().getId());
             sentencia.setBigDecimal(4, entidad.getCantidad());
@@ -66,15 +64,13 @@ public class MovimientoInventarioSqlServerDAO extends SqlDAO implements Movimien
                 + "inner join tipo_movimiento as tm on mi.id_tipo_movimiento = tm.id_tipo_movimiento "
                 + "inner join lote as l on mi.id_lote = l.id_lote "
                 + "where mi.id_movimiento_inventario = ?";
-        //si no se encuentra, se devuelve el movimiento por defecto (nunca nulo)
+
         var movimientoEncontrado = new MovimientoInventarioEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
 
             var resultado = sentencia.executeQuery();
             if (resultado.next()) {
-                //primero se arman los padres (clase, codigo y lote) para luego asignarlos al movimiento
-                //de los "abuelos" (categoria del codigo; insumo y unidad del lote) solo se trae el id
                 var claseMovimiento = new ClaseMovimientoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_clase_movimiento")))
                         .nombre(resultado.getString("nombre_clase_movimiento"))
@@ -130,7 +126,7 @@ public class MovimientoInventarioSqlServerDAO extends SqlDAO implements Movimien
                 + "inner join lote as l on mi.id_lote = l.id_lote "
                 + "where 1=1";
         var parametros = new ArrayList<Object>();
-        //estos los del movimiento
+
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
             sentenciaSql = sentenciaSql + " and mi.id_movimiento_inventario = ?";
             parametros.add(filtro.getId());
@@ -139,17 +135,16 @@ public class MovimientoInventarioSqlServerDAO extends SqlDAO implements Movimien
             sentenciaSql = sentenciaSql + " and mi.fecha_movimiento = ?";
             parametros.add(filtro.getFechaMovimiento());
         }
-        //este el de la clase (solo entradas o solo salidas)
+
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getClaseMovimiento().getId())) {
             sentenciaSql = sentenciaSql + " and cm.id_clase_movimiento = ?";
             parametros.add(filtro.getClaseMovimiento().getId());
         }
-        //este el del codigo (todos los movimientos de un renglon de compra, consumo de venta o cambio)
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getTipoMovimiento().getId())) {
             sentenciaSql = sentenciaSql + " and tm.id_tipo_movimiento = ?";
             parametros.add(filtro.getTipoMovimiento().getId());
         }
-        //estos los del lote (la historia de un lote, o la de todos los lotes de un insumo)
+
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getLote().getId())) {
             sentenciaSql = sentenciaSql + " and l.id_lote = ?";
             parametros.add(filtro.getLote().getId());
@@ -158,7 +153,7 @@ public class MovimientoInventarioSqlServerDAO extends SqlDAO implements Movimien
             sentenciaSql = sentenciaSql + " and l.id_producto_interno = ?";
             parametros.add(filtro.getLote().getProductoInterno().getId());
         }
-        // el orden va siempre al final: como un kardex, del mas viejo al mas nuevo
+
         sentenciaSql = sentenciaSql + " order by mi.fecha_movimiento asc";
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -168,10 +163,8 @@ public class MovimientoInventarioSqlServerDAO extends SqlDAO implements Movimien
             }
 
             var resultado = sentencia.executeQuery();
-            // por cada fila que llego, se arma un movimiento y se agrega a la lista
+
             while (resultado.next()) {
-                //primero se arman los padres (clase, codigo y lote) para luego asignarlos al movimiento
-                //de los "abuelos" (categoria del codigo; insumo y unidad del lote) solo se trae el id
                 var claseMovimiento = new ClaseMovimientoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_clase_movimiento")))
                         .nombre(resultado.getString("nombre_clase_movimiento"))
@@ -233,8 +226,7 @@ public class MovimientoInventarioSqlServerDAO extends SqlDAO implements Movimien
 
             var resultado = sentencia.executeQuery();
             while (resultado.next()) {
-                //primero se arman los padres (clase, codigo y lote) para luego asignarlos al movimiento
-                //de los "abuelos" (categoria del codigo; insumo y unidad del lote) solo se trae el id
+
                 var claseMovimiento = new ClaseMovimientoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_clase_movimiento")))
                         .nombre(resultado.getString("nombre_clase_movimiento"))

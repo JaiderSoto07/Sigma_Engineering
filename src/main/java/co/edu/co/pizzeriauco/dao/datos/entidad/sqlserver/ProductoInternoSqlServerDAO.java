@@ -241,7 +241,6 @@ public class ProductoInternoSqlServerDAO extends SqlDAO implements ProductoInter
         return productosInternosEncontrados;
     }
 
-    //tambien guarda activo: desactivar un producto interno (descontinuarlo) es actualizarlo con activo = false
     @Override
     public void actualizar(UUID id, ProductoInternoEntidad entidad) {
         var sentenciaSql = "update producto_interno set nombre = ?, perecedero = ?, vida_util = ?, id_unidad_medida = ?, activo = ? where id_producto_interno = ?";
@@ -264,8 +263,7 @@ public class ProductoInternoSqlServerDAO extends SqlDAO implements ProductoInter
         }
     }
 
-    //eliminar = borrar de verdad, solo si no tiene compras, lotes, movimientos o recetas (si los tiene, la base no deja);
-    //para retirarlo sin perder su historial se usa actualizar con activo = false
+
     @Override
     public void eliminar(UUID id) {
         var sentenciaSql = "delete from producto_interno where id_producto_interno = ?";

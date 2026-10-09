@@ -249,7 +249,6 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
 
             var resultado = sentencia.executeQuery();
             while (resultado.next()) {
-                //primero se arman los padres (tipo de producto, tamano e insumo asociado) para luego asignarlos al producto
                 var tipoProducto = new TipoProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_tipo_producto")))
                         .nombre(resultado.getString("nombre_tipo_producto"))
@@ -285,7 +284,7 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
         return productosEncontrados;
     }
 
-    //tambien guarda activo: desactivar un producto (retirarlo del menu) es actualizarlo con activo = false
+
     @Override
     public void actualizar(UUID id, ProductoEntidad entidad) {
         var sentenciaSql = "update producto set nombre = ?, id_tipo_producto = ?, id_tamano = ?, "
@@ -310,9 +309,6 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
         }
     }
 
-    //eliminar = borrar de verdad (para retirarlo del menu se usa actualizar con activo = false);
-    //la receta se borra en cascada; si el producto tiene ventas la base no deja eliminarlo,
-    //y negocio debe borrar antes su historial de precios en la misma transaccion
     @Override
     public void eliminar(UUID id) {
         var sentenciaSql = "delete from producto where id_producto = ?";

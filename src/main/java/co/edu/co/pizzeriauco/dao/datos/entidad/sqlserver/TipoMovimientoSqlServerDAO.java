@@ -25,9 +25,8 @@ public class TipoMovimientoSqlServerDAO extends SqlDAO implements TipoMovimiento
     public void crear(TipoMovimientoEntidad entidad) {
         var sentenciaSql = "insert into tipo_movimiento(id_tipo_movimiento, id_categoria_origen) values(?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
-            //se llenan los datos en el mismo orden de los ?
+
             sentencia.setObject(1, entidad.getId());
-            //de la categoria solo se guarda su id (llave foranea)
             sentencia.setObject(2, entidad.getCategoriaOrigen().getId());
             sentencia.executeUpdate();
         } catch (SQLException excepcion) {
@@ -47,14 +46,14 @@ public class TipoMovimientoSqlServerDAO extends SqlDAO implements TipoMovimiento
                 + "co.id_categoria_origen, co.nombre "
                 + "from tipo_movimiento as tm inner join categoria_origen as co on tm.id_categoria_origen = co.id_categoria_origen "
                 + "where tm.id_tipo_movimiento = ?";
-        //si no se encuentra, se devuelve el tipo de movimiento por defecto (nunca nulo)
+
         var tipoMovimientoEncontrado = new TipoMovimientoEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
 
             var resultado = sentencia.executeQuery();
             if (resultado.next()) {
-                //primero se arma la categoria para luego poderla asignar al tipo de movimiento
+
                 var categoriaOrigen = new CategoriaOrigenEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_categoria_origen")))
                         .nombre(resultado.getString("nombre"))
@@ -84,12 +83,11 @@ public class TipoMovimientoSqlServerDAO extends SqlDAO implements TipoMovimiento
                 + "from tipo_movimiento as tm inner join categoria_origen as co on tm.id_categoria_origen = co.id_categoria_origen "
                 + "where 1=1";
         var parametros = new ArrayList<Object>();
-        //este el del tipo de movimiento
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
             sentenciaSql = sentenciaSql + " and tm.id_tipo_movimiento = ?";
             parametros.add(filtro.getId());
         }
-        //estos los de la categoria
+
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getCategoriaOrigen().getId())) {
             sentenciaSql = sentenciaSql + " and co.id_categoria_origen = ?";
             parametros.add(filtro.getCategoriaOrigen().getId());
@@ -98,7 +96,7 @@ public class TipoMovimientoSqlServerDAO extends SqlDAO implements TipoMovimiento
             sentenciaSql = sentenciaSql + " and co.nombre = ?";
             parametros.add(filtro.getCategoriaOrigen().getNombre());
         }
-        // el orden va siempre al final
+
         sentenciaSql = sentenciaSql + " order by co.nombre asc";
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -108,9 +106,8 @@ public class TipoMovimientoSqlServerDAO extends SqlDAO implements TipoMovimiento
             }
 
             var resultado = sentencia.executeQuery();
-            // por cada fila que llego, se arma un tipo de movimiento y se agrega a la lista
             while (resultado.next()) {
-                //primero se arma la categoria para luego poderla asignar al tipo de movimiento
+
                 var categoriaOrigen = new CategoriaOrigenEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_categoria_origen")))
                         .nombre(resultado.getString("nombre"))
@@ -146,7 +143,6 @@ public class TipoMovimientoSqlServerDAO extends SqlDAO implements TipoMovimiento
 
             var resultado = sentencia.executeQuery();
             while (resultado.next()) {
-                //primero se arma la categoria para luego poderla asignar al tipo de movimiento
                 var categoriaOrigen = new CategoriaOrigenEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_categoria_origen")))
                         .nombre(resultado.getString("nombre"))

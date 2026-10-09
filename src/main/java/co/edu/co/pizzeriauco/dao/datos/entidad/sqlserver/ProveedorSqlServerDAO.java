@@ -24,7 +24,6 @@ public class ProveedorSqlServerDAO extends SqlDAO implements ProveedorDAO {
     public void crear(ProveedorEntidad entidad) {
         var sentenciaSql = "insert into proveedor(id_proveedor, nombre_empresa, nit, contacto, activo) values(?, ?, ?, ?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
-            //se llenan los datos en el mismo orden de los ?
             sentencia.setObject(1, entidad.getId());
             sentencia.setString(2, entidad.getNombreEmpresa());
             sentencia.setString(3, entidad.getNit());
@@ -45,14 +44,13 @@ public class ProveedorSqlServerDAO extends SqlDAO implements ProveedorDAO {
     @Override
     public ProveedorEntidad consultarPorId(UUID id) {
         var sentenciaSql = "select id_proveedor, nombre_empresa, nit, contacto, activo from proveedor where id_proveedor = ?";
-        //si no se encuentra, se devuelve el proveedor por defecto (nunca nulo)
         var proveedorEncontrado = new ProveedorEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
 
             var resultado = sentencia.executeQuery();
             if (resultado.next()) {
-                //si entra aca es porque se encontro el proveedor
+
                 proveedorEncontrado = new ProveedorEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_proveedor")))
                         .nombreEmpresa(resultado.getString("nombre_empresa"))
@@ -73,13 +71,13 @@ public class ProveedorSqlServerDAO extends SqlDAO implements ProveedorDAO {
         return proveedorEncontrado;
     }
 
-    //activo no se usa como filtro porque un boolean no tiene valor "sin definir"
+
     @Override
     public List<ProveedorEntidad> consultarPorFiltro(ProveedorEntidad filtro) {
         var proveedoresEncontrados = new ArrayList<ProveedorEntidad>();
         var sentenciaSql = "select id_proveedor, nombre_empresa, nit, contacto, activo from proveedor where 1=1";
         var parametros = new ArrayList<Object>();
-        //solo se filtra por los datos que vengan diferentes al valor por defecto
+
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
             sentenciaSql = sentenciaSql + " and id_proveedor = ?";
             parametros.add(filtro.getId());
@@ -96,7 +94,7 @@ public class ProveedorSqlServerDAO extends SqlDAO implements ProveedorDAO {
             sentenciaSql = sentenciaSql + " and contacto = ?";
             parametros.add(filtro.getContacto());
         }
-        // el orden va siempre al final
+
         sentenciaSql = sentenciaSql + " order by nombre_empresa asc";
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -106,7 +104,6 @@ public class ProveedorSqlServerDAO extends SqlDAO implements ProveedorDAO {
             }
 
             var resultado = sentencia.executeQuery();
-            // por cada fila que llego, se arma un proveedor y se agrega a la lista
             while (resultado.next()) {
                 var proveedor = new ProveedorEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_proveedor")))
@@ -191,7 +188,7 @@ public class ProveedorSqlServerDAO extends SqlDAO implements ProveedorDAO {
         return proveedoresEncontrados;
     }
 
-    //tambien guarda activo: desactivar un proveedor (retirarlo) es actualizarlo con activo = false
+
     @Override
     public void actualizar(UUID id, ProveedorEntidad entidad) {
         var sentenciaSql = "update proveedor set nombre_empresa = ?, nit = ?, contacto = ?, activo = ? where id_proveedor = ?";
@@ -213,8 +210,7 @@ public class ProveedorSqlServerDAO extends SqlDAO implements ProveedorDAO {
         }
     }
 
-    //eliminar = borrar de verdad, solo si no tiene compras (si las tiene, la base no deja);
-    //para retirarlo sin perder su historial se usa actualizar con activo = false
+
     @Override
     public void eliminar(UUID id) {
         var sentenciaSql = "delete from proveedor where id_proveedor = ?";

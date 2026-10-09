@@ -23,7 +23,6 @@ public class CategoriaOrigenSqlServerDAO extends SqlDAO implements CategoriaOrig
     @Override
     public CategoriaOrigenEntidad consultarPorId(UUID id) {
         var sentenciaSql = "select id_categoria_origen, nombre from categoria_origen where id_categoria_origen = ?";
-        //si no se encuentra, se devuelve el objeto por defecto (nunca nulo)
         var categoriaOrigenEncontrada = new CategoriaOrigenEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
@@ -62,7 +61,6 @@ public class CategoriaOrigenSqlServerDAO extends SqlDAO implements CategoriaOrig
             sentenciaSql = sentenciaSql + " and nombre = ?";
             parametros.add(filtro.getNombre());
         }
-        // el orden va siempre al final
         sentenciaSql = sentenciaSql + " order by nombre asc";
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -70,7 +68,6 @@ public class CategoriaOrigenSqlServerDAO extends SqlDAO implements CategoriaOrig
             for (var indice = 0; indice < parametros.size(); indice++) {
                 sentencia.setObject(indice + 1, parametros.get(indice));
             }
-
             var resultado = sentencia.executeQuery();
             // por cada fila que llego, se arma el objeto y se agrega a la lista
             while (resultado.next()) {

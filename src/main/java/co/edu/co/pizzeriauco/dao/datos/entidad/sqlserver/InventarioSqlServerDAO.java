@@ -22,16 +22,14 @@ public class InventarioSqlServerDAO extends SqlDAO implements InventarioDAO {
         super(conexion);
     }
 
-    //lo llama negocio cuando llega el primer lote de un producto interno sin inventario
-    //(el producto y la unidad se copian del lote)
+
     @Override
     public void crear(InventarioEntidad entidad) {
         var sentenciaSql = "insert into inventario(id_inventario, id_producto_interno, cantidad_total, id_unidad_medida, stock_minimo) "
                 + "values(?, ?, ?, ?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
-            //se llenan los datos en el mismo orden de los ?
+
             sentencia.setObject(1, entidad.getId());
-            //del producto interno y de la unidad solo se guarda su id (llaves foraneas)
             sentencia.setObject(2, entidad.getProductoInterno().getId());
             sentencia.setBigDecimal(3, entidad.getCantidadTotal());
             sentencia.setObject(4, entidad.getUnidadMedidaInventario().getId());
@@ -58,14 +56,12 @@ public class InventarioSqlServerDAO extends SqlDAO implements InventarioDAO {
                 + "inner join producto_interno as pi on i.id_producto_interno = pi.id_producto_interno "
                 + "inner join unidad_medida as um on i.id_unidad_medida = um.id_unidad_medida "
                 + "where i.id_inventario = ?";
-        //si no se encuentra, se devuelve el inventario por defecto (nunca nulo)
         var inventarioEncontrado = new InventarioEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
 
             var resultado = sentencia.executeQuery();
             if (resultado.next()) {
-                //primero se arman los padres (producto interno y unidad) para luego asignarlos al inventario
                 var productoInterno = new ProductoInternoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto_interno")))
                         .nombre(resultado.getString("nombre_producto_interno"))
@@ -112,12 +108,12 @@ public class InventarioSqlServerDAO extends SqlDAO implements InventarioDAO {
                 + "inner join unidad_medida as um on i.id_unidad_medida = um.id_unidad_medida "
                 + "where 1=1";
         var parametros = new ArrayList<Object>();
-        //este el del inventario
+
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
             sentenciaSql = sentenciaSql + " and i.id_inventario = ?";
             parametros.add(filtro.getId());
         }
-        //estos los del producto interno (para saber si un insumo ya tiene inventario)
+
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getProductoInterno().getId())) {
             sentenciaSql = sentenciaSql + " and pi.id_producto_interno = ?";
             parametros.add(filtro.getProductoInterno().getId());
@@ -126,12 +122,12 @@ public class InventarioSqlServerDAO extends SqlDAO implements InventarioDAO {
             sentenciaSql = sentenciaSql + " and pi.nombre = ?";
             parametros.add(filtro.getProductoInterno().getNombre());
         }
-        //este el de la unidad de medida
+
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getUnidadMedidaInventario().getId())) {
             sentenciaSql = sentenciaSql + " and um.id_unidad_medida = ?";
             parametros.add(filtro.getUnidadMedidaInventario().getId());
         }
-        // el orden va siempre al final
+
         sentenciaSql = sentenciaSql + " order by pi.nombre asc";
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -141,9 +137,9 @@ public class InventarioSqlServerDAO extends SqlDAO implements InventarioDAO {
             }
 
             var resultado = sentencia.executeQuery();
-            // por cada fila que llego, se arma un inventario y se agrega a la lista
+
             while (resultado.next()) {
-                //primero se arman los padres (producto interno y unidad) para luego asignarlos al inventario
+
                 var productoInterno = new ProductoInternoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto_interno")))
                         .nombre(resultado.getString("nombre_producto_interno"))
@@ -196,7 +192,7 @@ public class InventarioSqlServerDAO extends SqlDAO implements InventarioDAO {
 
             var resultado = sentencia.executeQuery();
             while (resultado.next()) {
-                //primero se arman los padres (producto interno y unidad) para luego asignarlos al inventario
+
                 var productoInterno = new ProductoInternoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto_interno")))
                         .nombre(resultado.getString("nombre_producto_interno"))
@@ -232,8 +228,8 @@ public class InventarioSqlServerDAO extends SqlDAO implements InventarioDAO {
         return inventariosEncontrados;
     }
 
-    //solo cambian la cantidad total (en cada movimiento) y el stock minimo ("Establecer stock minimo");
-    //el producto interno y la unidad se copiaron del lote y no cambian
+
+
     @Override
     public void actualizar(UUID id, InventarioEntidad entidad) {
         var sentenciaSql = "update inventario set cantidad_total = ?, stock_minimo = ? where id_inventario = ?";

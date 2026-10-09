@@ -269,8 +269,6 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
         return cambiosEncontrados;
     }
 
-
-
     @Override
     public void actualizar(UUID id, CambioEntidad entidad) {
         var sentenciaSql = "update cambio set id_producto_interno = ?, cantidad = ?, id_unidad_medida = ?, "
@@ -293,7 +291,6 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
             throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
         }
     }
-
 
     @Override
     public void eliminar(UUID id) {

@@ -32,11 +32,9 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
                 + "values(?, ?, ?, ?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, entidad.getId());
-            //del producto solo se guarda su id (llave foranea)
             sentencia.setObject(2, entidad.getProducto().getId());
             sentencia.setBigDecimal(3, entidad.getPrecio());
             sentencia.setObject(4, entidad.getFechaInicio());
-            //un precio nuevo llega con fecha fin 01/01/1000 = vigente
             sentencia.setObject(5, entidad.getFechaFin());
             sentencia.executeUpdate();
         } catch (SQLException excepcion) {
@@ -58,15 +56,15 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
                 + "from historico_precio as hp "
                 + "inner join producto as p on hp.id_producto = p.id_producto "
                 + "where hp.id_historico_precio = ?";
-        //si no se encuentra, se devuelve el historico por defecto (nunca nulo)
+
         var historicoEncontrado = new HistoricoPrecioEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
 
             var resultado = sentencia.executeQuery();
             if (resultado.next()) {
-                //primero se arma el producto para luego poderlo asignar al historico
-                //de sus padres (tipo, tamano e insumo asociado) solo se trae el id
+
+
                 var producto = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
                         .nombre(resultado.getString("nombre_producto"))
@@ -99,8 +97,7 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
         return historicoEncontrado;
     }
 
-    //ojo: fecha fin 01/01/1000 es el valor por defecto, por eso no sirve para filtrar "el vigente";
-    //para buscar el precio vigente se consultan los precios del producto y se toma el de fecha fin 01/01/1000
+
     @Override
     public List<HistoricoPrecioEntidad> consultarPorFiltro(HistoricoPrecioEntidad filtro) {
         var historicosEncontrados = new ArrayList<HistoricoPrecioEntidad>();
@@ -111,7 +108,6 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
                 + "inner join producto as p on hp.id_producto = p.id_producto "
                 + "where 1=1";
         var parametros = new ArrayList<Object>();
-        //estos los del historico
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
             sentenciaSql = sentenciaSql + " and hp.id_historico_precio = ?";
             parametros.add(filtro.getId());
@@ -120,7 +116,7 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
             sentenciaSql = sentenciaSql + " and hp.fecha_inicio = ?";
             parametros.add(filtro.getFechaInicio());
         }
-        //estos los del producto (para traer todos los precios de un producto)
+
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getProducto().getId())) {
             sentenciaSql = sentenciaSql + " and p.id_producto = ?";
             parametros.add(filtro.getProducto().getId());
@@ -129,7 +125,7 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
             sentenciaSql = sentenciaSql + " and p.nombre = ?";
             parametros.add(filtro.getProducto().getNombre());
         }
-        // el orden va siempre al final: por producto y del precio mas reciente al mas viejo
+
         sentenciaSql = sentenciaSql + " order by p.nombre asc, hp.fecha_inicio desc";
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -139,9 +135,9 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
             }
 
             var resultado = sentencia.executeQuery();
-            // por cada fila que llego, se arma un historico y se agrega a la lista
+
             while (resultado.next()) {
-                //primero se arma el producto para luego poderlo asignar al historico
+
                 var producto = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
                         .nombre(resultado.getString("nombre_producto"))
@@ -190,7 +186,6 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
 
             var resultado = sentencia.executeQuery();
             while (resultado.next()) {
-                //primero se arma el producto para luego poderlo asignar al historico
                 var producto = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
                         .nombre(resultado.getString("nombre_producto"))
@@ -224,8 +219,6 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
         return historicosEncontrados;
     }
 
-    //solo para cerrar el precio vigente (fecha fin = ayer) o corregir el precio de un vigente que empezo hoy;
-    //el producto y la fecha de inicio no cambian
     @Override
     public void actualizar(UUID id, HistoricoPrecioEntidad entidad) {
         var sentenciaSql = "update historico_precio set precio = ?, fecha_fin = ? where id_historico_precio = ?";

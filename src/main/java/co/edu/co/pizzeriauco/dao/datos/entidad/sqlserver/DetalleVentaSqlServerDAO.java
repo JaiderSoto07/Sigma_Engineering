@@ -29,17 +29,13 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
 
     @Override
     public void crear(DetalleVentaEntidad entidad) {
-        //subtotal no se escribe: la base lo calcula (cantidad * precio_producto)
         var sentenciaSql = "insert into detalle_venta(id_detalle_venta, id_venta, id_producto, cantidad, precio_producto) "
                 + "values(?, ?, ?, ?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
-            //se llenan los datos en el mismo orden de los ?
             sentencia.setObject(1, entidad.getId());
-            //de la venta y del producto solo se guarda su id (llaves foraneas)
             sentencia.setObject(2, entidad.getVenta().getId());
             sentencia.setObject(3, entidad.getProducto().getId());
             sentencia.setInt(4, entidad.getCantidad());
-            //precio congelado: el del producto en el momento de la venta
             sentencia.setBigDecimal(5, entidad.getPrecioProducto());
             sentencia.executeUpdate();
         } catch (SQLException excepcion) {
@@ -63,15 +59,12 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
                 + "inner join venta as v on dv.id_venta = v.id_venta "
                 + "inner join producto as p on dv.id_producto = p.id_producto "
                 + "where dv.id_detalle_venta = ?";
-        //si no se encuentra, se devuelve el detalle por defecto (nunca nulo)
         var detalleVentaEncontrado = new DetalleVentaEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
 
             var resultado = sentencia.executeQuery();
             if (resultado.next()) {
-                //primero se arman los padres (venta y producto) para luego asignarlos al detalle
-                //de los "abuelos" (tipo, tamano e insumo del producto) solo se trae el id
                 var venta = new VentaEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_venta")))
                         .fecha(resultado.getObject("fecha", LocalDate.class))
@@ -126,12 +119,10 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
                 + "inner join producto as p on dv.id_producto = p.id_producto "
                 + "where 1=1";
         var parametros = new ArrayList<Object>();
-        //este el del detalle
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
             sentenciaSql = sentenciaSql + " and dv.id_detalle_venta = ?";
             parametros.add(filtro.getId());
         }
-        //estos los de la venta (para traer todos los renglones de una factura)
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getVenta().getId())) {
             sentenciaSql = sentenciaSql + " and v.id_venta = ?";
             parametros.add(filtro.getVenta().getId());
@@ -149,7 +140,6 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
             sentenciaSql = sentenciaSql + " and p.nombre = ?";
             parametros.add(filtro.getProducto().getNombre());
         }
-        // el orden va siempre al final: ventas mas recientes primero y sus productos por nombre
         sentenciaSql = sentenciaSql + " order by v.fecha desc, v.hora desc, p.nombre asc";
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -159,9 +149,7 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
             }
 
             var resultado = sentencia.executeQuery();
-            // por cada fila que llego, se arma un detalle y se agrega a la lista
             while (resultado.next()) {
-                //primero se arman los padres (venta y producto) para luego asignarlos al detalle
                 var venta = new VentaEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_venta")))
                         .fecha(resultado.getObject("fecha", LocalDate.class))
@@ -221,7 +209,6 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
 
             var resultado = sentencia.executeQuery();
             while (resultado.next()) {
-                //primero se arman los padres (venta y producto) para luego asignarlos al detalle
                 var venta = new VentaEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_venta")))
                         .fecha(resultado.getObject("fecha", LocalDate.class))

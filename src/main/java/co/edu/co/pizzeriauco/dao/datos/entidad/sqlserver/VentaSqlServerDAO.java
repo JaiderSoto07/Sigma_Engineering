@@ -27,7 +27,6 @@ public class VentaSqlServerDAO extends SqlDAO implements VentaDAO {
     public void crear(VentaEntidad entidad) {
         var sentenciaSql = "insert into venta(id_venta, fecha, hora, factura, cliente, total) values(?, ?, ?, ?, ?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
-            //se llenan los datos en el mismo orden de los ?
             sentencia.setObject(1, entidad.getId());
             sentencia.setObject(2, entidad.getFecha());
             sentencia.setObject(3, entidad.getHora());
@@ -49,14 +48,12 @@ public class VentaSqlServerDAO extends SqlDAO implements VentaDAO {
     @Override
     public VentaEntidad consultarPorId(UUID id) {
         var sentenciaSql = "select id_venta, fecha, hora, factura, cliente, total from venta where id_venta = ?";
-        //si no se encuentra, se devuelve la venta por defecto (nunca nulo)
         var ventaEncontrada = new VentaEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
 
             var resultado = sentencia.executeQuery();
             if (resultado.next()) {
-                //si entra aca es porque se encontro la venta
                 ventaEncontrada = new VentaEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_venta")))
                         .fecha(resultado.getObject("fecha", LocalDate.class))
@@ -78,13 +75,11 @@ public class VentaSqlServerDAO extends SqlDAO implements VentaDAO {
         return ventaEncontrada;
     }
 
-    //el cliente no se usa como filtro cuando es el cliente por defecto ("2222222222")
     @Override
     public List<VentaEntidad> consultarPorFiltro(VentaEntidad filtro) {
         var ventasEncontradas = new ArrayList<VentaEntidad>();
         var sentenciaSql = "select id_venta, fecha, hora, factura, cliente, total from venta where 1=1";
         var parametros = new ArrayList<Object>();
-        //solo se filtra por los datos que vengan diferentes al valor por defecto
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
             sentenciaSql = sentenciaSql + " and id_venta = ?";
             parametros.add(filtro.getId());
@@ -93,7 +88,6 @@ public class VentaSqlServerDAO extends SqlDAO implements VentaDAO {
             sentenciaSql = sentenciaSql + " and fecha = ?";
             parametros.add(filtro.getFecha());
         }
-        //la factura es como se distingue una venta de otra
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getFactura())) {
             sentenciaSql = sentenciaSql + " and factura = ?";
             parametros.add(filtro.getFactura());
@@ -102,7 +96,7 @@ public class VentaSqlServerDAO extends SqlDAO implements VentaDAO {
             sentenciaSql = sentenciaSql + " and cliente = ?";
             parametros.add(filtro.getCliente());
         }
-        // el orden va siempre al final: las ventas mas recientes primero
+
         sentenciaSql = sentenciaSql + " order by fecha desc, hora desc";
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -112,7 +106,6 @@ public class VentaSqlServerDAO extends SqlDAO implements VentaDAO {
             }
 
             var resultado = sentencia.executeQuery();
-            // por cada fila que llego, se arma una venta y se agrega a la lista
             while (resultado.next()) {
                 var venta = new VentaEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_venta")))

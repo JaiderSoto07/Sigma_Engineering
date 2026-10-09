@@ -24,7 +24,7 @@ public class TamanoSqlServerDAO extends SqlDAO implements TamanoDAO {
     public void crear(TamanoEntidad entidad) {
         var sentenciaSql = "insert into tamano(id_tamano, tamano) values(?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
-            //se llenan los datos en el mismo orden de los ?
+
             sentencia.setObject(1, entidad.getId());
             sentencia.setString(2, entidad.getTamano());
             sentencia.executeUpdate();
@@ -42,14 +42,12 @@ public class TamanoSqlServerDAO extends SqlDAO implements TamanoDAO {
     @Override
     public TamanoEntidad consultarPorId(UUID id) {
         var sentenciaSql = "select id_tamano, tamano from tamano where id_tamano = ?";
-        //si no se encuentra, se devuelve el objeto por defecto (nunca nulo)
         var tamanoEncontrado = new TamanoEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
 
             var resultado = sentencia.executeQuery();
             if (resultado.next()) {
-                //si entra aca es porque se encontro
                 tamanoEncontrado = new TamanoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_tamano")))
                         .tamano(resultado.getString("tamano"))
@@ -72,7 +70,6 @@ public class TamanoSqlServerDAO extends SqlDAO implements TamanoDAO {
         var tamanosEncontrados = new ArrayList<TamanoEntidad>();
         var sentenciaSql = "select id_tamano, tamano from tamano where 1=1";
         var parametros = new ArrayList<Object>();
-        //solo se filtra por los datos que vengan diferentes al valor por defecto
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
             sentenciaSql = sentenciaSql + " and id_tamano = ?";
             parametros.add(filtro.getId());
@@ -81,7 +78,7 @@ public class TamanoSqlServerDAO extends SqlDAO implements TamanoDAO {
             sentenciaSql = sentenciaSql + " and tamano = ?";
             parametros.add(filtro.getTamano());
         }
-        // el orden va siempre al final
+
         sentenciaSql = sentenciaSql + " order by tamano asc";
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -91,7 +88,7 @@ public class TamanoSqlServerDAO extends SqlDAO implements TamanoDAO {
             }
 
             var resultado = sentencia.executeQuery();
-            // por cada fila que llego, se arma el objeto y se agrega a la lista
+
             while (resultado.next()) {
                 var tamano = new TamanoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_tamano")))
@@ -157,7 +154,6 @@ public class TamanoSqlServerDAO extends SqlDAO implements TamanoDAO {
         }
     }
 
-    //si tiene productos asociados la base no deja eliminarlo (llave foranea)
     @Override
     public void eliminar(UUID id) {
         var sentenciaSql = "delete from tamano where id_tamano = ?";

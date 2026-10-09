@@ -30,9 +30,8 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
         var sentenciaSql = "insert into detalle_receta(id_detalle_receta, id_producto, id_producto_interno, cantidad, id_unidad_medida) "
                 + "values(?, ?, ?, ?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
-            //se llenan los datos en el mismo orden de los ?
+
             sentencia.setObject(1, entidad.getId());
-            //del producto, el producto interno y la unidad solo se guarda su id (llaves foraneas)
             sentencia.setObject(2, entidad.getProducto().getId());
             sentencia.setObject(3, entidad.getProductoInterno().getId());
             sentencia.setBigDecimal(4, entidad.getCantidad());
@@ -61,15 +60,12 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
                 + "inner join producto_interno as pi on dr.id_producto_interno = pi.id_producto_interno "
                 + "inner join unidad_medida as um on dr.id_unidad_medida = um.id_unidad_medida "
                 + "where dr.id_detalle_receta = ?";
-        //si no se encuentra, se devuelve el detalle por defecto (nunca nulo)
         var detalleRecetaEncontrado = new DetalleRecetaEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
 
             var resultado = sentencia.executeQuery();
             if (resultado.next()) {
-                //primero se arman los padres (producto, producto interno y unidad) para luego asignarlos al detalle
-                //de los "abuelos" (tipo, tamano e insumo del producto; unidad del producto interno) solo se trae el id
                 var producto = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
                         .nombre(resultado.getString("nombre_producto"))
@@ -130,12 +126,10 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
                 + "inner join unidad_medida as um on dr.id_unidad_medida = um.id_unidad_medida "
                 + "where 1=1";
         var parametros = new ArrayList<Object>();
-        //este el del detalle
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
             sentenciaSql = sentenciaSql + " and dr.id_detalle_receta = ?";
             parametros.add(filtro.getId());
         }
-        //estos los del producto (para traer toda la receta de un producto)
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getProducto().getId())) {
             sentenciaSql = sentenciaSql + " and p.id_producto = ?";
             parametros.add(filtro.getProducto().getId());
@@ -144,7 +138,6 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
             sentenciaSql = sentenciaSql + " and p.nombre = ?";
             parametros.add(filtro.getProducto().getNombre());
         }
-        //estos los del producto interno (ingrediente)
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getProductoInterno().getId())) {
             sentenciaSql = sentenciaSql + " and pi.id_producto_interno = ?";
             parametros.add(filtro.getProductoInterno().getId());
@@ -153,12 +146,10 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
             sentenciaSql = sentenciaSql + " and pi.nombre = ?";
             parametros.add(filtro.getProductoInterno().getNombre());
         }
-        //este el de la unidad de medida
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getUnidadMedida().getId())) {
             sentenciaSql = sentenciaSql + " and um.id_unidad_medida = ?";
             parametros.add(filtro.getUnidadMedida().getId());
         }
-        // el orden va siempre al final
         sentenciaSql = sentenciaSql + " order by p.nombre asc, pi.nombre asc";
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -168,9 +159,7 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
             }
 
             var resultado = sentencia.executeQuery();
-            // por cada fila que llego, se arma un detalle y se agrega a la lista
             while (resultado.next()) {
-                //primero se arman los padres (producto, producto interno y unidad) para luego asignarlos al detalle
                 var producto = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
                         .nombre(resultado.getString("nombre_producto"))
@@ -307,7 +296,6 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
         }
     }
 
-    //retirar un ingrediente de la receta es un borrado real: la historia de lo vendido queda en el kardex
     @Override
     public void eliminar(UUID id) {
         var sentenciaSql = "delete from detalle_receta where id_detalle_receta = ?";

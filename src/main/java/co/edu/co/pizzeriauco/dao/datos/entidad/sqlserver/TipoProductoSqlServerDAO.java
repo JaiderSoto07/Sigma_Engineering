@@ -24,7 +24,6 @@ public class TipoProductoSqlServerDAO extends SqlDAO implements TipoProductoDAO 
     public void crear(TipoProductoEntidad entidad) {
         var sentenciaSql = "insert into tipo_producto(id_tipo_producto, nombre) values(?, ?)";
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
-            //se llenan los datos en el mismo orden de los ?
             sentencia.setObject(1, entidad.getId());
             sentencia.setString(2, entidad.getNombre());
             sentencia.executeUpdate();
@@ -42,14 +41,12 @@ public class TipoProductoSqlServerDAO extends SqlDAO implements TipoProductoDAO 
     @Override
     public TipoProductoEntidad consultarPorId(UUID id) {
         var sentenciaSql = "select id_tipo_producto, nombre from tipo_producto where id_tipo_producto = ?";
-        //si no se encuentra, se devuelve el objeto por defecto (nunca nulo)
         var tipoProductoEncontrado = new TipoProductoEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
 
             var resultado = sentencia.executeQuery();
             if (resultado.next()) {
-                //si entra aca es porque se encontro
                 tipoProductoEncontrado = new TipoProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_tipo_producto")))
                         .nombre(resultado.getString("nombre"))
@@ -72,7 +69,6 @@ public class TipoProductoSqlServerDAO extends SqlDAO implements TipoProductoDAO 
         var tiposProductoEncontrados = new ArrayList<TipoProductoEntidad>();
         var sentenciaSql = "select id_tipo_producto, nombre from tipo_producto where 1=1";
         var parametros = new ArrayList<Object>();
-        //solo se filtra por los datos que vengan diferentes al valor por defecto
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
             sentenciaSql = sentenciaSql + " and id_tipo_producto = ?";
             parametros.add(filtro.getId());
@@ -81,7 +77,6 @@ public class TipoProductoSqlServerDAO extends SqlDAO implements TipoProductoDAO 
             sentenciaSql = sentenciaSql + " and nombre = ?";
             parametros.add(filtro.getNombre());
         }
-        // el orden va siempre al final
         sentenciaSql = sentenciaSql + " order by nombre asc";
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -91,7 +86,6 @@ public class TipoProductoSqlServerDAO extends SqlDAO implements TipoProductoDAO 
             }
 
             var resultado = sentencia.executeQuery();
-            // por cada fila que llego, se arma el objeto y se agrega a la lista
             while (resultado.next()) {
                 var tipoProducto = new TipoProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_tipo_producto")))
@@ -157,7 +151,6 @@ public class TipoProductoSqlServerDAO extends SqlDAO implements TipoProductoDAO 
         }
     }
 
-    //si tiene productos asociados la base no deja eliminarlo (llave foranea)
     @Override
     public void eliminar(UUID id) {
         var sentenciaSql = "delete from tipo_producto where id_tipo_producto = ?";

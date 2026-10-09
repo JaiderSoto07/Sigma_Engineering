@@ -29,7 +29,6 @@ public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             //se llenan los datos en el mismo orden de los ?
             sentencia.setObject(1, entidad.getId());
-            //del proveedor solo se guarda su id (llave foranea)
             sentencia.setObject(2, entidad.getProveedor().getId());
             sentencia.setObject(3, entidad.getFechaCompra());
             sentencia.setString(4, entidad.getNumeroFactura());
@@ -59,7 +58,6 @@ public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
 
             var resultado = sentencia.executeQuery();
             if (resultado.next()) {
-                //primero se arma el proveedor para luego poderlo asignar a la compra
                 var proveedor = new ProveedorEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_proveedor")))
                         .nombreEmpresa(resultado.getString("nombre_empresa"))
@@ -95,7 +93,6 @@ public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
                 + "from compra as c inner join proveedor as p on c.id_proveedor = p.id_proveedor "
                 + "where 1=1";
         var parametros = new ArrayList<Object>();
-        //estos los de la compra
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
             sentenciaSql = sentenciaSql + " and c.id_compra = ?";
             parametros.add(filtro.getId());
@@ -108,7 +105,6 @@ public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
             sentenciaSql = sentenciaSql + " and c.numero_factura = ?";
             parametros.add(filtro.getNumeroFactura());
         }
-        //estos los del proveedor
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getProveedor().getId())) {
             sentenciaSql = sentenciaSql + " and p.id_proveedor = ?";
             parametros.add(filtro.getProveedor().getId());
@@ -121,7 +117,6 @@ public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
             sentenciaSql = sentenciaSql + " and p.nit = ?";
             parametros.add(filtro.getProveedor().getNit());
         }
-        // el orden va siempre al final: las compras mas recientes primero
         sentenciaSql = sentenciaSql + " order by c.fecha_compra desc";
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -131,9 +126,7 @@ public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
             }
 
             var resultado = sentencia.executeQuery();
-            // por cada fila que llego, se arma una compra y se agrega a la lista
             while (resultado.next()) {
-                //primero se arma el proveedor para luego poderlo asignar a la compra
                 var proveedor = new ProveedorEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_proveedor")))
                         .nombreEmpresa(resultado.getString("nombre_empresa"))
@@ -175,7 +168,6 @@ public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
 
             var resultado = sentencia.executeQuery();
             while (resultado.next()) {
-                //primero se arma el proveedor para luego poderlo asignar a la compra
                 var proveedor = new ProveedorEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_proveedor")))
                         .nombreEmpresa(resultado.getString("nombre_empresa"))
@@ -204,7 +196,7 @@ public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
         return comprasEncontradas;
     }
 
-    //negocio solo deja corregir el encabezado (fecha, numero de factura); los renglones no se tocan aqui
+
     @Override
     public void actualizar(UUID id, CompraEntidad entidad) {
         var sentenciaSql = "update compra set id_proveedor = ?, fecha_compra = ?, numero_factura = ?, total = ? where id_compra = ?";
@@ -226,7 +218,7 @@ public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
         }
     }
 
-    //si la compra tiene renglones la base no deja eliminarla (P-COM-005)
+
     @Override
     public void eliminar(UUID id) {
         var sentenciaSql = "delete from compra where id_compra = ?";

@@ -23,7 +23,6 @@ public class ClaseMovimientoSqlServerDAO extends SqlDAO implements ClaseMovimien
     @Override
     public ClaseMovimientoEntidad consultarPorId(UUID id) {
         var sentenciaSql = "select id_clase_movimiento, nombre from clase_movimiento where id_clase_movimiento = ?";
-        //si no se encuentra, se devuelve el objeto por defecto (nunca nulo)
         var claseMovimientoEncontrada = new ClaseMovimientoEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
@@ -53,7 +52,7 @@ public class ClaseMovimientoSqlServerDAO extends SqlDAO implements ClaseMovimien
         var clasesMovimientoEncontradas = new ArrayList<ClaseMovimientoEntidad>();
         var sentenciaSql = "select id_clase_movimiento, nombre from clase_movimiento where 1=1";
         var parametros = new ArrayList<Object>();
-        //solo se filtra por los datos que vengan diferentes al valor por defecto
+
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
             sentenciaSql = sentenciaSql + " and id_clase_movimiento = ?";
             parametros.add(filtro.getId());
@@ -62,7 +61,7 @@ public class ClaseMovimientoSqlServerDAO extends SqlDAO implements ClaseMovimien
             sentenciaSql = sentenciaSql + " and nombre = ?";
             parametros.add(filtro.getNombre());
         }
-        // el orden va siempre al final
+
         sentenciaSql = sentenciaSql + " order by nombre asc";
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -72,7 +71,6 @@ public class ClaseMovimientoSqlServerDAO extends SqlDAO implements ClaseMovimien
             }
 
             var resultado = sentencia.executeQuery();
-            // por cada fila que llego, se arma el objeto y se agrega a la lista
             while (resultado.next()) {
                 var claseMovimiento = new ClaseMovimientoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_clase_movimiento")))
