@@ -22,12 +22,28 @@ import co.edu.co.pizzeriauco.dao.datos.entidad.TipoMovimientoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.TipoProductoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.UnidadMedidaDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.VentaDAO;
+import co.edu.co.pizzeriauco.dao.factoria.enums.FactoriaEnum;
+import co.edu.co.pizzeriauco.dao.factoria.impl.SqlServerDAOFactory;
+import co.edu.co.pizzeriauco.transversal.catalogo.CatalogoMensajes;
+import co.edu.co.pizzeriauco.transversal.excepciones.PizzeriaDatosExcepcion;
 
 import java.sql.Connection;
 
 public abstract class DAOFactory {
 
     private Connection conexion;
+    private static FactoriaEnum factoria = FactoriaEnum.SQLSERVER;
+
+
+    public static DAOFactory obtenerFactoria() {
+        switch (factoria) {
+            case SQLSERVER:
+                return new SqlServerDAOFactory();
+            default:
+                var mensajeUsuario = CatalogoMensajes.DAOFactory.USUARIO_ERROR_FUENTE_INFORMACION_NO_HABILITADA;
+                throw PizzeriaDatosExcepcion.crear(mensajeUsuario);
+        }
+    }
 
     protected DAOFactory() {
         abrirConexion();

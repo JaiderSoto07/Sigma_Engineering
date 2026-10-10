@@ -426,4 +426,21 @@ public class CatalogoMensajes {
 
         public static final String ID_DETALLE_RECETA_YA_EXISTE = "No es posible registrar el ingrediente de la receta porque el identificador generado ya esta en uso. Por favor intente de nuevo y si el problema persiste contacte al administrador";
     }
+
+    public static class DetalleRecetaFachadaImpl {
+
+        private DetalleRecetaFachadaImpl() {
+        }
+
+        public static final String USUARIO_ERROR_PROBLEMA_INESPERADO_REGISTRANDO_DETALLE_RECETA = "Se ha presentado un problema inesperado tratando de registrar el ingrediente de la receta. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+    }
+
+    public static class DAOFactory {
+
+        private DAOFactory() {
+        }
+
+        public static final String USUARIO_ERROR_FUENTE_INFORMACION_NO_HABILITADA = "La fuente de informacion que se solicito para llevar a cabo la operacion deseada no esta habilitada. Por favor contacte al administrador de la aplicacion y reporte la novedad";
+    }
+
 }
