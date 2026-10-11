@@ -13,7 +13,9 @@ public class ProductoInternoDominio {
     private String nombre;
     private boolean perecedero;
     private Integer vidaUtil;
+
     private UnidadMedidaDominio tipoMedida;
+
     private boolean activo;
 
     private ProductoInternoDominio(Builder builder) {

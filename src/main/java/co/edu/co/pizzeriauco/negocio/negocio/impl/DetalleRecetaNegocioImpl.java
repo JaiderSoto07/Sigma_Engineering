@@ -35,7 +35,6 @@ public class DetalleRecetaNegocioImpl implements DetalleRecetaNegocio {
         AsegurarProductoInternoExisteRule.obtenerInstancia().ejecutar(datos.getProductoInterno().getId(), daoFactory);
         AsegurarProductoInternoNoRepetidoEnRecetaRule.obtenerInstancia().ejecutar(datos.getProducto().getId(),
                 datos.getProductoInterno().getId(), daoFactory);
-
         var idDetalleReceta = generarIdDetalleRecetaUnico();
         AsegurarIdDetalleRecetaNoExisteRule.obtenerInstancia().ejecutar(idDetalleReceta, daoFactory);
 
@@ -121,8 +120,8 @@ public class DetalleRecetaNegocioImpl implements DetalleRecetaNegocio {
 
     private UnidadMedidaDominio obtenerUnidadMedidaDeReceta(UUID idProductoInterno) {
         var productoInterno = daoFactory.obtenerProductoInternoDAO().consultarPorId(idProductoInterno);
-        var tipoMedida = productoInterno.getTipoMedida().getTipoMedida();
-
+        var tipoMedida = productoInterno.getNombreTipoMedida();
+        //valor inicial
         var abreviatura = UNIDAD_RECETA_UNIDAD;
         if (TIPO_MEDIDA_PESO.equals(tipoMedida)) {
             abreviatura = UNIDAD_RECETA_PESO;

@@ -40,9 +40,14 @@ public class ProductoInternoEntidad {
     public Integer getVidaUtil() {
         return vidaUtil;
     }
-
+    //retorna todo id, kg, y tipo
     public UnidadMedidaEntidad getTipoMedida() {
         return tipoMedida;
+    }
+
+    //solo retorna el tipo
+    public String getNombreTipoMedida() {
+        return tipoMedida.getTipoMedida();
     }
 
     public boolean isActivo() {

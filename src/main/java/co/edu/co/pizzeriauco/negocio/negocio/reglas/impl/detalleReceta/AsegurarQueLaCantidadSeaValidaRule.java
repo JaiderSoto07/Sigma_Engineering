@@ -7,21 +7,21 @@ import co.edu.co.pizzeriauco.transversal.utilitario.UtilNumero;
 
 import java.math.BigDecimal;
 
-public class AsegurarQueLaCantidadSeaValidaRule implements Rule<Object> {
+public class AsegurarQueLaCantidadSeaValidaRule implements Rule<BigDecimal> {
     private static final BigDecimal CANTIDAD_MAXIMA = new BigDecimal("10000");
 
-    private static final Rule<Object> instancia = new AsegurarQueLaCantidadSeaValidaRule();
+    private static final Rule<BigDecimal> instancia = new AsegurarQueLaCantidadSeaValidaRule();
 
     private AsegurarQueLaCantidadSeaValidaRule() {
     }
 
-    public static final Rule<Object> obtenerInstancia() {
+    public static final Rule<BigDecimal> obtenerInstancia() {
         return instancia;
     }
 
     @Override
-    public void ejecutar(Object... datos) {
-        var cantidad= (BigDecimal) datos[0];
+    public void ejecutar(BigDecimal... datos) {
+        var cantidad=  datos[0];
             if (!UtilNumero.mayorQue(cantidad, BigDecimal.ZERO)) {
                 var mensajeUsuario = CatalogoMensajes.DetalleRecetaNegocioImpl.CANTIDAD_DETALLE_RECETA_OBLIGATORIA;
                 throw PizzeriaNegocioExcepcion.crear(mensajeUsuario);
