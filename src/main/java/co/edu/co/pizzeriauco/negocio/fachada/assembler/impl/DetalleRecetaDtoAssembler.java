@@ -56,7 +56,12 @@ public final class DetalleRecetaDtoAssembler implements DTOAssembler<DetalleRece
     @Override
     public List<DetalleRecetaDto> convertirADTO(List<DetalleRecetaDominio> listaDominios) {
         var listaSegura = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(listaDominios, new ArrayList<DetalleRecetaDominio>());
-        return listaSegura.stream().map(this::convertirADTO).toList();
+
+        var listaDto = new ArrayList<DetalleRecetaDto>();
+        for (var dominio : listaSegura) {
+            listaDto.add(convertirADTO(dominio));
+        }
+        return listaDto;
     }
 
     private ProductoDto convertirProductoADTO(ProductoDominio producto) {

@@ -2,11 +2,11 @@ package co.edu.co.pizzeriauco.negocio.fachada.assembler;
 
 import java.util.List;
 
-public interface DTOAssembler<D, T> {
+public interface DTOAssembler<D, E> {
 
-    T convertirADTO(D dominio);
+    E convertirADTO(D dominio);
 
-    D convertirADominio(T dto);
+    D convertirADominio(E dto);
 
-    List<T> convertirADTO(List<D> listaDominios);
+    List<E> convertirADTO(List<D> listaDominios);
 }

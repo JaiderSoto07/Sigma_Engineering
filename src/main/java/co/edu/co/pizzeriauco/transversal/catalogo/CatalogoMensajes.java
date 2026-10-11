@@ -431,6 +431,11 @@ public class CatalogoMensajes {
         }
 
         public static final String USUARIO_ERROR_PROBLEMA_INESPERADO_REGISTRANDO_DETALLE_RECETA = "Se ha presentado un problema inesperado tratando de registrar el ingrediente de la receta. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_INESPERADO_MODIFICANDO_CANTIDAD_DETALLE_RECETA = "Se ha presentado un problema inesperado tratando de modificar la cantidad del ingrediente de la receta. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_INESPERADO_RETIRANDO_INGREDIENTE_DETALLE_RECETA = "Se ha presentado un problema inesperado tratando de retirar el ingrediente de la receta. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_INESPERADO_CONSULTANDO_POR_FILTRO_DETALLE_RECETA = "Se ha presentado un problema inesperado tratando de consultar los ingredientes de las recetas. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_INESPERADO_CONSULTANDO_PRODUCTOS_ACTIVOS_DETALLE_RECETA = "Se ha presentado un problema inesperado tratando de consultar las recetas de los productos activos. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_INESPERADO_CONSULTANDO_PRODUCTOS_INACTIVOS_DETALLE_RECETA = "Se ha presentado un problema inesperado tratando de consultar las recetas de los productos inactivos. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
     }
 
     public static class DAOFactory {
