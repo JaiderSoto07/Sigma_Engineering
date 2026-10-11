@@ -38,6 +38,7 @@ public final class DetalleRecetaEntidadAssembler implements EntidadAssembler<Det
                 .build();
     }
 
+
     @Override
     public DetalleRecetaDominio convertirADominio(DetalleRecetaEntidad entidad) {
         var entidadSegura = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(entidad, new DetalleRecetaEntidad.Builder().build());

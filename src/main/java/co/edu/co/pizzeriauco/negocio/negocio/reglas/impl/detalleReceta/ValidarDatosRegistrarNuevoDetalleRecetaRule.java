@@ -13,9 +13,6 @@ import java.util.UUID;
 
 public class ValidarDatosRegistrarNuevoDetalleRecetaRule implements Rule<DetalleRecetaDominio> {
 
-    private static final BigDecimal CANTIDAD_MAXIMA = new BigDecimal("10000");
-    private static final int CANTIDAD_MAXIMA_DECIMALES = 4;
-
     private static final Rule<DetalleRecetaDominio> instancia = new ValidarDatosRegistrarNuevoDetalleRecetaRule();
 
     private ValidarDatosRegistrarNuevoDetalleRecetaRule() {
@@ -32,8 +29,7 @@ public class ValidarDatosRegistrarNuevoDetalleRecetaRule implements Rule<Detalle
         validarObligatoriedadDatos(dominio);
         validarProducto(dominio.getProducto().getId());
         validarProductoInterno(dominio.getProductoInterno().getId());
-        validarUnidadMedida(dominio.getUnidadMedida().getId());
-        validarCantidad(dominio.getCantidad());
+        AsegurarQueLaCantidadSeaValidaRule.obtenerInstancia().ejecutar(dominio.getCantidad());
     }
 
     private void validarObligatoriedadDatos(DetalleRecetaDominio dominio) {
@@ -57,20 +53,4 @@ public class ValidarDatosRegistrarNuevoDetalleRecetaRule implements Rule<Detalle
         }
     }
 
-    private void validarUnidadMedida(UUID idUnidadMedida) {
-        if (UtilId.VALOR_DEFECTO.equals(idUnidadMedida)) {
-            var mensajeUsuario = CatalogoMensajes.DetalleRecetaNegocioImpl.UNIDAD_MEDIDA_DETALLE_RECETA_OBLIGATORIA;
-            throw PizzeriaNegocioExcepcion.crear(mensajeUsuario);
-        }
-    }
-    private void validarCantidad(BigDecimal cantidad) {
-        if (!UtilNumero.mayorQue(cantidad, BigDecimal.ZERO)) {
-            var mensajeUsuario = CatalogoMensajes.DetalleRecetaNegocioImpl.CANTIDAD_DETALLE_RECETA_OBLIGATORIA;
-            throw PizzeriaNegocioExcepcion.crear(mensajeUsuario);
-        }
-        if (!UtilNumero.menorIgual(cantidad, CANTIDAD_MAXIMA)) {
-            var mensajeUsuario = CatalogoMensajes.DetalleRecetaNegocioImpl.CANTIDAD_DETALLE_RECETA_FUERA_DE_RANGO;
-            throw PizzeriaNegocioExcepcion.crear(mensajeUsuario);
-        }
-    }
 }
