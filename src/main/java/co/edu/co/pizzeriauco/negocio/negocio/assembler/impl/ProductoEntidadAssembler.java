@@ -1,0 +1,48 @@
+package co.edu.co.pizzeriauco.negocio.negocio.assembler.impl;
+
+import co.edu.co.pizzeriauco.dominio.ProductoDominio;
+import co.edu.co.pizzeriauco.entidad.ProductoEntidad;
+import co.edu.co.pizzeriauco.negocio.negocio.assembler.EntidadAssembler;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
+
+public final class ProductoEntidadAssembler implements EntidadAssembler<ProductoDominio, ProductoEntidad> {
+
+    private static final EntidadAssembler<ProductoDominio, ProductoEntidad> INSTANCIA = new ProductoEntidadAssembler();
+
+    private ProductoEntidadAssembler() {
+    }
+
+    public static EntidadAssembler<ProductoDominio, ProductoEntidad> getInstance() {
+        return INSTANCIA;
+    }
+
+    @Override
+    public ProductoEntidad convertirAEntidad(ProductoDominio dominio) {
+        var dominioSeguro = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(dominio, new ProductoDominio.Builder().build());
+        return new ProductoEntidad.Builder()
+                .id(dominioSeguro.getId())
+                .nombre(dominioSeguro.getNombre())
+                .tipoProducto(TipoProductoEntidadAssembler.getInstance().convertirAEntidad(dominioSeguro.getTipoProducto()))
+                .tamano(TamanoEntidadAssembler.getInstance().convertirAEntidad(dominioSeguro.getTamano()))
+                .productoInterno(dominioSeguro.isProductoInterno())
+                .productoInternoAsociado(ProductoInternoEntidadAssembler.getInstance().convertirAEntidad(dominioSeguro.getProductoInternoAsociado()))
+                .precio(dominioSeguro.getPrecio())
+                .activo(dominioSeguro.isActivo())
+                .build();
+    }
+
+    @Override
+    public ProductoDominio convertirADominio(ProductoEntidad entidad) {
+        var entidadSegura = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(entidad, new ProductoEntidad.Builder().build());
+        return new ProductoDominio.Builder()
+                .id(entidadSegura.getId())
+                .nombre(entidadSegura.getNombre())
+                .tipoProducto(TipoProductoEntidadAssembler.getInstance().convertirADominio(entidadSegura.getTipoProducto()))
+                .tamano(TamanoEntidadAssembler.getInstance().convertirADominio(entidadSegura.getTamano()))
+                .productoInterno(entidadSegura.isProductoInterno())
+                .productoInternoAsociado(ProductoInternoEntidadAssembler.getInstance().convertirADominio(entidadSegura.getProductoInternoAsociado()))
+                .precio(entidadSegura.getPrecio())
+                .activo(entidadSegura.isActivo())
+                .build();
+    }
+}

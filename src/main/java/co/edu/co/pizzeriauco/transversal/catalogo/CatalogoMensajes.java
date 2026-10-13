@@ -438,6 +438,57 @@ public class CatalogoMensajes {
         public static final String USUARIO_ERROR_PROBLEMA_INESPERADO_CONSULTANDO_PRODUCTOS_INACTIVOS_DETALLE_RECETA = "Se ha presentado un problema inesperado tratando de consultar las recetas de los productos inactivos. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
     }
 
+    public static class TipoProductoFachadaImpl {
+
+        private TipoProductoFachadaImpl() {
+        }
+
+        public static final String USUARIO_ERROR_PROBLEMA_INESPERADO_CONSULTANDO_TODOS_LOS_TIPOS_PRODUCTO = "Se ha presentado un problema inesperado tratando de consultar los tipos de producto. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+    }
+
+    public static class TamanoFachadaImpl {
+
+        private TamanoFachadaImpl() {
+        }
+
+        public static final String USUARIO_ERROR_PROBLEMA_INESPERADO_CONSULTANDO_TODOS_LOS_TAMANOS = "Se ha presentado un problema inesperado tratando de consultar los tamanos. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+    }
+
+    public static class ProductoInternoFachadaImpl {
+
+        private ProductoInternoFachadaImpl() {
+        }
+
+        public static final String USUARIO_ERROR_PROBLEMA_INESPERADO_CONSULTANDO_PRODUCTOS_INTERNOS_ACTIVOS = "Se ha presentado un problema inesperado tratando de consultar los productos internos activos. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+    }
+
+    public static class ProductoNegocioImpl {
+
+        private ProductoNegocioImpl() {
+        }
+
+        public static final String DATOS_PRODUCTO_OBLIGATORIOS = "No es posible registrar el producto porque no se recibio su informacion. Por favor diligencie los datos del producto e intente de nuevo";
+        public static final String NOMBRE_PRODUCTO_OBLIGATORIO = "El nombre del producto es obligatorio. Por favor ingrese el nombre e intente de nuevo";
+        public static final String NOMBRE_PRODUCTO_LONGITUD_NO_VALIDA = "El nombre del producto debe tener entre 1 y 40 caracteres. Por favor ingrese un nombre valido e intente de nuevo";
+        public static final String TIPO_PRODUCTO_OBLIGATORIO = "No es posible registrar el producto porque no se indico el tipo de producto. Por favor seleccione el tipo de producto e intente de nuevo";
+        public static final String TAMANO_PRODUCTO_OBLIGATORIO = "No es posible registrar el producto porque no se indico el tamano. Por favor seleccione el tamano e intente de nuevo";
+        public static final String PRECIO_PRODUCTO_OBLIGATORIO = "El precio del producto es obligatorio y no puede ser cero ni negativo. Por favor ingrese un precio mayor que cero e intente de nuevo";
+        public static final String PRECIO_PRODUCTO_FUERA_DE_RANGO = "El precio del producto no puede ser mayor que 1000000. Por favor ingrese un precio valido e intente de nuevo";
+
+        public static final String PRODUCTO_YA_REGISTRADO_CON_NOMBRE_Y_TAMANO = "No es posible registrar el producto porque ya existe un producto con el mismo nombre y el mismo tamano. Por favor cambie el nombre o el tamano e intente de nuevo";
+
+        public static final String PRODUCTO_INTERNO_PRODUCTO_NO_EXISTE = "No es posible registrar el producto porque no existe un producto interno con el mismo nombre. Por favor verifique el nombre e intente de nuevo";
+    }
+
+    public static class ProductoFachadaImpl {
+
+        private ProductoFachadaImpl() {
+        }
+
+        public static final String USUARIO_ERROR_PROBLEMA_INESPERADO_REGISTRANDO_PRODUCTO = "Se ha presentado un problema inesperado tratando de registrar el producto. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_INESPERADO_CONSULTANDO_PRODUCTOS_ACTIVOS = "Se ha presentado un problema inesperado tratando de consultar los productos activos. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+    }
+
     public static class DAOFactory {
 
         private DAOFactory() {
