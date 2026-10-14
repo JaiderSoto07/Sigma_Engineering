@@ -58,6 +58,7 @@ public class ProductoNegocioImpl implements ProductoNegocio {
 
     private ProductoInternoDominio obtenerProductoInternoAsociado(ProductoDominio datos) {
         if (!datos.isProductoInterno()) {
+            //devuelve uno vacio
             return new ProductoInternoDominio.Builder().build();
         }
         AsegurarProductoInternoConMismoNombreExisteRule.obtenerInstancia().ejecutar(datos.getNombre(), daoFactory);

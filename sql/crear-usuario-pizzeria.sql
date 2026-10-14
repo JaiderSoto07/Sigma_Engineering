@@ -6,7 +6,8 @@
 -- Crea:
 --   1. La base de datos Pizzeria (si no existe).
 --   2. El login pizzeriaUser, para entrar al servidor.
---   3. El usuario pizzeriaUser dentro de la base Pizzeria, con permisos completos sobre ella.
+--   3. El usuario pizzeriaUser dentro de la base Pizzeria, solo con permisos de leer y escribir datos
+--      (select, insert, update, delete). No puede crear, modificar ni borrar tablas.
 
 IF DB_ID('Pizzeria') IS NULL
     CREATE DATABASE Pizzeria;
@@ -23,5 +24,8 @@ IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = 'pizzeriaUser'
     CREATE USER pizzeriaUser FOR LOGIN pizzeriaUser;
 GO
 
-ALTER ROLE db_owner ADD MEMBER pizzeriaUser;
+ALTER ROLE db_datareader ADD MEMBER pizzeriaUser;
+GO
+
+ALTER ROLE db_datawriter ADD MEMBER pizzeriaUser;
 GO
