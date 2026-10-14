@@ -1,6 +1,9 @@
 package co.edu.co.pizzeriauco.transversal.utilitario;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 
 public class UtilFecha {
@@ -14,6 +17,13 @@ public class UtilFecha {
     // aseguro que la fecha nunca sea nula
     public static LocalDate valorDefecto(LocalDate fecha){
         return UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(fecha, FECHA_POR_DEFECTO);
+    }
+    public static LocalDateTime fechaActual(){
+        return LocalDateTime.now(ZoneId.of("America/Bogota"));
+    }
+
+    public static long fechaParaMillins(){
+        return Instant.now().toEpochMilli();
     }
 
 }

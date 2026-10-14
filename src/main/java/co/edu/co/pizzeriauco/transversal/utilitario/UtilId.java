@@ -7,11 +7,14 @@ public class UtilId {
         private UtilId(){
         }
         public static UUID generarId(){
-            return UUID.randomUUID();
+            return UUID.ofEpochMillis(UtilFecha.fechaParaMillins());
         }
 
         public static UUID valorDefecto(UUID id){
             return UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(id, VALOR_DEFECTO);
+        }
+        public static String generarIdComoTexto(){
+          return generarId().toString();
         }
     }
 
