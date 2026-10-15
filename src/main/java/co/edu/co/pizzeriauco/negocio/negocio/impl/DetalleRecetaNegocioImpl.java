@@ -33,8 +33,7 @@ public class DetalleRecetaNegocioImpl implements DetalleRecetaNegocio {
         ValidarDatosRegistrarNuevoDetalleRecetaRule.obtenerInstancia().ejecutar(datos);
         AsegurarProductoExisteRule.obtenerInstancia().ejecutar(datos.getProducto().getId(), daoFactory);
         AsegurarProductoInternoExisteRule.obtenerInstancia().ejecutar(datos.getProductoInterno().getId(), daoFactory);
-        AsegurarProductoInternoNoRepetidoEnRecetaRule.obtenerInstancia().ejecutar(datos.getProducto().getId(),
-                datos.getProductoInterno().getId(), daoFactory);
+        AsegurarProductoInternoNoRepetidoEnRecetaRule.obtenerInstancia().ejecutar(datos.getProducto().getId(), datos.getProductoInterno().getId(), daoFactory);
         var idDetalleReceta = generarIdDetalleRecetaUnico();
         AsegurarIdDetalleRecetaNoExisteRule.obtenerInstancia().ejecutar(idDetalleReceta, daoFactory);
 
@@ -73,7 +72,6 @@ public class DetalleRecetaNegocioImpl implements DetalleRecetaNegocio {
         AsegurarQueIngredienteExisteRule.obtenerInstancia().ejecutar(id,daoFactory);
         daoFactory.obtenerDetalleRecetaDAO().eliminar(id);
 
-
     }
 
     @Override
@@ -82,8 +80,7 @@ public class DetalleRecetaNegocioImpl implements DetalleRecetaNegocio {
         var detallesEncontrados = daoFactory.obtenerDetalleRecetaDAO().consultarPorFiltro(filtroEntidad);
         var detallesDominio = new ArrayList<DetalleRecetaDominio>();
         for (var detalleRecetaEntidad : detallesEncontrados) {
-            detallesDominio.add(
-                    DetalleRecetaEntidadAssembler.getInstance().convertirADominio(detalleRecetaEntidad));
+            detallesDominio.add(DetalleRecetaEntidadAssembler.getInstance().convertirADominio(detalleRecetaEntidad));
         }
         return detallesDominio;
     }

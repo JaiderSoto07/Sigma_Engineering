@@ -29,7 +29,7 @@ public final class ProductoInternoDtoAssembler implements DTOAssembler<ProductoI
         dto.setNombre(dominioSeguro.getNombre());
         dto.setPerecedero(dominioSeguro.isPerecedero());
         dto.setVidaUtil(dominioSeguro.getVidaUtil());
-        dto.setTipoMedida(convertirUnidadMedidaADTO(dominioSeguro.getTipoMedida()));
+        dto.setTipoMedida(UnidadMedidaDtoAssembler.getInstance().convertirADTO(dominioSeguro.getTipoMedida()));
         dto.setActivo(dominioSeguro.isActivo());
         return dto;
     }
@@ -42,7 +42,7 @@ public final class ProductoInternoDtoAssembler implements DTOAssembler<ProductoI
                 .nombre(dtoSeguro.getNombre())
                 .perecedero(dtoSeguro.isPerecedero())
                 .vidaUtil(dtoSeguro.getVidaUtil())
-                .tipoMedida(convertirUnidadMedidaADominio(dtoSeguro.getTipoMedida()))
+                .tipoMedida(UnidadMedidaDtoAssembler.getInstance().convertirADominio(dtoSeguro.getTipoMedida()))
                 .activo(dtoSeguro.isActivo())
                 .build();
     }
@@ -58,19 +58,4 @@ public final class ProductoInternoDtoAssembler implements DTOAssembler<ProductoI
         return listaDto;
     }
 
-    private UnidadMedidaDto convertirUnidadMedidaADTO(UnidadMedidaDominio unidadMedida) {
-        var dto = new UnidadMedidaDto();
-        dto.setId(unidadMedida.getId());
-        dto.setUnidadMedida(unidadMedida.getUnidadMedida());
-        dto.setTipoMedida(unidadMedida.getTipoMedida());
-        return dto;
-    }
-
-    private UnidadMedidaDominio convertirUnidadMedidaADominio(UnidadMedidaDto unidadMedida) {
-        return new UnidadMedidaDominio.Builder()
-                .id(unidadMedida.getId())
-                .unidadMedida(unidadMedida.getUnidadMedida())
-                .tipoMedida(unidadMedida.getTipoMedida())
-                .build();
-    }
 }
