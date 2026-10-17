@@ -44,12 +44,7 @@ public class ProductoNegocioImpl implements ProductoNegocio {
     @Override
     public List<ProductoDominio> consultarActivos() {
         var productosEncontrados = daoFactory.obtenerProductoDAO().consultarActivos();
-        var productosDominio = new ArrayList<ProductoDominio>();
-        for (var productoEntidad : productosEncontrados) {
-            productosDominio.add(
-                    ProductoEntidadAssembler.getInstance().convertirADominio(productoEntidad));
-        }
-        return productosDominio;
+        return ProductoEntidadAssembler.getInstance().convertirADominio(productosEncontrados);
     }
 
     private UUID generarIdProductoUnico() {

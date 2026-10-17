@@ -19,12 +19,8 @@ public class TamanoNegocioImpl implements TamanoNegocio {
     @Override
     public List<TamanoDominio> consultarTodos() {
         var tamanosEncontrados = daoFactory.obtenerTamanoDAO().consultarTodos();
-        var tamanosDominio = new ArrayList<TamanoDominio>();
-        for (var tamanoEntidad : tamanosEncontrados) {
-            tamanosDominio.add(
-                    TamanoEntidadAssembler.getInstance().convertirADominio(tamanoEntidad));
-        }
-        return tamanosDominio;
+        return  TamanoEntidadAssembler.getInstance().convertirADominio(tamanosEncontrados);
+
     }
 
 }

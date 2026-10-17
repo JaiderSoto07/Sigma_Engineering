@@ -3,6 +3,7 @@ package co.edu.co.pizzeriauco.negocio.negocio.impl;
 import co.edu.co.pizzeriauco.dominio.UnidadMedidaDominio;
 import co.edu.co.pizzeriauco.entidad.DetalleRecetaEntidad;
 import co.edu.co.pizzeriauco.entidad.UnidadMedidaEntidad;
+import co.edu.co.pizzeriauco.negocio.negocio.assembler.impl.UnidadMedidaEntidadAssembler;
 import co.edu.co.pizzeriauco.negocio.negocio.reglas.impl.detalleReceta.*;
 import co.edu.co.pizzeriauco.transversal.utilitario.UtilId;
 import co.edu.co.pizzeriauco.dao.factoria.DAOFactory;
@@ -78,37 +79,20 @@ public class DetalleRecetaNegocioImpl implements DetalleRecetaNegocio {
     public List<DetalleRecetaDominio> consultarPorFiltro(DetalleRecetaDominio filtro) {
         var filtroEntidad = DetalleRecetaEntidadAssembler.getInstance().convertirAEntidad(filtro);
         var detallesEncontrados = daoFactory.obtenerDetalleRecetaDAO().consultarPorFiltro(filtroEntidad);
-        var detallesDominio = new ArrayList<DetalleRecetaDominio>();
-        for (var detalleRecetaEntidad : detallesEncontrados) {
-            detallesDominio.add(DetalleRecetaEntidadAssembler.getInstance().convertirADominio(detalleRecetaEntidad));
-        }
-        return detallesDominio;
+        return DetalleRecetaEntidadAssembler.getInstance().convertirADominio(detallesEncontrados);
     }
 
     @Override
     public List<DetalleRecetaDominio> consultarRecetasDeProductosActivos() {
-        var detallesEncontrados = daoFactory.obtenerDetalleRecetaDAO().consultarTodos();
-        var detallesDeProductosActivos = new ArrayList<DetalleRecetaDominio>();
-        for (var detalleRecetaEntidad : detallesEncontrados) {
-            if (detalleRecetaEntidad.getProducto().isActivo()) {
-                detallesDeProductosActivos.add(
-                        DetalleRecetaEntidadAssembler.getInstance().convertirADominio(detalleRecetaEntidad));
-            }
-        }
-        return detallesDeProductosActivos;
+        var detallesEncontrados = daoFactory.obtenerDetalleRecetaDAO().consultarActivos();
+        return DetalleRecetaEntidadAssembler.getInstance().convertirADominio(detallesEncontrados);
+
     }
 
     @Override
     public List<DetalleRecetaDominio> consultarRecetasDeProductosInactivos() {
-        var detallesEncontrados = daoFactory.obtenerDetalleRecetaDAO().consultarTodos();
-        var detallesDeProductosInactivos = new ArrayList<DetalleRecetaDominio>();
-        for (var detalleRecetaEntidad : detallesEncontrados) {
-            if (!detalleRecetaEntidad.getProducto().isActivo()) {
-                detallesDeProductosInactivos.add(
-                        DetalleRecetaEntidadAssembler.getInstance().convertirADominio(detalleRecetaEntidad));
-            }
-        }
-        return detallesDeProductosInactivos;
+        var detallesEncontrados = daoFactory.obtenerDetalleRecetaDAO().consultarInactivos();
+        return DetalleRecetaEntidadAssembler.getInstance().convertirADominio(detallesEncontrados);
     }
 
     private UUID generarIdDetalleRecetaUnico() {
@@ -130,11 +114,7 @@ public class DetalleRecetaNegocioImpl implements DetalleRecetaNegocio {
         var filtro = new UnidadMedidaEntidad.Builder().unidadMedida(abreviatura).build();
         var unidadEncontrada = daoFactory.obtenerUnidadMedidaDAO().consultarPorFiltro(filtro).get(0);
 
-        return new UnidadMedidaDominio.Builder()
-                .id(unidadEncontrada.getId())
-                .unidadMedida(unidadEncontrada.getUnidadMedida())
-                .tipoMedida(unidadEncontrada.getTipoMedida())
-                .build();
+        return UnidadMedidaEntidadAssembler.getInstance().convertirADominio(unidadEncontrada);
     }
 
 

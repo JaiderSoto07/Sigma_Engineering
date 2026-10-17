@@ -19,12 +19,8 @@ public class ProductoInternoNegocioImpl implements ProductoInternoNegocio {
     @Override
     public List<ProductoInternoDominio> consultarActivos() {
         var productosInternosEncontrados = daoFactory.obtenerProductoInternoDAO().consultarActivos();
-        var productosInternosDominio = new ArrayList<ProductoInternoDominio>();
-        for (var productoInternoEntidad : productosInternosEncontrados) {
-            productosInternosDominio.add(
-                    ProductoInternoEntidadAssembler.getInstance().convertirADominio(productoInternoEntidad));
-        }
-        return productosInternosDominio;
+       return ProductoInternoEntidadAssembler.getInstance().convertirADominio(productosInternosEncontrados);
+
     }
 
 }

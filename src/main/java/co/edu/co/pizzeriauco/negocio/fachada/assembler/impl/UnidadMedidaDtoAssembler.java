@@ -9,7 +9,7 @@ import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UnidadMedidaDtoAssembler implements DTOAssembler<UnidadMedidaDominio, UnidadMedidaDto> {
+public final  class UnidadMedidaDtoAssembler implements DTOAssembler<UnidadMedidaDominio, UnidadMedidaDto> {
     private static final DTOAssembler<UnidadMedidaDominio, UnidadMedidaDto> INSTANCIA = new UnidadMedidaDtoAssembler();
 
     private UnidadMedidaDtoAssembler() {

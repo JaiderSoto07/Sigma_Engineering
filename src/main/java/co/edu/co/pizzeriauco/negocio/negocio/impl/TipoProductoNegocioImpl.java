@@ -19,12 +19,8 @@ public class TipoProductoNegocioImpl implements TipoProductoNegocio {
     @Override
     public List<TipoProductoDominio> consultarTodos() {
         var tiposProductoEncontrados = daoFactory.obtenerTipoProductoDAO().consultarTodos();
-        var tiposProductoDominio = new ArrayList<TipoProductoDominio>();
-        for (var tipoProductoEntidad : tiposProductoEncontrados) {
-            tiposProductoDominio.add(
-                    TipoProductoEntidadAssembler.getInstance().convertirADominio(tipoProductoEntidad));
-        }
-        return tiposProductoDominio;
+        return  TipoProductoEntidadAssembler.getInstance().convertirADominio(tiposProductoEncontrados);
+
     }
 
 }

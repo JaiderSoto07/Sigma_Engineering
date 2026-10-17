@@ -336,4 +336,143 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
             throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
         }
     }
+
+    @Override
+    public List<DetalleRecetaEntidad> consultarActivos() {
+        var sentenciaSql =
+                """
+                select dr.id_detalle_receta, dr.cantidad,
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo as activo_producto,
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo as activo_producto_interno,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida
+                from detalle_receta as dr
+                inner join producto as p on dr.id_producto = p.id_producto
+                inner join producto_interno as pi on dr.id_producto_interno = pi.id_producto_interno
+                inner join unidad_medida as um on dr.id_unidad_medida = um.id_unidad_medida
+                where p.activo=1
+                order by p.nombre asc, pi.nombre asc
+                """;
+        var detallesEncontrados = new ArrayList<DetalleRecetaEntidad>();
+
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+
+            var resultado = sentencia.executeQuery();
+            while (resultado.next()) {
+                //primero se arman los padres (producto, producto interno y unidad) para luego asignarlos al detalle
+                var producto = new ProductoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_producto")))
+                        .nombre(resultado.getString("nombre_producto"))
+                        .tipoProducto(new TipoProductoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_tipo_producto"))).build())
+                        .tamano(new TamanoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_tamano"))).build())
+                        .productoInternoAsociado(new ProductoInternoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
+                        .precio(resultado.getBigDecimal("precio"))
+                        .activo(resultado.getBoolean("activo_producto"))
+                        .build();
+                var productoInterno = new ProductoInternoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_producto_interno")))
+                        .nombre(resultado.getString("nombre_producto_interno"))
+                        .perecedero(resultado.getBoolean("perecedero"))
+                        .vidaUtil(resultado.getInt("vida_util"))
+                        .tipoMedida(new UnidadMedidaEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_unidad_medida_producto_interno"))).build())
+                        .activo(resultado.getBoolean("activo_producto_interno"))
+                        .build();
+                var unidadMedida = new UnidadMedidaEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_unidad_medida")))
+                        .unidadMedida(resultado.getString("unidad_medida"))
+                        .tipoMedida(resultado.getString("tipo_medida"))
+                        .build();
+                var detalleReceta = new DetalleRecetaEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_detalle_receta")))
+                        .producto(producto)
+                        .productoInterno(productoInterno)
+                        .cantidad(resultado.getBigDecimal("cantidad"))
+                        .unidadMedida(unidadMedida)
+                        .build();
+                detallesEncontrados.add(detalleReceta);
+            }
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.DetalleRecetaSqlServerDAO.USUARIO_ERROR_PROBLEMA_CONSULTANDO_DETALLES_RECETA_PRODUCTOS_ACTIVOS;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.DetalleRecetaSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_DETALLES_RECETA_PRODUCTOS_ACTIVOS;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
+        return detallesEncontrados;
+    }
+    @Override
+    public List<DetalleRecetaEntidad> consultarInactivos() {
+        var sentenciaSql =
+                """
+                select dr.id_detalle_receta, dr.cantidad,
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo as activo_producto,
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo as activo_producto_interno,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida
+                from detalle_receta as dr
+                inner join producto as p on dr.id_producto = p.id_producto
+                inner join producto_interno as pi on dr.id_producto_interno = pi.id_producto_interno
+                inner join unidad_medida as um on dr.id_unidad_medida = um.id_unidad_medida
+                where p.activo=0
+                order by p.nombre asc, pi.nombre asc
+                """;
+        var detallesEncontrados = new ArrayList<DetalleRecetaEntidad>();
+
+        try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
+
+            var resultado = sentencia.executeQuery();
+            while (resultado.next()) {
+                //primero se arman los padres (producto, producto interno y unidad) para luego asignarlos al detalle
+                var producto = new ProductoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_producto")))
+                        .nombre(resultado.getString("nombre_producto"))
+                        .tipoProducto(new TipoProductoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_tipo_producto"))).build())
+                        .tamano(new TamanoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_tamano"))).build())
+                        .productoInternoAsociado(new ProductoInternoEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
+                        .precio(resultado.getBigDecimal("precio"))
+                        .activo(resultado.getBoolean("activo_producto"))
+                        .build();
+                var productoInterno = new ProductoInternoEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_producto_interno")))
+                        .nombre(resultado.getString("nombre_producto_interno"))
+                        .perecedero(resultado.getBoolean("perecedero"))
+                        .vidaUtil(resultado.getInt("vida_util"))
+                        .tipoMedida(new UnidadMedidaEntidad.Builder()
+                                .id(UUID.fromString(resultado.getString("id_unidad_medida_producto_interno"))).build())
+                        .activo(resultado.getBoolean("activo_producto_interno"))
+                        .build();
+                var unidadMedida = new UnidadMedidaEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_unidad_medida")))
+                        .unidadMedida(resultado.getString("unidad_medida"))
+                        .tipoMedida(resultado.getString("tipo_medida"))
+                        .build();
+                var detalleReceta = new DetalleRecetaEntidad.Builder()
+                        .id(UUID.fromString(resultado.getString("id_detalle_receta")))
+                        .producto(producto)
+                        .productoInterno(productoInterno)
+                        .cantidad(resultado.getBigDecimal("cantidad"))
+                        .unidadMedida(unidadMedida)
+                        .build();
+                detallesEncontrados.add(detalleReceta);
+            }
+        } catch (SQLException excepcion) {
+            //el controlado
+            var mensajeUsuario = CatalogoMensajes.DetalleRecetaSqlServerDAO.USUARIO_ERROR_PROBLEMA_CONSULTANDO_DETALLES_RECETA_PRODUCTOS_INACTIVOS;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        } catch (Exception excepcion) {
+            //no controlado
+            var mensajeUsuario = CatalogoMensajes.DetalleRecetaSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_DETALLES_RECETA_PRODUCTOS_INACTIVOS;
+            throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
+        }
+        return detallesEncontrados;
+    }
 }
