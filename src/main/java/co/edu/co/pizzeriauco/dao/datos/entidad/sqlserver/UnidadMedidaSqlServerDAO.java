@@ -22,7 +22,10 @@ public class UnidadMedidaSqlServerDAO extends SqlDAO implements UnidadMedidaDAO 
 
     @Override
     public UnidadMedidaEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select id_unidad_medida, unidad_medida, tipo_medida from unidad_medida where id_unidad_medida = ?";
+        var sentenciaSql =
+                """
+                select id_unidad_medida, unidad_medida, tipo_medida from unidad_medida where id_unidad_medida = ?
+                """;
         var unidadMedidaEncontrada = new UnidadMedidaEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
@@ -50,22 +53,29 @@ public class UnidadMedidaSqlServerDAO extends SqlDAO implements UnidadMedidaDAO 
     @Override
     public List<UnidadMedidaEntidad> consultarPorFiltro(UnidadMedidaEntidad filtro) {
         var unidadesEncontradas = new ArrayList<UnidadMedidaEntidad>();
-        var sentenciaSql = "select id_unidad_medida, unidad_medida, tipo_medida from unidad_medida where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select id_unidad_medida, unidad_medida, tipo_medida from unidad_medida
+                """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and id_unidad_medida = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " id_unidad_medida = ? ");
             parametros.add(filtro.getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getUnidadMedida())) {
-            sentenciaSql = sentenciaSql + " and unidad_medida = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " unidad_medida = ? ");
             parametros.add(filtro.getUnidadMedida());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getTipoMedida())) {
-            sentenciaSql = sentenciaSql + " and tipo_medida = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " tipo_medida = ? ");
             parametros.add(filtro.getTipoMedida());
+            cont = cont + 1;
         }
 
-        sentenciaSql = sentenciaSql + " order by tipo_medida asc, unidad_medida asc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by tipo_medida asc, unidad_medida asc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -97,7 +107,10 @@ public class UnidadMedidaSqlServerDAO extends SqlDAO implements UnidadMedidaDAO 
 
     @Override
     public List<UnidadMedidaEntidad> consultarTodos() {
-        var sentenciaSql = "select id_unidad_medida, unidad_medida, tipo_medida from unidad_medida order by tipo_medida asc, unidad_medida asc";
+        var sentenciaSql =
+                """
+                select id_unidad_medida, unidad_medida, tipo_medida from unidad_medida order by tipo_medida asc, unidad_medida asc
+                """;
         var unidadesEncontradas = new ArrayList<UnidadMedidaEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {

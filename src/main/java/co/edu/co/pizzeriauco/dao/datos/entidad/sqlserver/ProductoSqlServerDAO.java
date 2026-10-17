@@ -25,8 +25,11 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
 
     @Override
     public void crear(ProductoEntidad entidad) {
-        var sentenciaSql = "insert into producto(id_producto, nombre, id_tipo_producto, id_tamano, id_producto_interno, precio, activo) "
-                + "values(?, ?, ?, ?, ?, ?, ?)";
+        var sentenciaSql =
+                """
+                insert into producto(id_producto, nombre, id_tipo_producto, id_tamano, id_producto_interno, precio, activo)
+                values(?, ?, ?, ?, ?, ?, ?)
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, entidad.getId());
             sentencia.setString(2, entidad.getNombre());
@@ -49,12 +52,15 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
 
     @Override
     public ProductoEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.producto_interno, p.precio, p.activo, "
-                + "tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano "
-                + "from producto as p "
-                + "inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto "
-                + "inner join tamano as t on p.id_tamano = t.id_tamano "
-                + "where p.id_producto = ?";
+        var sentenciaSql =
+                """
+                select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.producto_interno, p.precio, p.activo,
+                tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano
+                from producto as p
+                inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto
+                inner join tamano as t on p.id_tamano = t.id_tamano
+                where p.id_producto = ?
+                """;
         var productoEncontrado = new ProductoEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
@@ -100,42 +106,51 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
     @Override
     public List<ProductoEntidad> consultarPorFiltro(ProductoEntidad filtro) {
         var productosEncontrados = new ArrayList<ProductoEntidad>();
-        var sentenciaSql = "select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.producto_interno, p.precio, p.activo, "
-                + "tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano "
-                + "from producto as p "
-                + "inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto "
-                + "inner join tamano as t on p.id_tamano = t.id_tamano "
-                + "where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.producto_interno, p.precio, p.activo,
+                tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano
+                from producto as p
+                inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto
+                inner join tamano as t on p.id_tamano = t.id_tamano
+                """;
         var parametros = new ArrayList<Object>();
         //estos los del producto
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and p.id_producto = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " p.id_producto = ? ");
             parametros.add(filtro.getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getNombre())) {
-            sentenciaSql = sentenciaSql + " and p.nombre = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " p.nombre = ? ");
             parametros.add(filtro.getNombre());
+            cont = cont + 1;
         }
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getTipoProducto().getId())) {
-            sentenciaSql = sentenciaSql + " and tp.id_tipo_producto = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " tp.id_tipo_producto = ? ");
             parametros.add(filtro.getTipoProducto().getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getTipoProducto().getNombre())) {
-            sentenciaSql = sentenciaSql + " and tp.nombre = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " tp.nombre = ? ");
             parametros.add(filtro.getTipoProducto().getNombre());
+            cont = cont + 1;
         }
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getTamano().getId())) {
-            sentenciaSql = sentenciaSql + " and t.id_tamano = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " t.id_tamano = ? ");
             parametros.add(filtro.getTamano().getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getTamano().getTamano())) {
-            sentenciaSql = sentenciaSql + " and t.tamano = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " t.tamano = ? ");
             parametros.add(filtro.getTamano().getTamano());
+            cont = cont + 1;
         }
 
-        sentenciaSql = sentenciaSql + " order by p.nombre asc, t.tamano asc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by p.nombre asc, t.tamano asc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -185,12 +200,15 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
 
     @Override
     public List<ProductoEntidad> consultarTodos() {
-        var sentenciaSql = "select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.producto_interno, p.precio, p.activo, "
-                + "tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano "
-                + "from producto as p "
-                + "inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto "
-                + "inner join tamano as t on p.id_tamano = t.id_tamano "
-                + "order by p.nombre asc, t.tamano asc";
+        var sentenciaSql =
+                """
+                select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.producto_interno, p.precio, p.activo,
+                tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano
+                from producto as p
+                inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto
+                inner join tamano as t on p.id_tamano = t.id_tamano
+                order by p.nombre asc, t.tamano asc
+                """;
         var productosEncontrados = new ArrayList<ProductoEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -236,13 +254,16 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
     @Override
     public List<ProductoEntidad> consultarActivos() {
 
-        var sentenciaSql = "select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.producto_interno, p.precio, p.activo, "
-                + "tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano "
-                + "from producto as p "
-                + "inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto "
-                + "inner join tamano as t on p.id_tamano = t.id_tamano "
-                + "where p.activo=1 "
-                + "order by p.nombre asc, t.tamano asc";
+        var sentenciaSql =
+                """
+                select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.producto_interno, p.precio, p.activo,
+                tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano
+                from producto as p
+                inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto
+                inner join tamano as t on p.id_tamano = t.id_tamano
+                where p.activo=1
+                order by p.nombre asc, t.tamano asc
+                """;
         var productosEncontrados = new ArrayList<ProductoEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -287,8 +308,11 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
 
     @Override
     public void actualizar(UUID id, ProductoEntidad entidad) {
-        var sentenciaSql = "update producto set nombre = ?, id_tipo_producto = ?, id_tamano = ?, "
-                + "id_producto_interno = ?, precio = ?, activo = ? where id_producto = ?";
+        var sentenciaSql =
+                """
+                update producto set nombre = ?, id_tipo_producto = ?, id_tamano = ?,
+                id_producto_interno = ?, precio = ?, activo = ? where id_producto = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setString(1, entidad.getNombre());
             sentencia.setObject(2, entidad.getTipoProducto().getId());
@@ -311,7 +335,10 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
 
     @Override
     public void eliminar(UUID id) {
-        var sentenciaSql = "delete from producto where id_producto = ?";
+        var sentenciaSql =
+                """
+                delete from producto where id_producto = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
             sentencia.executeUpdate();

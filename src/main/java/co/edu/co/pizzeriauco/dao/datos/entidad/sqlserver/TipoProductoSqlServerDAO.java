@@ -22,7 +22,10 @@ public class TipoProductoSqlServerDAO extends SqlDAO implements TipoProductoDAO 
 
     @Override
     public void crear(TipoProductoEntidad entidad) {
-        var sentenciaSql = "insert into tipo_producto(id_tipo_producto, nombre) values(?, ?)";
+        var sentenciaSql =
+                """
+                insert into tipo_producto(id_tipo_producto, nombre) values(?, ?)
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, entidad.getId());
             sentencia.setString(2, entidad.getNombre());
@@ -40,7 +43,10 @@ public class TipoProductoSqlServerDAO extends SqlDAO implements TipoProductoDAO 
 
     @Override
     public TipoProductoEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select id_tipo_producto, nombre from tipo_producto where id_tipo_producto = ?";
+        var sentenciaSql =
+                """
+                select id_tipo_producto, nombre from tipo_producto where id_tipo_producto = ?
+                """;
         var tipoProductoEncontrado = new TipoProductoEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
@@ -67,17 +73,23 @@ public class TipoProductoSqlServerDAO extends SqlDAO implements TipoProductoDAO 
     @Override
     public List<TipoProductoEntidad> consultarPorFiltro(TipoProductoEntidad filtro) {
         var tiposProductoEncontrados = new ArrayList<TipoProductoEntidad>();
-        var sentenciaSql = "select id_tipo_producto, nombre from tipo_producto where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select id_tipo_producto, nombre from tipo_producto
+                """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and id_tipo_producto = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " id_tipo_producto = ? ");
             parametros.add(filtro.getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getNombre())) {
-            sentenciaSql = sentenciaSql + " and nombre = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " nombre = ? ");
             parametros.add(filtro.getNombre());
+            cont = cont + 1;
         }
-        sentenciaSql = sentenciaSql + " order by nombre asc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by nombre asc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -108,7 +120,10 @@ public class TipoProductoSqlServerDAO extends SqlDAO implements TipoProductoDAO 
 
     @Override
     public List<TipoProductoEntidad> consultarTodos() {
-        var sentenciaSql = "select id_tipo_producto, nombre from tipo_producto order by nombre asc";
+        var sentenciaSql =
+                """
+                select id_tipo_producto, nombre from tipo_producto order by nombre asc
+                """;
         var tiposProductoEncontrados = new ArrayList<TipoProductoEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -135,7 +150,10 @@ public class TipoProductoSqlServerDAO extends SqlDAO implements TipoProductoDAO 
 
     @Override
     public void actualizar(UUID id, TipoProductoEntidad entidad) {
-        var sentenciaSql = "update tipo_producto set nombre = ? where id_tipo_producto = ?";
+        var sentenciaSql =
+                """
+                update tipo_producto set nombre = ? where id_tipo_producto = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setString(1, entidad.getNombre());
             sentencia.setObject(2, id);
@@ -153,7 +171,10 @@ public class TipoProductoSqlServerDAO extends SqlDAO implements TipoProductoDAO 
 
     @Override
     public void eliminar(UUID id) {
-        var sentenciaSql = "delete from tipo_producto where id_tipo_producto = ?";
+        var sentenciaSql =
+                """
+                delete from tipo_producto where id_tipo_producto = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
             sentencia.executeUpdate();

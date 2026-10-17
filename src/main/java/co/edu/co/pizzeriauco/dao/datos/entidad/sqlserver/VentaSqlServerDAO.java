@@ -25,7 +25,10 @@ public class VentaSqlServerDAO extends SqlDAO implements VentaDAO {
 
     @Override
     public void crear(VentaEntidad entidad) {
-        var sentenciaSql = "insert into venta(id_venta, fecha, hora, factura, cliente, total) values(?, ?, ?, ?, ?, ?)";
+        var sentenciaSql =
+                """
+                insert into venta(id_venta, fecha, hora, factura, cliente, total) values(?, ?, ?, ?, ?, ?)
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, entidad.getId());
             sentencia.setObject(2, entidad.getFecha());
@@ -47,7 +50,10 @@ public class VentaSqlServerDAO extends SqlDAO implements VentaDAO {
 
     @Override
     public VentaEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select id_venta, fecha, hora, factura, cliente, total from venta where id_venta = ?";
+        var sentenciaSql =
+                """
+                select id_venta, fecha, hora, factura, cliente, total from venta where id_venta = ?
+                """;
         var ventaEncontrada = new VentaEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
@@ -78,26 +84,34 @@ public class VentaSqlServerDAO extends SqlDAO implements VentaDAO {
     @Override
     public List<VentaEntidad> consultarPorFiltro(VentaEntidad filtro) {
         var ventasEncontradas = new ArrayList<VentaEntidad>();
-        var sentenciaSql = "select id_venta, fecha, hora, factura, cliente, total from venta where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select id_venta, fecha, hora, factura, cliente, total from venta
+                """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and id_venta = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " id_venta = ? ");
             parametros.add(filtro.getId());
+            cont = cont + 1;
         }
         if (!UtilFecha.FECHA_POR_DEFECTO.equals(filtro.getFecha())) {
-            sentenciaSql = sentenciaSql + " and fecha = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " fecha = ? ");
             parametros.add(filtro.getFecha());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getFactura())) {
-            sentenciaSql = sentenciaSql + " and factura = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " factura = ? ");
             parametros.add(filtro.getFactura());
+            cont = cont + 1;
         }
         if (!UtilTexto.CLIENTE_POR_DEFECTO.equals(filtro.getCliente())) {
-            sentenciaSql = sentenciaSql + " and cliente = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " cliente = ? ");
             parametros.add(filtro.getCliente());
+            cont = cont + 1;
         }
 
-        sentenciaSql = sentenciaSql + " order by fecha desc, hora desc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by fecha desc, hora desc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -132,7 +146,10 @@ public class VentaSqlServerDAO extends SqlDAO implements VentaDAO {
 
     @Override
     public List<VentaEntidad> consultarTodos() {
-        var sentenciaSql = "select id_venta, fecha, hora, factura, cliente, total from venta order by fecha desc, hora desc";
+        var sentenciaSql =
+                """
+                select id_venta, fecha, hora, factura, cliente, total from venta order by fecha desc, hora desc
+                """;
         var ventasEncontradas = new ArrayList<VentaEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {

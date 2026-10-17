@@ -27,8 +27,11 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
     @Override
     public void crear(LoteEntidad entidad) {
 
-        var sentenciaSql = "insert into lote(id_lote, numero_lote, id_producto_interno, cantidad, "
-                + "saldo, id_unidad_medida, fecha_vencimiento) values(?, ?, ?, ?, ?, ?, ?)";
+        var sentenciaSql =
+                """
+                insert into lote(id_lote, numero_lote, id_producto_interno, cantidad,
+                saldo, id_unidad_medida, fecha_vencimiento) values(?, ?, ?, ?, ?, ?, ?)
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
             sentencia.setObject(1, entidad.getId());
@@ -53,14 +56,17 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
 
     @Override
     public LoteEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, l.disponible, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
-                + "from lote as l "
-                + "inner join producto_interno as pi on l.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on l.id_unidad_medida = um.id_unidad_medida "
-                + "where l.id_lote = ?";
+        var sentenciaSql =
+                """
+                select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, l.disponible,
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida
+                from lote as l
+                inner join producto_interno as pi on l.id_producto_interno = pi.id_producto_interno
+                inner join unidad_medida as um on l.id_unidad_medida = um.id_unidad_medida
+                where l.id_lote = ?
+                """;
 
         var loteEncontrado = new LoteEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -111,39 +117,47 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
     @Override
     public List<LoteEntidad> consultarPorFiltro(LoteEntidad filtro) {
         var lotesEncontrados = new ArrayList<LoteEntidad>();
-        var sentenciaSql = "select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, l.disponible, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
-                + "from lote as l "
-                + "inner join producto_interno as pi on l.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on l.id_unidad_medida = um.id_unidad_medida "
-                + "where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, l.disponible,
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida
+                from lote as l
+                inner join producto_interno as pi on l.id_producto_interno = pi.id_producto_interno
+                inner join unidad_medida as um on l.id_unidad_medida = um.id_unidad_medida
+                """;
         var parametros = new ArrayList<Object>();
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and l.id_lote = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " l.id_lote = ? ");
             parametros.add(filtro.getId());
+            cont = cont + 1;
         }
         if (filtro.getNumeroLote() > 0) {
-            sentenciaSql = sentenciaSql + " and l.numero_lote = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " l.numero_lote = ? ");
             parametros.add(filtro.getNumeroLote());
+            cont = cont + 1;
         }
         if (!UtilFecha.FECHA_POR_DEFECTO.equals(filtro.getFechaVencimiento())) {
-            sentenciaSql = sentenciaSql + " and l.fecha_vencimiento = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " l.fecha_vencimiento = ? ");
             parametros.add(filtro.getFechaVencimiento());
+            cont = cont + 1;
         }
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getProductoInterno().getId())) {
-            sentenciaSql = sentenciaSql + " and pi.id_producto_interno = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " pi.id_producto_interno = ? ");
             parametros.add(filtro.getProductoInterno().getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getProductoInterno().getNombre())) {
-            sentenciaSql = sentenciaSql + " and pi.nombre = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " pi.nombre = ? ");
             parametros.add(filtro.getProductoInterno().getNombre());
+            cont = cont + 1;
         }
 
-        sentenciaSql = sentenciaSql + " order by pi.nombre asc, l.numero_lote asc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by pi.nombre asc, l.numero_lote asc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -196,14 +210,17 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
 
     @Override
     public List<LoteEntidad> consultarTodos() {
-        var sentenciaSql = "select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, l.disponible, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
-                + "from lote as l "
-                + "inner join producto_interno as pi on l.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on l.id_unidad_medida = um.id_unidad_medida "
-                + "order by pi.nombre asc, l.numero_lote asc";
+        var sentenciaSql =
+                """
+                select l.id_lote, l.numero_lote, l.cantidad, l.saldo, l.fecha_vencimiento, l.disponible,
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida
+                from lote as l
+                inner join producto_interno as pi on l.id_producto_interno = pi.id_producto_interno
+                inner join unidad_medida as um on l.id_unidad_medida = um.id_unidad_medida
+                order by pi.nombre asc, l.numero_lote asc
+                """;
         var lotesEncontrados = new ArrayList<LoteEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -251,7 +268,10 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
 
     @Override
     public void actualizar(UUID id, LoteEntidad entidad) {
-        var sentenciaSql = "update lote set cantidad = ?, saldo = ?, fecha_vencimiento = ? where id_lote = ?";
+        var sentenciaSql =
+                """
+                update lote set cantidad = ?, saldo = ?, fecha_vencimiento = ? where id_lote = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setBigDecimal(1, entidad.getCantidad());
             sentencia.setBigDecimal(2, entidad.getSaldo());
@@ -271,7 +291,10 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
 
     @Override
     public void eliminar(UUID id) {
-        var sentenciaSql = "delete from lote where id_lote = ?";
+        var sentenciaSql =
+                """
+                delete from lote where id_lote = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
             sentencia.executeUpdate();

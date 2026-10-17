@@ -30,8 +30,11 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
 
     @Override
     public void crear(DetalleCompraEntidad entidad) {
-        var sentenciaSql = "insert into detalle_compra(id_detalle_compra, id_compra, id_producto_interno, cantidad, "
-                + "id_unidad_medida, precio_compra, fecha_vencimiento, id_tipo_movimiento) values(?, ?, ?, ?, ?, ?, ?, ?)";
+        var sentenciaSql =
+                """
+                insert into detalle_compra(id_detalle_compra, id_compra, id_producto_interno, cantidad,
+                id_unidad_medida, precio_compra, fecha_vencimiento, id_tipo_movimiento) values(?, ?, ?, ?, ?, ?, ?, ?)
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, entidad.getId());
             sentencia.setObject(2, entidad.getCompra().getId());
@@ -55,18 +58,21 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
 
     @Override
     public DetalleCompraEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select dc.id_detalle_compra, dc.cantidad, dc.precio_compra, dc.fecha_vencimiento, "
-                + "c.id_compra, c.fecha_compra, c.numero_factura, c.total, c.id_proveedor, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida, "
-                + "tm.id_tipo_movimiento, tm.id_categoria_origen "
-                + "from detalle_compra as dc "
-                + "inner join compra as c on dc.id_compra = c.id_compra "
-                + "inner join producto_interno as pi on dc.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on dc.id_unidad_medida = um.id_unidad_medida "
-                + "inner join tipo_movimiento as tm on dc.id_tipo_movimiento = tm.id_tipo_movimiento "
-                + "where dc.id_detalle_compra = ?";
+        var sentenciaSql =
+                """
+                select dc.id_detalle_compra, dc.cantidad, dc.precio_compra, dc.fecha_vencimiento,
+                c.id_compra, c.fecha_compra, c.numero_factura, c.total, c.id_proveedor,
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida,
+                tm.id_tipo_movimiento, tm.id_categoria_origen
+                from detalle_compra as dc
+                inner join compra as c on dc.id_compra = c.id_compra
+                inner join producto_interno as pi on dc.id_producto_interno = pi.id_producto_interno
+                inner join unidad_medida as um on dc.id_unidad_medida = um.id_unidad_medida
+                inner join tipo_movimiento as tm on dc.id_tipo_movimiento = tm.id_tipo_movimiento
+                where dc.id_detalle_compra = ?
+                """;
         var detalleCompraEncontrado = new DetalleCompraEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
@@ -126,54 +132,65 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
     @Override
     public List<DetalleCompraEntidad> consultarPorFiltro(DetalleCompraEntidad filtro) {
         var detallesEncontrados = new ArrayList<DetalleCompraEntidad>();
-        var sentenciaSql = "select dc.id_detalle_compra, dc.cantidad, dc.precio_compra, dc.fecha_vencimiento, "
-                + "c.id_compra, c.fecha_compra, c.numero_factura, c.total, c.id_proveedor, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida, "
-                + "tm.id_tipo_movimiento, tm.id_categoria_origen "
-                + "from detalle_compra as dc "
-                + "inner join compra as c on dc.id_compra = c.id_compra "
-                + "inner join producto_interno as pi on dc.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on dc.id_unidad_medida = um.id_unidad_medida "
-                + "inner join tipo_movimiento as tm on dc.id_tipo_movimiento = tm.id_tipo_movimiento "
-                + "where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select dc.id_detalle_compra, dc.cantidad, dc.precio_compra, dc.fecha_vencimiento,
+                c.id_compra, c.fecha_compra, c.numero_factura, c.total, c.id_proveedor,
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida,
+                tm.id_tipo_movimiento, tm.id_categoria_origen
+                from detalle_compra as dc
+                inner join compra as c on dc.id_compra = c.id_compra
+                inner join producto_interno as pi on dc.id_producto_interno = pi.id_producto_interno
+                inner join unidad_medida as um on dc.id_unidad_medida = um.id_unidad_medida
+                inner join tipo_movimiento as tm on dc.id_tipo_movimiento = tm.id_tipo_movimiento
+                """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and dc.id_detalle_compra = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " dc.id_detalle_compra = ? ");
             parametros.add(filtro.getId());
+            cont = cont + 1;
         }
         if (!UtilFecha.FECHA_POR_DEFECTO.equals(filtro.getFechaVencimiento())) {
-            sentenciaSql = sentenciaSql + " and dc.fecha_vencimiento = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " dc.fecha_vencimiento = ? ");
             parametros.add(filtro.getFechaVencimiento());
+            cont = cont + 1;
         }
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getCompra().getId())) {
-            sentenciaSql = sentenciaSql + " and c.id_compra = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " c.id_compra = ? ");
             parametros.add(filtro.getCompra().getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getCompra().getNumeroFactura())) {
-            sentenciaSql = sentenciaSql + " and c.numero_factura = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " c.numero_factura = ? ");
             parametros.add(filtro.getCompra().getNumeroFactura());
+            cont = cont + 1;
         }
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getProductoInterno().getId())) {
-            sentenciaSql = sentenciaSql + " and pi.id_producto_interno = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " pi.id_producto_interno = ? ");
             parametros.add(filtro.getProductoInterno().getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getProductoInterno().getNombre())) {
-            sentenciaSql = sentenciaSql + " and pi.nombre = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " pi.nombre = ? ");
             parametros.add(filtro.getProductoInterno().getNombre());
+            cont = cont + 1;
         }
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getUnidadMedida().getId())) {
-            sentenciaSql = sentenciaSql + " and um.id_unidad_medida = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " um.id_unidad_medida = ? ");
             parametros.add(filtro.getUnidadMedida().getId());
+            cont = cont + 1;
         }
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getTipoMovimiento().getId())) {
-            sentenciaSql = sentenciaSql + " and tm.id_tipo_movimiento = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " tm.id_tipo_movimiento = ? ");
             parametros.add(filtro.getTipoMovimiento().getId());
+            cont = cont + 1;
         }
 
-        sentenciaSql = sentenciaSql + " order by c.fecha_compra desc, pi.nombre asc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by c.fecha_compra desc, pi.nombre asc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -237,18 +254,21 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
 
     @Override
     public List<DetalleCompraEntidad> consultarTodos() {
-        var sentenciaSql = "select dc.id_detalle_compra, dc.cantidad, dc.precio_compra, dc.fecha_vencimiento, "
-                + "c.id_compra, c.fecha_compra, c.numero_factura, c.total, c.id_proveedor, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida, "
-                + "tm.id_tipo_movimiento, tm.id_categoria_origen "
-                + "from detalle_compra as dc "
-                + "inner join compra as c on dc.id_compra = c.id_compra "
-                + "inner join producto_interno as pi on dc.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on dc.id_unidad_medida = um.id_unidad_medida "
-                + "inner join tipo_movimiento as tm on dc.id_tipo_movimiento = tm.id_tipo_movimiento "
-                + "order by c.fecha_compra desc, pi.nombre asc";
+        var sentenciaSql =
+                """
+                select dc.id_detalle_compra, dc.cantidad, dc.precio_compra, dc.fecha_vencimiento,
+                c.id_compra, c.fecha_compra, c.numero_factura, c.total, c.id_proveedor,
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida,
+                tm.id_tipo_movimiento, tm.id_categoria_origen
+                from detalle_compra as dc
+                inner join compra as c on dc.id_compra = c.id_compra
+                inner join producto_interno as pi on dc.id_producto_interno = pi.id_producto_interno
+                inner join unidad_medida as um on dc.id_unidad_medida = um.id_unidad_medida
+                inner join tipo_movimiento as tm on dc.id_tipo_movimiento = tm.id_tipo_movimiento
+                order by c.fecha_compra desc, pi.nombre asc
+                """;
         var detallesEncontrados = new ArrayList<DetalleCompraEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -309,8 +329,11 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
 
     @Override
     public void actualizar(UUID id, DetalleCompraEntidad entidad) {
-        var sentenciaSql = "update detalle_compra set id_compra = ?, id_producto_interno = ?, cantidad = ?, "
-                + "id_unidad_medida = ?, precio_compra = ?, fecha_vencimiento = ? where id_detalle_compra = ?";
+        var sentenciaSql =
+                """
+                update detalle_compra set id_compra = ?, id_producto_interno = ?, cantidad = ?,
+                id_unidad_medida = ?, precio_compra = ?, fecha_vencimiento = ? where id_detalle_compra = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, entidad.getCompra().getId());
             sentencia.setObject(2, entidad.getProductoInterno().getId());
@@ -333,7 +356,10 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
 
     @Override
     public void eliminar(UUID id) {
-        var sentenciaSql = "delete from detalle_compra where id_detalle_compra = ?";
+        var sentenciaSql =
+                """
+                delete from detalle_compra where id_detalle_compra = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
             sentencia.executeUpdate();

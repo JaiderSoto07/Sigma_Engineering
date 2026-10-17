@@ -22,7 +22,10 @@ public class ProveedorSqlServerDAO extends SqlDAO implements ProveedorDAO {
 
     @Override
     public void crear(ProveedorEntidad entidad) {
-        var sentenciaSql = "insert into proveedor(id_proveedor, nombre_empresa, nit, contacto, activo) values(?, ?, ?, ?, ?)";
+        var sentenciaSql =
+                """
+                insert into proveedor(id_proveedor, nombre_empresa, nit, contacto, activo) values(?, ?, ?, ?, ?)
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, entidad.getId());
             sentencia.setString(2, entidad.getNombreEmpresa());
@@ -43,7 +46,10 @@ public class ProveedorSqlServerDAO extends SqlDAO implements ProveedorDAO {
 
     @Override
     public ProveedorEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select id_proveedor, nombre_empresa, nit, contacto, activo from proveedor where id_proveedor = ?";
+        var sentenciaSql =
+                """
+                select id_proveedor, nombre_empresa, nit, contacto, activo from proveedor where id_proveedor = ?
+                """;
         var proveedorEncontrado = new ProveedorEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
@@ -75,27 +81,35 @@ public class ProveedorSqlServerDAO extends SqlDAO implements ProveedorDAO {
     @Override
     public List<ProveedorEntidad> consultarPorFiltro(ProveedorEntidad filtro) {
         var proveedoresEncontrados = new ArrayList<ProveedorEntidad>();
-        var sentenciaSql = "select id_proveedor, nombre_empresa, nit, contacto, activo from proveedor where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select id_proveedor, nombre_empresa, nit, contacto, activo from proveedor
+                """;
         var parametros = new ArrayList<Object>();
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and id_proveedor = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " id_proveedor = ? ");
             parametros.add(filtro.getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getNombreEmpresa())) {
-            sentenciaSql = sentenciaSql + " and nombre_empresa = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " nombre_empresa = ? ");
             parametros.add(filtro.getNombreEmpresa());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getNit())) {
-            sentenciaSql = sentenciaSql + " and nit = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " nit = ? ");
             parametros.add(filtro.getNit());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getContacto())) {
-            sentenciaSql = sentenciaSql + " and contacto = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " contacto = ? ");
             parametros.add(filtro.getContacto());
+            cont = cont + 1;
         }
 
-        sentenciaSql = sentenciaSql + " order by nombre_empresa asc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by nombre_empresa asc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -129,7 +143,10 @@ public class ProveedorSqlServerDAO extends SqlDAO implements ProveedorDAO {
 
     @Override
     public List<ProveedorEntidad> consultarTodos() {
-        var sentenciaSql = "select id_proveedor, nombre_empresa, nit, contacto, activo from proveedor order by nombre_empresa asc";
+        var sentenciaSql =
+                """
+                select id_proveedor, nombre_empresa, nit, contacto, activo from proveedor order by nombre_empresa asc
+                """;
         var proveedoresEncontrados = new ArrayList<ProveedorEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -158,8 +175,11 @@ public class ProveedorSqlServerDAO extends SqlDAO implements ProveedorDAO {
     }
     @Override
     public List<ProveedorEntidad> consultarActivos() {
-        var sentenciaSql = "select id_proveedor, nombre_empresa, nit, contacto, activo from proveedor"
-        +" where activo=1 order by nombre_empresa asc";
+        var sentenciaSql =
+                """
+                select id_proveedor, nombre_empresa, nit, contacto, activo from proveedor
+                where activo=1 order by nombre_empresa asc
+                """;
         var proveedoresEncontrados = new ArrayList<ProveedorEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -191,7 +211,10 @@ public class ProveedorSqlServerDAO extends SqlDAO implements ProveedorDAO {
 
     @Override
     public void actualizar(UUID id, ProveedorEntidad entidad) {
-        var sentenciaSql = "update proveedor set nombre_empresa = ?, nit = ?, contacto = ?, activo = ? where id_proveedor = ?";
+        var sentenciaSql =
+                """
+                update proveedor set nombre_empresa = ?, nit = ?, contacto = ?, activo = ? where id_proveedor = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setString(1, entidad.getNombreEmpresa());
             sentencia.setString(2, entidad.getNit());
@@ -213,7 +236,10 @@ public class ProveedorSqlServerDAO extends SqlDAO implements ProveedorDAO {
 
     @Override
     public void eliminar(UUID id) {
-        var sentenciaSql = "delete from proveedor where id_proveedor = ?";
+        var sentenciaSql =
+                """
+                delete from proveedor where id_proveedor = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
             sentencia.executeUpdate();

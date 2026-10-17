@@ -25,8 +25,11 @@ public class InventarioSqlServerDAO extends SqlDAO implements InventarioDAO {
 
     @Override
     public void crear(InventarioEntidad entidad) {
-        var sentenciaSql = "insert into inventario(id_inventario, id_producto_interno, cantidad_total, id_unidad_medida, stock_minimo) "
-                + "values(?, ?, ?, ?, ?)";
+        var sentenciaSql =
+                """
+                insert into inventario(id_inventario, id_producto_interno, cantidad_total, id_unidad_medida, stock_minimo)
+                values(?, ?, ?, ?, ?)
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
             sentencia.setObject(1, entidad.getId());
@@ -48,14 +51,17 @@ public class InventarioSqlServerDAO extends SqlDAO implements InventarioDAO {
 
     @Override
     public InventarioEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select i.id_inventario, i.cantidad_total, i.stock_minimo, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
-                + "from inventario as i "
-                + "inner join producto_interno as pi on i.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on i.id_unidad_medida = um.id_unidad_medida "
-                + "where i.id_inventario = ?";
+        var sentenciaSql =
+                """
+                select i.id_inventario, i.cantidad_total, i.stock_minimo,
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida
+                from inventario as i
+                inner join producto_interno as pi on i.id_producto_interno = pi.id_producto_interno
+                inner join unidad_medida as um on i.id_unidad_medida = um.id_unidad_medida
+                where i.id_inventario = ?
+                """;
         var inventarioEncontrado = new InventarioEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
@@ -99,36 +105,43 @@ public class InventarioSqlServerDAO extends SqlDAO implements InventarioDAO {
     @Override
     public List<InventarioEntidad> consultarPorFiltro(InventarioEntidad filtro) {
         var inventariosEncontrados = new ArrayList<InventarioEntidad>();
-        var sentenciaSql = "select i.id_inventario, i.cantidad_total, i.stock_minimo, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
-                + "from inventario as i "
-                + "inner join producto_interno as pi on i.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on i.id_unidad_medida = um.id_unidad_medida "
-                + "where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select i.id_inventario, i.cantidad_total, i.stock_minimo,
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida
+                from inventario as i
+                inner join producto_interno as pi on i.id_producto_interno = pi.id_producto_interno
+                inner join unidad_medida as um on i.id_unidad_medida = um.id_unidad_medida
+                """;
         var parametros = new ArrayList<Object>();
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and i.id_inventario = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " i.id_inventario = ? ");
             parametros.add(filtro.getId());
+            cont = cont + 1;
         }
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getProductoInterno().getId())) {
-            sentenciaSql = sentenciaSql + " and pi.id_producto_interno = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " pi.id_producto_interno = ? ");
             parametros.add(filtro.getProductoInterno().getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getProductoInterno().getNombre())) {
-            sentenciaSql = sentenciaSql + " and pi.nombre = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " pi.nombre = ? ");
             parametros.add(filtro.getProductoInterno().getNombre());
+            cont = cont + 1;
         }
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getUnidadMedidaInventario().getId())) {
-            sentenciaSql = sentenciaSql + " and um.id_unidad_medida = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " um.id_unidad_medida = ? ");
             parametros.add(filtro.getUnidadMedidaInventario().getId());
+            cont = cont + 1;
         }
 
-        sentenciaSql = sentenciaSql + " order by pi.nombre asc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by pi.nombre asc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -178,14 +191,17 @@ public class InventarioSqlServerDAO extends SqlDAO implements InventarioDAO {
 
     @Override
     public List<InventarioEntidad> consultarTodos() {
-        var sentenciaSql = "select i.id_inventario, i.cantidad_total, i.stock_minimo, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
-                + "from inventario as i "
-                + "inner join producto_interno as pi on i.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on i.id_unidad_medida = um.id_unidad_medida "
-                + "order by pi.nombre asc";
+        var sentenciaSql =
+                """
+                select i.id_inventario, i.cantidad_total, i.stock_minimo,
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida
+                from inventario as i
+                inner join producto_interno as pi on i.id_producto_interno = pi.id_producto_interno
+                inner join unidad_medida as um on i.id_unidad_medida = um.id_unidad_medida
+                order by pi.nombre asc
+                """;
         var inventariosEncontrados = new ArrayList<InventarioEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -232,7 +248,10 @@ public class InventarioSqlServerDAO extends SqlDAO implements InventarioDAO {
 
     @Override
     public void actualizar(UUID id, InventarioEntidad entidad) {
-        var sentenciaSql = "update inventario set cantidad_total = ?, stock_minimo = ? where id_inventario = ?";
+        var sentenciaSql =
+                """
+                update inventario set cantidad_total = ?, stock_minimo = ? where id_inventario = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setBigDecimal(1, entidad.getCantidadTotal());
             sentencia.setBigDecimal(2, entidad.getStockMinimo());

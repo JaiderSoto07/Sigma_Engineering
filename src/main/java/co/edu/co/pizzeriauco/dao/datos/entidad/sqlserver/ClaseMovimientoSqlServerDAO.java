@@ -22,14 +22,16 @@ public class ClaseMovimientoSqlServerDAO extends SqlDAO implements ClaseMovimien
 
     @Override
     public ClaseMovimientoEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select id_clase_movimiento, nombre from clase_movimiento where id_clase_movimiento = ?";
+        var sentenciaSql =
+                """
+                select id_clase_movimiento, nombre from clase_movimiento where id_clase_movimiento = ?
+                """;
         var claseMovimientoEncontrada = new ClaseMovimientoEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
 
             var resultado = sentencia.executeQuery();
             if (resultado.next()) {
-                //si entra aca es porque se encontro
                 claseMovimientoEncontrada = new ClaseMovimientoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_clase_movimiento")))
                         .nombre(resultado.getString("nombre"))
@@ -50,19 +52,25 @@ public class ClaseMovimientoSqlServerDAO extends SqlDAO implements ClaseMovimien
     @Override
     public List<ClaseMovimientoEntidad> consultarPorFiltro(ClaseMovimientoEntidad filtro) {
         var clasesMovimientoEncontradas = new ArrayList<ClaseMovimientoEntidad>();
-        var sentenciaSql = "select id_clase_movimiento, nombre from clase_movimiento where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select id_clase_movimiento, nombre from clase_movimiento
+                """;
         var parametros = new ArrayList<Object>();
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and id_clase_movimiento = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " id_clase_movimiento = ? ");
             parametros.add(filtro.getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getNombre())) {
-            sentenciaSql = sentenciaSql + " and nombre = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " nombre = ? ");
             parametros.add(filtro.getNombre());
+            cont = cont + 1;
         }
 
-        sentenciaSql = sentenciaSql + " order by nombre asc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by nombre asc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -93,7 +101,10 @@ public class ClaseMovimientoSqlServerDAO extends SqlDAO implements ClaseMovimien
 
     @Override
     public List<ClaseMovimientoEntidad> consultarTodos() {
-        var sentenciaSql = "select id_clase_movimiento, nombre from clase_movimiento order by nombre asc";
+        var sentenciaSql =
+                """
+                select id_clase_movimiento, nombre from clase_movimiento order by nombre asc
+                """;
         var clasesMovimientoEncontradas = new ArrayList<ClaseMovimientoEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {

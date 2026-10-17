@@ -23,7 +23,10 @@ public class TipoMovimientoSqlServerDAO extends SqlDAO implements TipoMovimiento
 
     @Override
     public void crear(TipoMovimientoEntidad entidad) {
-        var sentenciaSql = "insert into tipo_movimiento(id_tipo_movimiento, id_categoria_origen) values(?, ?)";
+        var sentenciaSql =
+                """
+                insert into tipo_movimiento(id_tipo_movimiento, id_categoria_origen) values(?, ?)
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
             sentencia.setObject(1, entidad.getId());
@@ -42,10 +45,13 @@ public class TipoMovimientoSqlServerDAO extends SqlDAO implements TipoMovimiento
 
     @Override
     public TipoMovimientoEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select tm.id_tipo_movimiento, "
-                + "co.id_categoria_origen, co.nombre "
-                + "from tipo_movimiento as tm inner join categoria_origen as co on tm.id_categoria_origen = co.id_categoria_origen "
-                + "where tm.id_tipo_movimiento = ?";
+        var sentenciaSql =
+                """
+                select tm.id_tipo_movimiento,
+                co.id_categoria_origen, co.nombre
+                from tipo_movimiento as tm inner join categoria_origen as co on tm.id_categoria_origen = co.id_categoria_origen
+                where tm.id_tipo_movimiento = ?
+                """;
 
         var tipoMovimientoEncontrado = new TipoMovimientoEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -78,26 +84,32 @@ public class TipoMovimientoSqlServerDAO extends SqlDAO implements TipoMovimiento
     @Override
     public List<TipoMovimientoEntidad> consultarPorFiltro(TipoMovimientoEntidad filtro) {
         var tiposMovimientoEncontrados = new ArrayList<TipoMovimientoEntidad>();
-        var sentenciaSql = "select tm.id_tipo_movimiento, "
-                + "co.id_categoria_origen, co.nombre "
-                + "from tipo_movimiento as tm inner join categoria_origen as co on tm.id_categoria_origen = co.id_categoria_origen "
-                + "where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select tm.id_tipo_movimiento,
+                co.id_categoria_origen, co.nombre
+                from tipo_movimiento as tm inner join categoria_origen as co on tm.id_categoria_origen = co.id_categoria_origen
+                """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and tm.id_tipo_movimiento = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " tm.id_tipo_movimiento = ? ");
             parametros.add(filtro.getId());
+            cont = cont + 1;
         }
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getCategoriaOrigen().getId())) {
-            sentenciaSql = sentenciaSql + " and co.id_categoria_origen = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " co.id_categoria_origen = ? ");
             parametros.add(filtro.getCategoriaOrigen().getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getCategoriaOrigen().getNombre())) {
-            sentenciaSql = sentenciaSql + " and co.nombre = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " co.nombre = ? ");
             parametros.add(filtro.getCategoriaOrigen().getNombre());
+            cont = cont + 1;
         }
 
-        sentenciaSql = sentenciaSql + " order by co.nombre asc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by co.nombre asc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -133,10 +145,13 @@ public class TipoMovimientoSqlServerDAO extends SqlDAO implements TipoMovimiento
 
     @Override
     public List<TipoMovimientoEntidad> consultarTodos() {
-        var sentenciaSql = "select tm.id_tipo_movimiento, "
-                + "co.id_categoria_origen, co.nombre "
-                + "from tipo_movimiento as tm inner join categoria_origen as co on tm.id_categoria_origen = co.id_categoria_origen "
-                + "order by co.nombre asc";
+        var sentenciaSql =
+                """
+                select tm.id_tipo_movimiento,
+                co.id_categoria_origen, co.nombre
+                from tipo_movimiento as tm inner join categoria_origen as co on tm.id_categoria_origen = co.id_categoria_origen
+                order by co.nombre asc
+                """;
         var tiposMovimientoEncontrados = new ArrayList<TipoMovimientoEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {

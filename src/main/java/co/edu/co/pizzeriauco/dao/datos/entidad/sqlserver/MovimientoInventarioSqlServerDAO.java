@@ -4,6 +4,7 @@ import co.edu.co.pizzeriauco.transversal.catalogo.CatalogoMensajes;
 import co.edu.co.pizzeriauco.transversal.excepciones.PizzeriaDatosExcepcion;
 import co.edu.co.pizzeriauco.transversal.utilitario.UtilFecha;
 import co.edu.co.pizzeriauco.transversal.utilitario.UtilId;
+import co.edu.co.pizzeriauco.transversal.utilitario.UtilTexto;
 import co.edu.co.pizzeriauco.dao.datos.entidad.MovimientoInventarioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.CategoriaOrigenEntidad;
@@ -29,8 +30,11 @@ public class MovimientoInventarioSqlServerDAO extends SqlDAO implements Movimien
 
     @Override
     public void crear(MovimientoInventarioEntidad entidad) {
-        var sentenciaSql = "insert into movimiento_inventario(id_movimiento_inventario, id_clase_movimiento, id_tipo_movimiento, "
-                + "cantidad, fecha_movimiento, id_lote) values(?, ?, ?, ?, ?, ?)";
+        var sentenciaSql =
+                """
+                insert into movimiento_inventario(id_movimiento_inventario, id_clase_movimiento, id_tipo_movimiento,
+                cantidad, fecha_movimiento, id_lote) values(?, ?, ?, ?, ?, ?)
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
             sentencia.setObject(1, entidad.getId());
@@ -54,16 +58,19 @@ public class MovimientoInventarioSqlServerDAO extends SqlDAO implements Movimien
 
     @Override
     public MovimientoInventarioEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select mi.id_movimiento_inventario, mi.cantidad, mi.fecha_movimiento, "
-                + "cm.id_clase_movimiento, cm.nombre as nombre_clase_movimiento, "
-                + "tm.id_tipo_movimiento, tm.id_categoria_origen, "
-                + "l.id_lote, l.numero_lote, l.id_producto_interno, l.cantidad as cantidad_lote, l.saldo, "
-                + "l.id_unidad_medida, l.fecha_vencimiento "
-                + "from movimiento_inventario as mi "
-                + "inner join clase_movimiento as cm on mi.id_clase_movimiento = cm.id_clase_movimiento "
-                + "inner join tipo_movimiento as tm on mi.id_tipo_movimiento = tm.id_tipo_movimiento "
-                + "inner join lote as l on mi.id_lote = l.id_lote "
-                + "where mi.id_movimiento_inventario = ?";
+        var sentenciaSql =
+                """
+                select mi.id_movimiento_inventario, mi.cantidad, mi.fecha_movimiento,
+                cm.id_clase_movimiento, cm.nombre as nombre_clase_movimiento,
+                tm.id_tipo_movimiento, tm.id_categoria_origen,
+                l.id_lote, l.numero_lote, l.id_producto_interno, l.cantidad as cantidad_lote, l.saldo,
+                l.id_unidad_medida, l.fecha_vencimiento
+                from movimiento_inventario as mi
+                inner join clase_movimiento as cm on mi.id_clase_movimiento = cm.id_clase_movimiento
+                inner join tipo_movimiento as tm on mi.id_tipo_movimiento = tm.id_tipo_movimiento
+                inner join lote as l on mi.id_lote = l.id_lote
+                where mi.id_movimiento_inventario = ?
+                """;
 
         var movimientoEncontrado = new MovimientoInventarioEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -115,46 +122,55 @@ public class MovimientoInventarioSqlServerDAO extends SqlDAO implements Movimien
     @Override
     public List<MovimientoInventarioEntidad> consultarPorFiltro(MovimientoInventarioEntidad filtro) {
         var movimientosEncontrados = new ArrayList<MovimientoInventarioEntidad>();
-        var sentenciaSql = "select mi.id_movimiento_inventario, mi.cantidad, mi.fecha_movimiento, "
-                + "cm.id_clase_movimiento, cm.nombre as nombre_clase_movimiento, "
-                + "tm.id_tipo_movimiento, tm.id_categoria_origen, "
-                + "l.id_lote, l.numero_lote, l.id_producto_interno, l.cantidad as cantidad_lote, l.saldo, "
-                + "l.id_unidad_medida, l.fecha_vencimiento "
-                + "from movimiento_inventario as mi "
-                + "inner join clase_movimiento as cm on mi.id_clase_movimiento = cm.id_clase_movimiento "
-                + "inner join tipo_movimiento as tm on mi.id_tipo_movimiento = tm.id_tipo_movimiento "
-                + "inner join lote as l on mi.id_lote = l.id_lote "
-                + "where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select mi.id_movimiento_inventario, mi.cantidad, mi.fecha_movimiento,
+                cm.id_clase_movimiento, cm.nombre as nombre_clase_movimiento,
+                tm.id_tipo_movimiento, tm.id_categoria_origen,
+                l.id_lote, l.numero_lote, l.id_producto_interno, l.cantidad as cantidad_lote, l.saldo,
+                l.id_unidad_medida, l.fecha_vencimiento
+                from movimiento_inventario as mi
+                inner join clase_movimiento as cm on mi.id_clase_movimiento = cm.id_clase_movimiento
+                inner join tipo_movimiento as tm on mi.id_tipo_movimiento = tm.id_tipo_movimiento
+                inner join lote as l on mi.id_lote = l.id_lote
+                """;
         var parametros = new ArrayList<Object>();
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and mi.id_movimiento_inventario = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " mi.id_movimiento_inventario = ? ");
             parametros.add(filtro.getId());
+            cont = cont + 1;
         }
         if (!UtilFecha.FECHA_POR_DEFECTO.equals(filtro.getFechaMovimiento())) {
-            sentenciaSql = sentenciaSql + " and mi.fecha_movimiento = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " mi.fecha_movimiento = ? ");
             parametros.add(filtro.getFechaMovimiento());
+            cont = cont + 1;
         }
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getClaseMovimiento().getId())) {
-            sentenciaSql = sentenciaSql + " and cm.id_clase_movimiento = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " cm.id_clase_movimiento = ? ");
             parametros.add(filtro.getClaseMovimiento().getId());
+            cont = cont + 1;
         }
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getTipoMovimiento().getId())) {
-            sentenciaSql = sentenciaSql + " and tm.id_tipo_movimiento = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " tm.id_tipo_movimiento = ? ");
             parametros.add(filtro.getTipoMovimiento().getId());
+            cont = cont + 1;
         }
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getLote().getId())) {
-            sentenciaSql = sentenciaSql + " and l.id_lote = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " l.id_lote = ? ");
             parametros.add(filtro.getLote().getId());
+            cont = cont + 1;
         }
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getLote().getProductoInterno().getId())) {
-            sentenciaSql = sentenciaSql + " and l.id_producto_interno = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " l.id_producto_interno = ? ");
             parametros.add(filtro.getLote().getProductoInterno().getId());
+            cont = cont + 1;
         }
 
-        sentenciaSql = sentenciaSql + " order by mi.fecha_movimiento asc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by mi.fecha_movimiento asc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -210,16 +226,19 @@ public class MovimientoInventarioSqlServerDAO extends SqlDAO implements Movimien
 
     @Override
     public List<MovimientoInventarioEntidad> consultarTodos() {
-        var sentenciaSql = "select mi.id_movimiento_inventario, mi.cantidad, mi.fecha_movimiento, "
-                + "cm.id_clase_movimiento, cm.nombre as nombre_clase_movimiento, "
-                + "tm.id_tipo_movimiento, tm.id_categoria_origen, "
-                + "l.id_lote, l.numero_lote, l.id_producto_interno, l.cantidad as cantidad_lote, l.saldo, "
-                + "l.id_unidad_medida, l.fecha_vencimiento "
-                + "from movimiento_inventario as mi "
-                + "inner join clase_movimiento as cm on mi.id_clase_movimiento = cm.id_clase_movimiento "
-                + "inner join tipo_movimiento as tm on mi.id_tipo_movimiento = tm.id_tipo_movimiento "
-                + "inner join lote as l on mi.id_lote = l.id_lote "
-                + "order by mi.fecha_movimiento asc";
+        var sentenciaSql =
+                """
+                select mi.id_movimiento_inventario, mi.cantidad, mi.fecha_movimiento,
+                cm.id_clase_movimiento, cm.nombre as nombre_clase_movimiento,
+                tm.id_tipo_movimiento, tm.id_categoria_origen,
+                l.id_lote, l.numero_lote, l.id_producto_interno, l.cantidad as cantidad_lote, l.saldo,
+                l.id_unidad_medida, l.fecha_vencimiento
+                from movimiento_inventario as mi
+                inner join clase_movimiento as cm on mi.id_clase_movimiento = cm.id_clase_movimiento
+                inner join tipo_movimiento as tm on mi.id_tipo_movimiento = tm.id_tipo_movimiento
+                inner join lote as l on mi.id_lote = l.id_lote
+                order by mi.fecha_movimiento asc
+                """;
         var movimientosEncontrados = new ArrayList<MovimientoInventarioEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -271,7 +290,10 @@ public class MovimientoInventarioSqlServerDAO extends SqlDAO implements Movimien
 
     @Override
     public void eliminar(UUID id) {
-        var sentenciaSql = "delete from movimiento_inventario where id_movimiento_inventario = ?";
+        var sentenciaSql =
+                """
+                delete from movimiento_inventario where id_movimiento_inventario = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
             sentencia.executeUpdate();

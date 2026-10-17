@@ -28,8 +28,11 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
 
     @Override
     public void crear(CambioEntidad entidad) {
-        var sentenciaSql = "insert into cambio(id_cambio, id_producto_interno, cantidad, id_unidad_medida, fecha_vencimiento, fecha_cambio, "
-                + "id_tipo_movimiento) values(?, ?, ?, ?, ?, ?, ?)";
+        var sentenciaSql =
+                """
+                insert into cambio(id_cambio, id_producto_interno, cantidad, id_unidad_medida, fecha_vencimiento, fecha_cambio,
+                id_tipo_movimiento) values(?, ?, ?, ?, ?, ?, ?) ;
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, entidad.getId());
             sentencia.setObject(2, entidad.getProductoCambio().getId());
@@ -52,16 +55,19 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
 
     @Override
     public CambioEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select ca.id_cambio, ca.cantidad, ca.fecha_vencimiento, ca.fecha_cambio, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida, "
-                + "tm.id_tipo_movimiento, tm.id_categoria_origen "
-                + "from cambio as ca "
-                + "inner join producto_interno as pi on ca.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on ca.id_unidad_medida = um.id_unidad_medida "
-                + "inner join tipo_movimiento as tm on ca.id_tipo_movimiento = tm.id_tipo_movimiento "
-                + "where ca.id_cambio = ?";
+        var sentenciaSql =
+                """   
+                select ca.id_cambio, ca.cantidad, ca.fecha_vencimiento, ca.fecha_cambio, 
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, 
+                pi.id_unidad_medida as id_unidad_medida_producto_interno, 
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida, 
+                tm.id_tipo_movimiento, tm.id_categoria_origen 
+                from cambio as ca 
+                inner join producto_interno as pi on ca.id_producto_interno = pi.id_producto_interno 
+                inner join unidad_medida as um on ca.id_unidad_medida = um.id_unidad_medida 
+                inner join tipo_movimiento as tm on ca.id_tipo_movimiento = tm.id_tipo_movimiento 
+                where ca.id_cambio = ? ;
+                """;
 
         var cambioEncontrado = new CambioEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -113,45 +119,59 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
     @Override
     public List<CambioEntidad> consultarPorFiltro(CambioEntidad filtro) {
         var cambiosEncontrados = new ArrayList<CambioEntidad>();
-        var sentenciaSql = "select ca.id_cambio, ca.cantidad, ca.fecha_vencimiento, ca.fecha_cambio, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida, "
-                + "tm.id_tipo_movimiento, tm.id_categoria_origen "
-                + "from cambio as ca "
-                + "inner join producto_interno as pi on ca.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on ca.id_unidad_medida = um.id_unidad_medida "
-                + "inner join tipo_movimiento as tm on ca.id_tipo_movimiento = tm.id_tipo_movimiento "
-                + "where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select ca.id_cambio, ca.cantidad, ca.fecha_vencimiento, ca.fecha_cambio, 
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno, 
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida, 
+                tm.id_tipo_movimiento, tm.id_categoria_origen 
+                from cambio as ca 
+                inner join producto_interno as pi on ca.id_producto_interno = pi.id_producto_interno 
+                inner join unidad_medida as um on ca.id_unidad_medida = um.id_unidad_medida 
+                inner join tipo_movimiento as tm on ca.id_tipo_movimiento = tm.id_tipo_movimiento
+               
+                """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and ca.id_cambio = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql , (cont== 0 ? " where " : " and ")," ca.id_cambio = ? ");
             parametros.add(filtro.getId());
+            cont = cont +1;
+
         }
         if (!UtilFecha.FECHA_POR_DEFECTO.equals(filtro.getFechaCambio())) {
-            sentenciaSql = sentenciaSql + " and ca.fecha_cambio = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql , (cont== 0 ? " where " : " and ")," ca.fecha_cambio = ? ");
             parametros.add(filtro.getFechaCambio());
+            cont = cont +1;
+
         }
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getProductoCambio().getId())) {
-            sentenciaSql = sentenciaSql + " and pi.id_producto_interno = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql , (cont== 0 ? " where " : " and ")," pi.id_producto_interno = ? ");
             parametros.add(filtro.getProductoCambio().getId());
+            cont = cont +1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getProductoCambio().getNombre())) {
-            sentenciaSql = sentenciaSql + " and pi.nombre = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql , (cont== 0 ? " where " : " and ")," pi.nombre = ? ");
             parametros.add(filtro.getProductoCambio().getNombre());
+            cont = cont +1;
+
         }
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getUnidadMedida().getId())) {
-            sentenciaSql = sentenciaSql + " and um.id_unidad_medida = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql , (cont== 0 ? " where " : " and ")," um.id_unidad_medida = ? ");
             parametros.add(filtro.getUnidadMedida().getId());
+            cont = cont +1;
         }
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getTipoMovimiento().getId())) {
-            sentenciaSql = sentenciaSql + " and tm.id_tipo_movimiento = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql , (cont== 0 ? " where " : " and "),"  tm.id_tipo_movimiento = ? ");
             parametros.add(filtro.getTipoMovimiento().getId());
+            cont = cont +1;
+
         }
-        sentenciaSql = sentenciaSql + " order by ca.fecha_cambio desc, pi.nombre asc";
+        sentenciaSql =UtilTexto.getUtilTexto().concatenar(sentenciaSql , " order by ca.fecha_cambio desc, pi.nombre asc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -209,16 +229,19 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
 
     @Override
     public List<CambioEntidad> consultarTodos() {
-        var sentenciaSql = "select ca.id_cambio, ca.cantidad, ca.fecha_vencimiento, ca.fecha_cambio, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida, "
-                + "tm.id_tipo_movimiento, tm.id_categoria_origen "
-                + "from cambio as ca "
-                + "inner join producto_interno as pi on ca.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on ca.id_unidad_medida = um.id_unidad_medida "
-                + "inner join tipo_movimiento as tm on ca.id_tipo_movimiento = tm.id_tipo_movimiento "
-                + "order by ca.fecha_cambio desc, pi.nombre asc";
+        var sentenciaSql =
+                """
+                select ca.id_cambio, ca.cantidad, ca.fecha_vencimiento, ca.fecha_cambio, 
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno, 
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida, 
+                tm.id_tipo_movimiento, tm.id_categoria_origen 
+                from cambio as ca 
+                inner join producto_interno as pi on ca.id_producto_interno = pi.id_producto_interno 
+                inner join unidad_medida as um on ca.id_unidad_medida = um.id_unidad_medida 
+                inner join tipo_movimiento as tm on ca.id_tipo_movimiento = tm.id_tipo_movimiento 
+                order by ca.fecha_cambio desc, pi.nombre asc
+                """;
         var cambiosEncontrados = new ArrayList<CambioEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -271,8 +294,11 @@ public class CambioSqlServerDAO extends SqlDAO implements CambioDAO {
 
     @Override
     public void actualizar(UUID id, CambioEntidad entidad) {
-        var sentenciaSql = "update cambio set id_producto_interno = ?, cantidad = ?, id_unidad_medida = ?, "
-                + "fecha_vencimiento = ?, fecha_cambio = ? where id_cambio = ?";
+        var sentenciaSql =
+                """                      
+                update cambio set id_producto_interno = ?, cantidad = ?, id_unidad_medida = ?,
+                fecha_vencimiento = ?, fecha_cambio = ? where id_cambio = ? ;
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, entidad.getProductoCambio().getId());
             sentencia.setBigDecimal(2, entidad.getCantidad());

@@ -27,8 +27,11 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
 
     @Override
     public void crear(DetalleRecetaEntidad entidad) {
-        var sentenciaSql = "insert into detalle_receta(id_detalle_receta, id_producto, id_producto_interno, cantidad, id_unidad_medida) "
-                + "values(?, ?, ?, ?, ?)";
+        var sentenciaSql =
+                """
+                insert into detalle_receta(id_detalle_receta, id_producto, id_producto_interno, cantidad, id_unidad_medida)
+                values(?, ?, ?, ?, ?)
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
             sentencia.setObject(1, entidad.getId());
@@ -50,16 +53,19 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
 
     @Override
     public DetalleRecetaEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select dr.id_detalle_receta, dr.cantidad, "
-                + "p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo as activo_producto, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo as activo_producto_interno, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
-                + "from detalle_receta as dr "
-                + "inner join producto as p on dr.id_producto = p.id_producto "
-                + "inner join producto_interno as pi on dr.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on dr.id_unidad_medida = um.id_unidad_medida "
-                + "where dr.id_detalle_receta = ?";
+        var sentenciaSql =
+                """
+                select dr.id_detalle_receta, dr.cantidad,
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo as activo_producto,
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo as activo_producto_interno,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida
+                from detalle_receta as dr
+                inner join producto as p on dr.id_producto = p.id_producto
+                inner join producto_interno as pi on dr.id_producto_interno = pi.id_producto_interno
+                inner join unidad_medida as um on dr.id_unidad_medida = um.id_unidad_medida
+                where dr.id_detalle_receta = ?
+                """;
         var detalleRecetaEncontrado = new DetalleRecetaEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
@@ -115,42 +121,51 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
     @Override
     public List<DetalleRecetaEntidad> consultarPorFiltro(DetalleRecetaEntidad filtro) {
         var detallesEncontrados = new ArrayList<DetalleRecetaEntidad>();
-        var sentenciaSql = "select dr.id_detalle_receta, dr.cantidad, "
-                + "p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo as activo_producto, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo as activo_producto_interno, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
-                + "from detalle_receta as dr "
-                + "inner join producto as p on dr.id_producto = p.id_producto "
-                + "inner join producto_interno as pi on dr.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on dr.id_unidad_medida = um.id_unidad_medida "
-                + "where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select dr.id_detalle_receta, dr.cantidad,
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo as activo_producto,
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo as activo_producto_interno,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida
+                from detalle_receta as dr
+                inner join producto as p on dr.id_producto = p.id_producto
+                inner join producto_interno as pi on dr.id_producto_interno = pi.id_producto_interno
+                inner join unidad_medida as um on dr.id_unidad_medida = um.id_unidad_medida
+                """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and dr.id_detalle_receta = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " dr.id_detalle_receta = ? ");
             parametros.add(filtro.getId());
+            cont = cont + 1;
         }
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getProducto().getId())) {
-            sentenciaSql = sentenciaSql + " and p.id_producto = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " p.id_producto = ? ");
             parametros.add(filtro.getProducto().getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getProducto().getNombre())) {
-            sentenciaSql = sentenciaSql + " and p.nombre = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " p.nombre = ? ");
             parametros.add(filtro.getProducto().getNombre());
+            cont = cont + 1;
         }
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getProductoInterno().getId())) {
-            sentenciaSql = sentenciaSql + " and pi.id_producto_interno = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " pi.id_producto_interno = ? ");
             parametros.add(filtro.getProductoInterno().getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getProductoInterno().getNombre())) {
-            sentenciaSql = sentenciaSql + " and pi.nombre = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " pi.nombre = ? ");
             parametros.add(filtro.getProductoInterno().getNombre());
+            cont = cont + 1;
         }
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getUnidadMedida().getId())) {
-            sentenciaSql = sentenciaSql + " and um.id_unidad_medida = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " um.id_unidad_medida = ? ");
             parametros.add(filtro.getUnidadMedida().getId());
+            cont = cont + 1;
         }
-        sentenciaSql = sentenciaSql + " order by p.nombre asc, pi.nombre asc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by p.nombre asc, pi.nombre asc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -210,16 +225,19 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
 
     @Override
     public List<DetalleRecetaEntidad> consultarTodos() {
-        var sentenciaSql = "select dr.id_detalle_receta, dr.cantidad, "
-                + "p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo as activo_producto, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo as activo_producto_interno, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
-                + "from detalle_receta as dr "
-                + "inner join producto as p on dr.id_producto = p.id_producto "
-                + "inner join producto_interno as pi on dr.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on dr.id_unidad_medida = um.id_unidad_medida "
-                + "order by p.nombre asc, pi.nombre asc";
+        var sentenciaSql =
+                """
+                select dr.id_detalle_receta, dr.cantidad,
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo as activo_producto,
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo as activo_producto_interno,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida
+                from detalle_receta as dr
+                inner join producto as p on dr.id_producto = p.id_producto
+                inner join producto_interno as pi on dr.id_producto_interno = pi.id_producto_interno
+                inner join unidad_medida as um on dr.id_unidad_medida = um.id_unidad_medida
+                order by p.nombre asc, pi.nombre asc
+                """;
         var detallesEncontrados = new ArrayList<DetalleRecetaEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -276,8 +294,11 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
 
     @Override
     public void actualizar(UUID id, DetalleRecetaEntidad entidad) {
-        var sentenciaSql = "update detalle_receta set id_producto = ?, id_producto_interno = ?, cantidad = ?, "
-                + "id_unidad_medida = ? where id_detalle_receta = ?";
+        var sentenciaSql =
+                """
+                update detalle_receta set id_producto = ?, id_producto_interno = ?, cantidad = ?,
+                id_unidad_medida = ? where id_detalle_receta = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, entidad.getProducto().getId());
             sentencia.setObject(2, entidad.getProductoInterno().getId());
@@ -298,7 +319,10 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
 
     @Override
     public void eliminar(UUID id) {
-        var sentenciaSql = "delete from detalle_receta where id_detalle_receta = ?";
+        var sentenciaSql =
+                """
+                delete from detalle_receta where id_detalle_receta = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
             sentencia.executeUpdate();

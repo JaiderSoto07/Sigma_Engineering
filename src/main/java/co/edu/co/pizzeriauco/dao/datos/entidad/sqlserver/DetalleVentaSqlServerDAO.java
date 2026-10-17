@@ -29,8 +29,11 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
 
     @Override
     public void crear(DetalleVentaEntidad entidad) {
-        var sentenciaSql = "insert into detalle_venta(id_detalle_venta, id_venta, id_producto, cantidad, precio_producto) "
-                + "values(?, ?, ?, ?, ?)";
+        var sentenciaSql =
+                """
+                insert into detalle_venta(id_detalle_venta, id_venta, id_producto, cantidad, precio_producto)
+                values(?, ?, ?, ?, ?)
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, entidad.getId());
             sentencia.setObject(2, entidad.getVenta().getId());
@@ -51,14 +54,17 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
 
     @Override
     public DetalleVentaEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, dv.subtotal, "
-                + "v.id_venta, v.fecha, v.hora, v.factura, v.cliente, v.total, "
-                + "p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, "
-                + "p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo "
-                + "from detalle_venta as dv "
-                + "inner join venta as v on dv.id_venta = v.id_venta "
-                + "inner join producto as p on dv.id_producto = p.id_producto "
-                + "where dv.id_detalle_venta = ?";
+        var sentenciaSql =
+                """
+                select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, dv.subtotal,
+                v.id_venta, v.fecha, v.hora, v.factura, v.cliente, v.total,
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano,
+                p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo
+                from detalle_venta as dv
+                inner join venta as v on dv.id_venta = v.id_venta
+                inner join producto as p on dv.id_producto = p.id_producto
+                where dv.id_detalle_venta = ?
+                """;
         var detalleVentaEncontrado = new DetalleVentaEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
@@ -110,37 +116,44 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
     @Override
     public List<DetalleVentaEntidad> consultarPorFiltro(DetalleVentaEntidad filtro) {
         var detallesEncontrados = new ArrayList<DetalleVentaEntidad>();
-        var sentenciaSql = "select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, dv.subtotal, "
-                + "v.id_venta, v.fecha, v.hora, v.factura, v.cliente, v.total, "
-                + "p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, "
-                + "p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo "
-                + "from detalle_venta as dv "
-                + "inner join venta as v on dv.id_venta = v.id_venta "
-                + "inner join producto as p on dv.id_producto = p.id_producto "
-                + "where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, dv.subtotal,
+                v.id_venta, v.fecha, v.hora, v.factura, v.cliente, v.total,
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano,
+                p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo
+                from detalle_venta as dv
+                inner join venta as v on dv.id_venta = v.id_venta
+                inner join producto as p on dv.id_producto = p.id_producto
+                """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and dv.id_detalle_venta = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " dv.id_detalle_venta = ? ");
             parametros.add(filtro.getId());
+            cont = cont + 1;
         }
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getVenta().getId())) {
-            sentenciaSql = sentenciaSql + " and v.id_venta = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " v.id_venta = ? ");
             parametros.add(filtro.getVenta().getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getVenta().getFactura())) {
-            sentenciaSql = sentenciaSql + " and v.factura = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " v.factura = ? ");
             parametros.add(filtro.getVenta().getFactura());
+            cont = cont + 1;
         }
-        //estos los del producto (por ejemplo, para saber cuanto se ha vendido de un producto)
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getProducto().getId())) {
-            sentenciaSql = sentenciaSql + " and p.id_producto = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " p.id_producto = ? ");
             parametros.add(filtro.getProducto().getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getProducto().getNombre())) {
-            sentenciaSql = sentenciaSql + " and p.nombre = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " p.nombre = ? ");
             parametros.add(filtro.getProducto().getNombre());
+            cont = cont + 1;
         }
-        sentenciaSql = sentenciaSql + " order by v.fecha desc, v.hora desc, p.nombre asc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by v.fecha desc, v.hora desc, p.nombre asc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -195,14 +208,17 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
 
     @Override
     public List<DetalleVentaEntidad> consultarTodos() {
-        var sentenciaSql = "select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, dv.subtotal, "
-                + "v.id_venta, v.fecha, v.hora, v.factura, v.cliente, v.total, "
-                + "p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, "
-                + "p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo "
-                + "from detalle_venta as dv "
-                + "inner join venta as v on dv.id_venta = v.id_venta "
-                + "inner join producto as p on dv.id_producto = p.id_producto "
-                + "order by v.fecha desc, v.hora desc, p.nombre asc";
+        var sentenciaSql =
+                """
+                select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, dv.subtotal,
+                v.id_venta, v.fecha, v.hora, v.factura, v.cliente, v.total,
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano,
+                p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo
+                from detalle_venta as dv
+                inner join venta as v on dv.id_venta = v.id_venta
+                inner join producto as p on dv.id_producto = p.id_producto
+                order by v.fecha desc, v.hora desc, p.nombre asc
+                """;
         var detallesEncontrados = new ArrayList<DetalleVentaEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {

@@ -22,7 +22,10 @@ public class CategoriaOrigenSqlServerDAO extends SqlDAO implements CategoriaOrig
 
     @Override
     public CategoriaOrigenEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select id_categoria_origen, nombre from categoria_origen where id_categoria_origen = ?";
+        var sentenciaSql =
+                """
+                select id_categoria_origen, nombre from categoria_origen where id_categoria_origen = ?
+                """;
         var categoriaOrigenEncontrada = new CategoriaOrigenEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
@@ -50,18 +53,24 @@ public class CategoriaOrigenSqlServerDAO extends SqlDAO implements CategoriaOrig
     @Override
     public List<CategoriaOrigenEntidad> consultarPorFiltro(CategoriaOrigenEntidad filtro) {
         var categoriasOrigenEncontradas = new ArrayList<CategoriaOrigenEntidad>();
-        var sentenciaSql = "select id_categoria_origen, nombre from categoria_origen where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select id_categoria_origen, nombre from categoria_origen
+                """;
         var parametros = new ArrayList<Object>();
         //solo se filtra por los datos que vengan diferentes al valor por defecto
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and id_categoria_origen = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " id_categoria_origen = ? ");
             parametros.add(filtro.getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getNombre())) {
-            sentenciaSql = sentenciaSql + " and nombre = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " nombre = ? ");
             parametros.add(filtro.getNombre());
+            cont = cont + 1;
         }
-        sentenciaSql = sentenciaSql + " order by nombre asc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by nombre asc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -92,7 +101,10 @@ public class CategoriaOrigenSqlServerDAO extends SqlDAO implements CategoriaOrig
 
     @Override
     public List<CategoriaOrigenEntidad> consultarTodos() {
-        var sentenciaSql = "select id_categoria_origen, nombre from categoria_origen order by nombre asc";
+        var sentenciaSql =
+                """
+                select id_categoria_origen, nombre from categoria_origen order by nombre asc
+                """;
         var categoriasOrigenEncontradas = new ArrayList<CategoriaOrigenEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {

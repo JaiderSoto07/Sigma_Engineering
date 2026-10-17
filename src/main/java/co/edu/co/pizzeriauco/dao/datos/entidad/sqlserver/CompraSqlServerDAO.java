@@ -25,7 +25,10 @@ public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
 
     @Override
     public void crear(CompraEntidad entidad) {
-        var sentenciaSql = "insert into compra(id_compra, id_proveedor, fecha_compra, numero_factura, total) values(?, ?, ?, ?, ?)";
+        var sentenciaSql =
+                """
+                insert into compra(id_compra, id_proveedor, fecha_compra, numero_factura, total) values(?, ?, ?, ?, ?)
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             //se llenan los datos en el mismo orden de los ?
             sentencia.setObject(1, entidad.getId());
@@ -35,11 +38,9 @@ public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
             sentencia.setBigDecimal(5, entidad.getTotal());
             sentencia.executeUpdate();
         } catch (SQLException excepcion) {
-            //el controlado
             var mensajeUsuario = CatalogoMensajes.CompraSqlServerDAO.USUARIO_ERROR_PROBLEMA_CREANDO_COMPRA;
             throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
         } catch (Exception excepcion) {
-            //no controlado
             var mensajeUsuario = CatalogoMensajes.CompraSqlServerDAO.USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CREANDO_COMPRA;
             throw PizzeriaDatosExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
         }
@@ -47,11 +48,14 @@ public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
 
     @Override
     public CompraEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select c.id_compra, c.fecha_compra, c.numero_factura, c.total, "
-                + "p.id_proveedor, p.nombre_empresa, p.nit, p.contacto, p.activo "
-                + "from compra as c inner join proveedor as p on c.id_proveedor = p.id_proveedor "
-                + "where c.id_compra = ?";
-        //si no se encuentra, se devuelve la compra por defecto (nunca nulo)
+        var sentenciaSql =
+                """
+                select c.id_compra, c.fecha_compra, c.numero_factura, c.total,
+                p.id_proveedor, p.nombre_empresa, p.nit, p.contacto, p.activo
+                from compra as c inner join proveedor as p on c.id_proveedor = p.id_proveedor
+                where c.id_compra = ?
+                """;
+
         var compraEncontrada = new CompraEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
@@ -88,36 +92,45 @@ public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
     @Override
     public List<CompraEntidad> consultarPorFiltro(CompraEntidad filtro) {
         var comprasEncontradas = new ArrayList<CompraEntidad>();
-        var sentenciaSql = "select c.id_compra, c.fecha_compra, c.numero_factura, c.total, "
-                + "p.id_proveedor, p.nombre_empresa, p.nit, p.contacto, p.activo "
-                + "from compra as c inner join proveedor as p on c.id_proveedor = p.id_proveedor "
-                + "where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select c.id_compra, c.fecha_compra, c.numero_factura, c.total,
+                p.id_proveedor, p.nombre_empresa, p.nit, p.contacto, p.activo
+                from compra as c inner join proveedor as p on c.id_proveedor = p.id_proveedor
+                """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and c.id_compra = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " c.id_compra = ? ");
             parametros.add(filtro.getId());
+            cont = cont + 1;
         }
         if (!UtilFecha.FECHA_POR_DEFECTO.equals(filtro.getFechaCompra())) {
-            sentenciaSql = sentenciaSql + " and c.fecha_compra = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " c.fecha_compra = ? ");
             parametros.add(filtro.getFechaCompra());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getNumeroFactura())) {
-            sentenciaSql = sentenciaSql + " and c.numero_factura = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " c.numero_factura = ? ");
             parametros.add(filtro.getNumeroFactura());
+            cont = cont + 1;
         }
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getProveedor().getId())) {
-            sentenciaSql = sentenciaSql + " and p.id_proveedor = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " p.id_proveedor = ? ");
             parametros.add(filtro.getProveedor().getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getProveedor().getNombreEmpresa())) {
-            sentenciaSql = sentenciaSql + " and p.nombre_empresa = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " p.nombre_empresa = ? ");
             parametros.add(filtro.getProveedor().getNombreEmpresa());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getProveedor().getNit())) {
-            sentenciaSql = sentenciaSql + " and p.nit = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " p.nit = ? ");
             parametros.add(filtro.getProveedor().getNit());
+            cont = cont + 1;
         }
-        sentenciaSql = sentenciaSql + " order by c.fecha_compra desc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by c.fecha_compra desc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -158,10 +171,13 @@ public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
 
     @Override
     public List<CompraEntidad> consultarTodos() {
-        var sentenciaSql = "select c.id_compra, c.fecha_compra, c.numero_factura, c.total, "
-                + "p.id_proveedor, p.nombre_empresa, p.nit, p.contacto, p.activo "
-                + "from compra as c inner join proveedor as p on c.id_proveedor = p.id_proveedor "
-                + "order by c.fecha_compra desc";
+        var sentenciaSql =
+                """
+                select c.id_compra, c.fecha_compra, c.numero_factura, c.total,
+                p.id_proveedor, p.nombre_empresa, p.nit, p.contacto, p.activo
+                from compra as c inner join proveedor as p on c.id_proveedor = p.id_proveedor
+                order by c.fecha_compra desc
+                """;
         var comprasEncontradas = new ArrayList<CompraEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -199,7 +215,10 @@ public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
 
     @Override
     public void actualizar(UUID id, CompraEntidad entidad) {
-        var sentenciaSql = "update compra set id_proveedor = ?, fecha_compra = ?, numero_factura = ?, total = ? where id_compra = ?";
+        var sentenciaSql =
+                """
+                update compra set id_proveedor = ?, fecha_compra = ?, numero_factura = ?, total = ? where id_compra = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, entidad.getProveedor().getId());
             sentencia.setObject(2, entidad.getFechaCompra());
@@ -221,7 +240,10 @@ public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
 
     @Override
     public void eliminar(UUID id) {
-        var sentenciaSql = "delete from compra where id_compra = ?";
+        var sentenciaSql =
+                """
+                delete from compra where id_compra = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
             sentencia.executeUpdate();

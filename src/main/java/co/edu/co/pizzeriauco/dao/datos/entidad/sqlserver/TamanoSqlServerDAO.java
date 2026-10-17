@@ -22,7 +22,10 @@ public class TamanoSqlServerDAO extends SqlDAO implements TamanoDAO {
 
     @Override
     public void crear(TamanoEntidad entidad) {
-        var sentenciaSql = "insert into tamano(id_tamano, tamano) values(?, ?)";
+        var sentenciaSql =
+                """
+                insert into tamano(id_tamano, tamano) values(?, ?)
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
             sentencia.setObject(1, entidad.getId());
@@ -41,7 +44,10 @@ public class TamanoSqlServerDAO extends SqlDAO implements TamanoDAO {
 
     @Override
     public TamanoEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select id_tamano, tamano from tamano where id_tamano = ?";
+        var sentenciaSql =
+                """
+                select id_tamano, tamano from tamano where id_tamano = ?
+                """;
         var tamanoEncontrado = new TamanoEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
@@ -68,18 +74,24 @@ public class TamanoSqlServerDAO extends SqlDAO implements TamanoDAO {
     @Override
     public List<TamanoEntidad> consultarPorFiltro(TamanoEntidad filtro) {
         var tamanosEncontrados = new ArrayList<TamanoEntidad>();
-        var sentenciaSql = "select id_tamano, tamano from tamano where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select id_tamano, tamano from tamano
+                """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and id_tamano = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " id_tamano = ? ");
             parametros.add(filtro.getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getTamano())) {
-            sentenciaSql = sentenciaSql + " and tamano = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " tamano = ? ");
             parametros.add(filtro.getTamano());
+            cont = cont + 1;
         }
 
-        sentenciaSql = sentenciaSql + " order by tamano asc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by tamano asc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -111,7 +123,10 @@ public class TamanoSqlServerDAO extends SqlDAO implements TamanoDAO {
 
     @Override
     public List<TamanoEntidad> consultarTodos() {
-        var sentenciaSql = "select id_tamano, tamano from tamano order by tamano asc";
+        var sentenciaSql =
+                """
+                select id_tamano, tamano from tamano order by tamano asc
+                """;
         var tamanosEncontrados = new ArrayList<TamanoEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -138,7 +153,10 @@ public class TamanoSqlServerDAO extends SqlDAO implements TamanoDAO {
 
     @Override
     public void actualizar(UUID id, TamanoEntidad entidad) {
-        var sentenciaSql = "update tamano set tamano = ? where id_tamano = ?";
+        var sentenciaSql =
+                """
+                update tamano set tamano = ? where id_tamano = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setString(1, entidad.getTamano());
             sentencia.setObject(2, id);
@@ -156,7 +174,10 @@ public class TamanoSqlServerDAO extends SqlDAO implements TamanoDAO {
 
     @Override
     public void eliminar(UUID id) {
-        var sentenciaSql = "delete from tamano where id_tamano = ?";
+        var sentenciaSql =
+                """
+                delete from tamano where id_tamano = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
             sentencia.executeUpdate();

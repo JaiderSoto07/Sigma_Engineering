@@ -29,8 +29,11 @@ public class ConsumoVentaSqlServerDAO extends SqlDAO implements ConsumoVentaDAO 
 
     @Override
     public void crear(ConsumoVentaEntidad entidad) {
-        var sentenciaSql = "insert into consumo_venta(id_consumo_venta, id_detalle_venta, id_producto_interno, cantidad, "
-                + "id_unidad_medida, id_tipo_movimiento) values(?, ?, ?, ?, ?, ?)";
+        var sentenciaSql =
+                """
+                insert into consumo_venta(id_consumo_venta, id_detalle_venta, id_producto_interno, cantidad,
+                id_unidad_medida, id_tipo_movimiento) values(?, ?, ?, ?, ?, ?)
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, entidad.getId());
             sentencia.setObject(2, entidad.getDetalleVenta().getId());
@@ -52,18 +55,21 @@ public class ConsumoVentaSqlServerDAO extends SqlDAO implements ConsumoVentaDAO 
 
     @Override
     public ConsumoVentaEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select cv.id_consumo_venta, cv.cantidad, "
-                + "dv.id_detalle_venta, dv.cantidad as cantidad_detalle_venta, dv.precio_producto, dv.id_venta, dv.id_producto, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida, "
-                + "tm.id_tipo_movimiento, tm.id_categoria_origen "
-                + "from consumo_venta as cv "
-                + "inner join detalle_venta as dv on cv.id_detalle_venta = dv.id_detalle_venta "
-                + "inner join producto_interno as pi on cv.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on cv.id_unidad_medida = um.id_unidad_medida "
-                + "inner join tipo_movimiento as tm on cv.id_tipo_movimiento = tm.id_tipo_movimiento "
-                + "where cv.id_consumo_venta = ?";
+        var sentenciaSql =
+                """
+                select cv.id_consumo_venta, cv.cantidad,
+                dv.id_detalle_venta, dv.cantidad as cantidad_detalle_venta, dv.precio_producto, dv.id_venta, dv.id_producto,
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida,
+                tm.id_tipo_movimiento, tm.id_categoria_origen
+                from consumo_venta as cv
+                inner join detalle_venta as dv on cv.id_detalle_venta = dv.id_detalle_venta
+                inner join producto_interno as pi on cv.id_producto_interno = pi.id_producto_interno
+                inner join unidad_medida as um on cv.id_unidad_medida = um.id_unidad_medida
+                inner join tipo_movimiento as tm on cv.id_tipo_movimiento = tm.id_tipo_movimiento
+                where cv.id_consumo_venta = ?
+                """;
 
         var consumoVentaEncontrado = new ConsumoVentaEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -123,45 +129,54 @@ public class ConsumoVentaSqlServerDAO extends SqlDAO implements ConsumoVentaDAO 
     @Override
     public List<ConsumoVentaEntidad> consultarPorFiltro(ConsumoVentaEntidad filtro) {
         var consumosEncontrados = new ArrayList<ConsumoVentaEntidad>();
-        var sentenciaSql = "select cv.id_consumo_venta, cv.cantidad, "
-                + "dv.id_detalle_venta, dv.cantidad as cantidad_detalle_venta, dv.precio_producto, dv.id_venta, dv.id_producto, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida, "
-                + "tm.id_tipo_movimiento, tm.id_categoria_origen "
-                + "from consumo_venta as cv "
-                + "inner join detalle_venta as dv on cv.id_detalle_venta = dv.id_detalle_venta "
-                + "inner join producto_interno as pi on cv.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on cv.id_unidad_medida = um.id_unidad_medida "
-                + "inner join tipo_movimiento as tm on cv.id_tipo_movimiento = tm.id_tipo_movimiento "
-                + "where 1=1";
+        var cont = 0;
+        var sentenciaSql =
+                """
+                select cv.id_consumo_venta, cv.cantidad,
+                dv.id_detalle_venta, dv.cantidad as cantidad_detalle_venta, dv.precio_producto, dv.id_venta, dv.id_producto,
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida,
+                tm.id_tipo_movimiento, tm.id_categoria_origen
+                from consumo_venta as cv
+                inner join detalle_venta as dv on cv.id_detalle_venta = dv.id_detalle_venta
+                inner join producto_interno as pi on cv.id_producto_interno = pi.id_producto_interno
+                inner join unidad_medida as um on cv.id_unidad_medida = um.id_unidad_medida
+                inner join tipo_movimiento as tm on cv.id_tipo_movimiento = tm.id_tipo_movimiento
+                """;
         var parametros = new ArrayList<Object>();
         //este el del consumo
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and cv.id_consumo_venta = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " cv.id_consumo_venta = ? ");
             parametros.add(filtro.getId());
+            cont = cont + 1;
         }
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getDetalleVenta().getId())) {
-            sentenciaSql = sentenciaSql + " and dv.id_detalle_venta = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " dv.id_detalle_venta = ? ");
             parametros.add(filtro.getDetalleVenta().getId());
+            cont = cont + 1;
         }
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getDetalleVenta().getVenta().getId())) {
-            sentenciaSql = sentenciaSql + " and dv.id_venta = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " dv.id_venta = ? ");
             parametros.add(filtro.getDetalleVenta().getVenta().getId());
+            cont = cont + 1;
         }
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getProductoInterno().getId())) {
-            sentenciaSql = sentenciaSql + " and pi.id_producto_interno = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " pi.id_producto_interno = ? ");
             parametros.add(filtro.getProductoInterno().getId());
+            cont = cont + 1;
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getProductoInterno().getNombre())) {
-            sentenciaSql = sentenciaSql + " and pi.nombre = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " pi.nombre = ? ");
             parametros.add(filtro.getProductoInterno().getNombre());
+            cont = cont + 1;
         }
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getTipoMovimiento().getId())) {
-            sentenciaSql = sentenciaSql + " and tm.id_tipo_movimiento = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " tm.id_tipo_movimiento = ? ");
             parametros.add(filtro.getTipoMovimiento().getId());
+            cont = cont + 1;
         }
-        sentenciaSql = sentenciaSql + " order by pi.nombre asc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by pi.nombre asc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -225,18 +240,21 @@ public class ConsumoVentaSqlServerDAO extends SqlDAO implements ConsumoVentaDAO 
 
     @Override
     public List<ConsumoVentaEntidad> consultarTodos() {
-        var sentenciaSql = "select cv.id_consumo_venta, cv.cantidad, "
-                + "dv.id_detalle_venta, dv.cantidad as cantidad_detalle_venta, dv.precio_producto, dv.id_venta, dv.id_producto, "
-                + "pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "pi.id_unidad_medida as id_unidad_medida_producto_interno, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida, "
-                + "tm.id_tipo_movimiento, tm.id_categoria_origen "
-                + "from consumo_venta as cv "
-                + "inner join detalle_venta as dv on cv.id_detalle_venta = dv.id_detalle_venta "
-                + "inner join producto_interno as pi on cv.id_producto_interno = pi.id_producto_interno "
-                + "inner join unidad_medida as um on cv.id_unidad_medida = um.id_unidad_medida "
-                + "inner join tipo_movimiento as tm on cv.id_tipo_movimiento = tm.id_tipo_movimiento "
-                + "order by pi.nombre asc";
+        var sentenciaSql =
+                """
+                select cv.id_consumo_venta, cv.cantidad,
+                dv.id_detalle_venta, dv.cantidad as cantidad_detalle_venta, dv.precio_producto, dv.id_venta, dv.id_producto,
+                pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                pi.id_unidad_medida as id_unidad_medida_producto_interno,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida,
+                tm.id_tipo_movimiento, tm.id_categoria_origen
+                from consumo_venta as cv
+                inner join detalle_venta as dv on cv.id_detalle_venta = dv.id_detalle_venta
+                inner join producto_interno as pi on cv.id_producto_interno = pi.id_producto_interno
+                inner join unidad_medida as um on cv.id_unidad_medida = um.id_unidad_medida
+                inner join tipo_movimiento as tm on cv.id_tipo_movimiento = tm.id_tipo_movimiento
+                order by pi.nombre asc
+                """;
         var consumosEncontrados = new ArrayList<ConsumoVentaEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {

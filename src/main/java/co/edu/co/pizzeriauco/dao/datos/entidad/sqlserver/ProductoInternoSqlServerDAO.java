@@ -23,7 +23,10 @@ public class ProductoInternoSqlServerDAO extends SqlDAO implements ProductoInter
 
     @Override
     public void crear(ProductoInternoEntidad entidad) {
-        var sentenciaSql = "insert into producto_interno(id_producto_interno, nombre, perecedero, vida_util, id_unidad_medida, activo) values(?, ?, ?, ?, ?, ?)";
+        var sentenciaSql =
+                """
+                insert into producto_interno(id_producto_interno, nombre, perecedero, vida_util, id_unidad_medida, activo) values(?, ?, ?, ?, ?, ?)
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             //se llenan los datos en el mismo orden de los ?
             sentencia.setObject(1, entidad.getId());
@@ -47,10 +50,13 @@ public class ProductoInternoSqlServerDAO extends SqlDAO implements ProductoInter
 
     @Override
     public ProductoInternoEntidad consultarPorId(UUID id) {
-        var sentenciaSql = "select pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
-                + "from producto_interno as pi inner join unidad_medida as um on pi.id_unidad_medida = um.id_unidad_medida "
-                + "where pi.id_producto_interno = ?";
+        var sentenciaSql =
+                """
+                select pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida
+                from producto_interno as pi inner join unidad_medida as um on pi.id_unidad_medida = um.id_unidad_medida
+                where pi.id_producto_interno = ?
+                """;
         //si no se encuentra, se devuelve el producto interno por defecto (nunca nulo)
         var productoInternoEncontrado = new ProductoInternoEntidad.Builder().build();
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -85,39 +91,41 @@ public class ProductoInternoSqlServerDAO extends SqlDAO implements ProductoInter
         return productoInternoEncontrado;
     }
 
-    //perecedero y activo no se usan como filtro porque un boolean no tiene valor "sin definir"
     @Override
     public List<ProductoInternoEntidad> consultarPorFiltro(ProductoInternoEntidad filtro) {
         var productosInternosEncontrados = new ArrayList<ProductoInternoEntidad>();
-        var sentenciaSql = "select pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
-                + "from producto_interno as pi inner join unidad_medida as um on pi.id_unidad_medida = um.id_unidad_medida "
-                + "where pi.id_producto_interno <> ?";
+        var sentenciaSql =
+                """
+                select pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida
+                from producto_interno as pi inner join unidad_medida as um on pi.id_unidad_medida = um.id_unidad_medida
+                where pi.id_producto_interno <> ?
+                """;
         var parametros = new ArrayList<Object>();
-        parametros.add(UtilId.VALOR_DEFECTO); // para que el priemr valor me quede con el comodin
+        parametros.add(UtilId.VALOR_DEFECTO);
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = sentenciaSql + " and pi.id_producto_interno = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql,  " and ", " pi.id_producto_interno = ? ");
             parametros.add(filtro.getId());
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getNombre())) {
-            sentenciaSql = sentenciaSql + " and pi.nombre = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql,  "and ", " pi.nombre = ? ");
             parametros.add(filtro.getNombre());
         }
         //estos los de la unidad de medida
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getTipoMedida().getId())) {
-            sentenciaSql = sentenciaSql + " and um.id_unidad_medida = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " and ", " um.id_unidad_medida = ? ");
             parametros.add(filtro.getTipoMedida().getId());
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getTipoMedida().getUnidadMedida())) {
-            sentenciaSql = sentenciaSql + " and um.unidad_medida = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " and ", " um.unidad_medida = ? ");
             parametros.add(filtro.getTipoMedida().getUnidadMedida());
         }
         if (!UtilTexto.getUtilTexto().esVacia(filtro.getTipoMedida().getTipoMedida())) {
-            sentenciaSql = sentenciaSql + " and um.tipo_medida = ?";
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql,  " and ", " um.tipo_medida = ? ");
             parametros.add(filtro.getTipoMedida().getTipoMedida());
         }
         // el orden va siempre al final
-        sentenciaSql = sentenciaSql + " order by pi.nombre asc";
+        sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " order by pi.nombre asc");
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
 
@@ -159,11 +167,14 @@ public class ProductoInternoSqlServerDAO extends SqlDAO implements ProductoInter
 
     @Override
     public List<ProductoInternoEntidad> consultarTodos() {
-        var sentenciaSql = "select pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
-                + "from producto_interno as pi inner join unidad_medida as um on pi.id_unidad_medida = um.id_unidad_medida "
-                + "where pi.id_producto_interno <> ? "
-                + "order by pi.nombre asc";
+        var sentenciaSql =
+                """
+                select pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida
+                from producto_interno as pi inner join unidad_medida as um on pi.id_unidad_medida = um.id_unidad_medida
+                where pi.id_producto_interno <> ?
+                order by pi.nombre asc
+                """;
         var productosInternosEncontrados = new ArrayList<ProductoInternoEntidad>();
 
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -201,11 +212,14 @@ public class ProductoInternoSqlServerDAO extends SqlDAO implements ProductoInter
     @Override
     public List<ProductoInternoEntidad> consultarActivos() {
 
-        var sentenciaSql = "select pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo, "
-                + "um.id_unidad_medida, um.unidad_medida, um.tipo_medida "
-                + "from producto_interno as pi inner join unidad_medida as um on pi.id_unidad_medida = um.id_unidad_medida "
-                + "where pi.id_producto_interno <> ? and pi.activo=1 "
-                + "order by pi.nombre asc";
+        var sentenciaSql =
+                """
+                select pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo,
+                um.id_unidad_medida, um.unidad_medida, um.tipo_medida
+                from producto_interno as pi inner join unidad_medida as um on pi.id_unidad_medida = um.id_unidad_medida
+                where pi.id_producto_interno <> ? and pi.activo=1
+                order by pi.nombre asc
+                """;
 
         var productosInternosEncontrados = new ArrayList<ProductoInternoEntidad>();
 
@@ -243,7 +257,10 @@ public class ProductoInternoSqlServerDAO extends SqlDAO implements ProductoInter
 
     @Override
     public void actualizar(UUID id, ProductoInternoEntidad entidad) {
-        var sentenciaSql = "update producto_interno set nombre = ?, perecedero = ?, vida_util = ?, id_unidad_medida = ?, activo = ? where id_producto_interno = ?";
+        var sentenciaSql =
+                """
+                update producto_interno set nombre = ?, perecedero = ?, vida_util = ?, id_unidad_medida = ?, activo = ? where id_producto_interno = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setString(1, entidad.getNombre());
             sentencia.setBoolean(2, entidad.isPerecedero());
@@ -266,7 +283,10 @@ public class ProductoInternoSqlServerDAO extends SqlDAO implements ProductoInter
 
     @Override
     public void eliminar(UUID id) {
-        var sentenciaSql = "delete from producto_interno where id_producto_interno = ?";
+        var sentenciaSql =
+                """
+                delete from producto_interno where id_producto_interno = ?
+                """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setObject(1, id);
             sentencia.executeUpdate();
