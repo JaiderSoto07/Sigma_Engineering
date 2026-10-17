@@ -1,9 +1,14 @@
 package co.edu.co.pizzeriauco.negocio.negocio.assembler.impl;
 
 import co.edu.co.pizzeriauco.dominio.TamanoDominio;
+import co.edu.co.pizzeriauco.dominio.TipoProductoDominio;
 import co.edu.co.pizzeriauco.entidad.TamanoEntidad;
+import co.edu.co.pizzeriauco.entidad.TipoProductoEntidad;
 import co.edu.co.pizzeriauco.negocio.negocio.assembler.EntidadAssembler;
 import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class TamanoEntidadAssembler implements EntidadAssembler<TamanoDominio, TamanoEntidad> {
 
@@ -32,5 +37,16 @@ public final class TamanoEntidadAssembler implements EntidadAssembler<TamanoDomi
                 .id(entidadSegura.getId())
                 .tamano(entidadSegura.getTamano())
                 .build();
+    }
+
+    @Override
+    public List<TamanoDominio> convertirADominio(List<TamanoEntidad> listaEntidades) {
+
+        var listaSegura = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(listaEntidades, new ArrayList<TamanoEntidad>());
+        var listaDominio = new ArrayList<TamanoDominio>();
+        for (var entidad : listaSegura) {
+            listaDominio.add(convertirADominio(entidad));
+        }
+        return listaDominio;
     }
 }

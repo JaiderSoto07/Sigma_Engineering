@@ -15,6 +15,9 @@ import co.edu.co.pizzeriauco.entidad.TipoProductoEntidad;
 import co.edu.co.pizzeriauco.entidad.UnidadMedidaEntidad;
 import co.edu.co.pizzeriauco.negocio.negocio.assembler.EntidadAssembler;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public final class DetalleRecetaEntidadAssembler implements EntidadAssembler<DetalleRecetaDominio, DetalleRecetaEntidad> {
 
     private static final EntidadAssembler<DetalleRecetaDominio, DetalleRecetaEntidad> INSTANCIA = new DetalleRecetaEntidadAssembler();
@@ -31,10 +34,10 @@ public final class DetalleRecetaEntidadAssembler implements EntidadAssembler<Det
         var dominioSeguro = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(dominio, new DetalleRecetaDominio.Builder().build());
         return new DetalleRecetaEntidad.Builder()
                 .id(dominioSeguro.getId())
-                .producto(convertirProductoAEntidad(dominioSeguro.getProducto()))
-                .productoInterno(convertirProductoInternoAEntidad(dominioSeguro.getProductoInterno()))
+                .producto(ProductoEntidadAssembler.getInstance().convertirAEntidad(dominioSeguro.getProducto()))
+                .productoInterno(ProductoInternoEntidadAssembler.getInstance().convertirAEntidad(dominioSeguro.getProductoInterno()))
                 .cantidad(dominioSeguro.getCantidad())
-                .unidadMedida(convertirUnidadMedidaAEntidad(dominioSeguro.getUnidadMedida()))
+                .unidadMedida(UnidadMedidaEntidadAssembler.getInstance().convertirAEntidad(dominioSeguro.getUnidadMedida()))
                 .build();
     }
 
@@ -44,84 +47,21 @@ public final class DetalleRecetaEntidadAssembler implements EntidadAssembler<Det
         var entidadSegura = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(entidad, new DetalleRecetaEntidad.Builder().build());
         return new DetalleRecetaDominio.Builder()
                 .id(entidadSegura.getId())
-                .producto(convertirProductoADominio(entidadSegura.getProducto()))
-                .productoInterno(convertirProductoInternoADominio(entidadSegura.getProductoInterno()))
+                .producto(ProductoEntidadAssembler.getInstance().convertirADominio(entidadSegura.getProducto()))
+                .productoInterno(ProductoInternoEntidadAssembler.getInstance().convertirADominio(entidadSegura.getProductoInterno()))
                 .cantidad(entidadSegura.getCantidad())
-                .unidadMedida(convertirUnidadMedidaADominio(entidadSegura.getUnidadMedida()))
+                .unidadMedida(UnidadMedidaEntidadAssembler.getInstance().convertirADominio(entidadSegura.getUnidadMedida()))
                 .build();
     }
 
-    private ProductoEntidad convertirProductoAEntidad(ProductoDominio producto) {
-        return new ProductoEntidad.Builder()
-                .id(producto.getId())
-                .nombre(producto.getNombre())
-                .tipoProducto(new TipoProductoEntidad.Builder()
-                        .id(producto.getTipoProducto().getId())
-                        .nombre(producto.getTipoProducto().getNombre())
-                        .build())
-                .tamano(new TamanoEntidad.Builder()
-                        .id(producto.getTamano().getId())
-                        .tamano(producto.getTamano().getTamano())
-                        .build())
-                .productoInternoAsociado(convertirProductoInternoAEntidad(producto.getProductoInternoAsociado()))
-                .precio(producto.getPrecio())
-                .activo(producto.isActivo())
-                .build();
+    @Override
+    public List<DetalleRecetaDominio> convertirADominio(List<DetalleRecetaEntidad> listaEntidades) {
+        var listaSegura = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(listaEntidades, new ArrayList<DetalleRecetaEntidad>());
+        var listaDominio = new ArrayList<DetalleRecetaDominio>();
+        for (var entidad : listaSegura) {
+            listaDominio.add(convertirADominio(entidad));
+        }
+        return listaDominio;
     }
 
-    private ProductoDominio convertirProductoADominio(ProductoEntidad producto) {
-        return new ProductoDominio.Builder()
-                .id(producto.getId())
-                .nombre(producto.getNombre())
-                .tipoProducto(new TipoProductoDominio.Builder()
-                        .id(producto.getTipoProducto().getId())
-                        .nombre(producto.getTipoProducto().getNombre())
-                        .build())
-                .tamano(new TamanoDominio.Builder()
-                        .id(producto.getTamano().getId())
-                        .tamano(producto.getTamano().getTamano())
-                        .build())
-                .productoInternoAsociado(convertirProductoInternoADominio(producto.getProductoInternoAsociado()))
-                .precio(producto.getPrecio())
-                .activo(producto.isActivo())
-                .build();
-    }
-
-    private ProductoInternoEntidad convertirProductoInternoAEntidad(ProductoInternoDominio productoInterno) {
-        return new ProductoInternoEntidad.Builder()
-                .id(productoInterno.getId())
-                .nombre(productoInterno.getNombre())
-                .perecedero(productoInterno.isPerecedero())
-                .vidaUtil(productoInterno.getVidaUtil())
-                .tipoMedida(convertirUnidadMedidaAEntidad(productoInterno.getTipoMedida()))
-                .activo(productoInterno.isActivo())
-                .build();
-    }
-
-    private ProductoInternoDominio convertirProductoInternoADominio(ProductoInternoEntidad productoInterno) {
-        return new ProductoInternoDominio.Builder()
-                .id(productoInterno.getId())
-                .nombre(productoInterno.getNombre())
-                .perecedero(productoInterno.isPerecedero())
-                .vidaUtil(productoInterno.getVidaUtil())
-                .tipoMedida(convertirUnidadMedidaADominio(productoInterno.getTipoMedida()))
-                .activo(productoInterno.isActivo())
-                .build();
-    }
-
-    private UnidadMedidaEntidad convertirUnidadMedidaAEntidad(UnidadMedidaDominio unidadMedida) {
-        return new UnidadMedidaEntidad.Builder()
-                .id(unidadMedida.getId())
-                .unidadMedida(unidadMedida.getUnidadMedida())
-                .tipoMedida(unidadMedida.getTipoMedida())
-                .build();
-    }
-
-    private UnidadMedidaDominio convertirUnidadMedidaADominio(UnidadMedidaEntidad unidadMedida) {
-        return new UnidadMedidaDominio.Builder()
-                .id(unidadMedida.getId())
-                .unidadMedida(unidadMedida.getUnidadMedida())
-                .tipoMedida(unidadMedida.getTipoMedida())
-                .build();
-    }
 }

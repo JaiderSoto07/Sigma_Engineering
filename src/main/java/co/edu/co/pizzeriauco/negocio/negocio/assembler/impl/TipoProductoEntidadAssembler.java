@@ -5,6 +5,9 @@ import co.edu.co.pizzeriauco.entidad.TipoProductoEntidad;
 import co.edu.co.pizzeriauco.negocio.negocio.assembler.EntidadAssembler;
 import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public final class TipoProductoEntidadAssembler implements EntidadAssembler<TipoProductoDominio, TipoProductoEntidad> {
 
     private static final EntidadAssembler<TipoProductoDominio, TipoProductoEntidad> INSTANCIA = new TipoProductoEntidadAssembler();
@@ -32,5 +35,16 @@ public final class TipoProductoEntidadAssembler implements EntidadAssembler<Tipo
                 .id(entidadSegura.getId())
                 .nombre(entidadSegura.getNombre())
                 .build();
+    }
+
+    @Override
+    public List<TipoProductoDominio> convertirADominio(List<TipoProductoEntidad> listaEntidades) {
+
+        var listaSegura = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(listaEntidades, new ArrayList<TipoProductoEntidad>());
+        var listaDominio = new ArrayList<TipoProductoDominio>();
+        for (var entidad : listaSegura) {
+            listaDominio.add(convertirADominio(entidad));
+        }
+        return listaDominio;
     }
 }

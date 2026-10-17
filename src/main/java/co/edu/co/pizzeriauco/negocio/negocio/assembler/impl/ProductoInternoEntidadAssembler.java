@@ -1,11 +1,16 @@
 package co.edu.co.pizzeriauco.negocio.negocio.assembler.impl;
 
 import co.edu.co.pizzeriauco.dominio.ProductoInternoDominio;
+import co.edu.co.pizzeriauco.dominio.TipoProductoDominio;
 import co.edu.co.pizzeriauco.dominio.UnidadMedidaDominio;
 import co.edu.co.pizzeriauco.entidad.ProductoInternoEntidad;
+import co.edu.co.pizzeriauco.entidad.TipoProductoEntidad;
 import co.edu.co.pizzeriauco.entidad.UnidadMedidaEntidad;
 import co.edu.co.pizzeriauco.negocio.negocio.assembler.EntidadAssembler;
 import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class ProductoInternoEntidadAssembler implements EntidadAssembler<ProductoInternoDominio, ProductoInternoEntidad> {
 
@@ -26,7 +31,7 @@ public final class ProductoInternoEntidadAssembler implements EntidadAssembler<P
                 .nombre(dominioSeguro.getNombre())
                 .perecedero(dominioSeguro.isPerecedero())
                 .vidaUtil(dominioSeguro.getVidaUtil())
-                .tipoMedida(convertirUnidadMedidaAEntidad(dominioSeguro.getTipoMedida()))
+                .tipoMedida(UnidadMedidaEntidadAssembler.getInstance().convertirAEntidad(dominioSeguro.getTipoMedida()))
                 .activo(dominioSeguro.isActivo())
                 .build();
     }
@@ -39,24 +44,20 @@ public final class ProductoInternoEntidadAssembler implements EntidadAssembler<P
                 .nombre(entidadSegura.getNombre())
                 .perecedero(entidadSegura.isPerecedero())
                 .vidaUtil(entidadSegura.getVidaUtil())
-                .tipoMedida(convertirUnidadMedidaADominio(entidadSegura.getTipoMedida()))
+                .tipoMedida(UnidadMedidaEntidadAssembler.getInstance().convertirADominio(entidadSegura.getTipoMedida()))
                 .activo(entidadSegura.isActivo())
                 .build();
     }
 
-    private UnidadMedidaEntidad convertirUnidadMedidaAEntidad(UnidadMedidaDominio unidadMedida) {
-        return new UnidadMedidaEntidad.Builder()
-                .id(unidadMedida.getId())
-                .unidadMedida(unidadMedida.getUnidadMedida())
-                .tipoMedida(unidadMedida.getTipoMedida())
-                .build();
+    @Override
+    public List<ProductoInternoDominio> convertirADominio(List<ProductoInternoEntidad> listaEntidades) {
+
+        var listaSegura = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(listaEntidades, new ArrayList<ProductoInternoEntidad>());
+        var listaDominio = new ArrayList<ProductoInternoDominio>();
+        for (var entidad : listaSegura) {
+            listaDominio.add(convertirADominio(entidad));
+        }
+        return listaDominio;
     }
 
-    private UnidadMedidaDominio convertirUnidadMedidaADominio(UnidadMedidaEntidad unidadMedida) {
-        return new UnidadMedidaDominio.Builder()
-                .id(unidadMedida.getId())
-                .unidadMedida(unidadMedida.getUnidadMedida())
-                .tipoMedida(unidadMedida.getTipoMedida())
-                .build();
-    }
 }

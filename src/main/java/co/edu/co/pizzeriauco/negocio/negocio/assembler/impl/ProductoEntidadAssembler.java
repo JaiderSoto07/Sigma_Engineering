@@ -1,9 +1,14 @@
 package co.edu.co.pizzeriauco.negocio.negocio.assembler.impl;
 
 import co.edu.co.pizzeriauco.dominio.ProductoDominio;
+import co.edu.co.pizzeriauco.dominio.ProductoInternoDominio;
 import co.edu.co.pizzeriauco.entidad.ProductoEntidad;
+import co.edu.co.pizzeriauco.entidad.ProductoInternoEntidad;
 import co.edu.co.pizzeriauco.negocio.negocio.assembler.EntidadAssembler;
 import co.edu.co.pizzeriauco.transversal.utilitario.UtilObjeto;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class ProductoEntidadAssembler implements EntidadAssembler<ProductoDominio, ProductoEntidad> {
 
@@ -44,5 +49,15 @@ public final class ProductoEntidadAssembler implements EntidadAssembler<Producto
                 .precio(entidadSegura.getPrecio())
                 .activo(entidadSegura.isActivo())
                 .build();
+    }
+
+    @Override
+    public List<ProductoDominio> convertirADominio(List<ProductoEntidad> listaEntidades) {
+        var listaSegura = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(listaEntidades, new ArrayList<ProductoEntidad>());
+        var listaDominio = new ArrayList<ProductoDominio>();
+        for (var entidad : listaSegura) {
+            listaDominio.add(convertirADominio(entidad));
+        }
+        return listaDominio;
     }
 }
