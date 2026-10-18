@@ -2,43 +2,26 @@ package co.edu.co.pizzeriauco.controlador.impl;
 
 import co.edu.co.pizzeriauco.controlador.AbstractRestController;
 import co.edu.co.pizzeriauco.dto.DetalleRecetaDto;
+import co.edu.co.pizzeriauco.dto.ProductoDto;
 import co.edu.co.pizzeriauco.negocio.fachada.impl.DetalleRecetaFachadaImpl;
+import co.edu.co.pizzeriauco.negocio.fachada.impl.ProductoFachadaImpl;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/detallerecetas")
-public class DetallerecetaControlador  extends AbstractRestController {
+@RequestMapping("/api/v1/productos")
+public class ProductoControlador extends AbstractRestController {
     @PostMapping
-    public String registrarInformacionNuevoDetalleReceta( @RequestBody DetalleRecetaDto datos){
-        var fachada = new DetalleRecetaFachadaImpl();
-        fachada.registrarInformacionNuevoDetalleReceta(datos);
-        return "Detalle de receta registrado exitosamente";
-    }
-    @PutMapping("/{id}")
-    public  String modificarCantidadIngrediente (@PathVariable UUID id, @RequestBody DetalleRecetaDto datos){
-        var fachada = new DetalleRecetaFachadaImpl();
-        fachada.modificarCantidadIngrediente(id, datos);
-        return "Detalle de receta modificado exitosamente";
-    }
-    @DeleteMapping("/{id}")
-    public  String retirarIngredienteDeReceta(@PathVariable UUID id){
-        var fachada = new DetalleRecetaFachadaImpl();
-        fachada.retirarIngredienteDeReceta(id);
-        return "Detalle de receta  eliminado exitosamente";
+    public String registrarInformacionNuevoProducto( @RequestBody ProductoDto datos){
+        var fachada = new ProductoFachadaImpl();
+        fachada.registrarInformacionNuevoProducto(datos);
+        return "Producto registrado exitosamente";
     }
 
     @GetMapping
-    public String consultarPorFiltro(DetalleRecetaDto filtro){
+    public String consultarActivos(){
         return "Solicitud exitosa";
     }
-    @GetMapping
-    public String consultarRecetasDeProductosActivos(){
-        return "Solicitud exitosa";
-    }
-    @GetMapping
-    public String consultarRecetasDeProductosInactivos(){
-        return "Solicitud exitosa";
-    }
+
 }

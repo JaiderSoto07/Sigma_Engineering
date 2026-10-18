@@ -70,10 +70,10 @@ public class UtilTexto {
         return obtenerValorDefecto(valor).matches(obtenerValorDefecto(patron));
     }
 
-    public String concatenar(String...textos){
+    public String concatenar(Object...valores){
         var resultado= new StringBuilder();
-        for(var texto:textos){
-            resultado.append(obtenerValorDefecto(texto));
+        for(var valor:valores){
+            resultado.append(UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(valor, vacia));
         }
         return  resultado.toString();
     }
