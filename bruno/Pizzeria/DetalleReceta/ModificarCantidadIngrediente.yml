@@ -1,0 +1,16 @@
+info:
+  name: ModificarCantidadIngrediente
+  type: http
+  seq: 2
+
+http:
+  method: PUT
+  url: http://localhost:986/api/v1/detallerecetas
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
