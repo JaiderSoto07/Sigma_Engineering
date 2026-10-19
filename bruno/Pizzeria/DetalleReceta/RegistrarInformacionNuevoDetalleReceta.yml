@@ -6,6 +6,18 @@ info:
 http:
   method: POST
   url: http://localhost:986/api/v1/detallerecetas
+  body:
+    type: json
+    data: |-
+      
+      {
+        "producto": {
+          "id": "01A150D5-2A27-70F0-9862-EC35BBC06354"
+        },
+        "productoInterno": {
+        "id": "FB827B0A-480B-4313-B86C-0E74FBC3B8FC"},
+        "cantidad": 50
+      }
   auth: inherit
 
 settings:
