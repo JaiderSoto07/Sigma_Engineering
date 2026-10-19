@@ -6,7 +6,6 @@ import java.util.List;
 
 public interface ProductoFachada {
 
-    void registrarInformacionNuevoProducto(ProductoDto datos);
     List<ProductoDto> consultarActivos();
 
 }

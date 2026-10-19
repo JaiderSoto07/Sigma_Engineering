@@ -23,29 +23,6 @@ public class ProductoFachadaImpl implements ProductoFachada {
     }
 
     @Override
-    public void registrarInformacionNuevoProducto(ProductoDto datos) {
-
-        daoFactory.iniciarTransaccion();
-
-        try {
-            var productoDominio = ProductoDtoAssembler.getInstance().convertirADominio(datos);
-            productoNegocio.registrarInformacionNuevoProducto(productoDominio);
-            daoFactory.confirmarTransaccion();
-
-        } catch (PizzeriaExcepcion excepcion) {
-            daoFactory.cancelarTransaccion();
-            throw excepcion;
-        } catch (Exception excepcion) {
-            daoFactory.cancelarTransaccion();
-
-            var mensajeUsuario = CatalogoMensajes.ProductoFachadaImpl.USUARIO_ERROR_PROBLEMA_INESPERADO_REGISTRANDO_PRODUCTO;
-            throw PizzeriaFachadaExcepcion.crear(mensajeUsuario, excepcion.getMessage(), excepcion);
-        } finally {
-            daoFactory.cerrarConexion();
-        }
-    }
-
-    @Override
     public List<ProductoDto> consultarActivos() {
         try {
             //aqui los tengo en dominio los quiero convertir a dto
