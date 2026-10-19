@@ -5,7 +5,13 @@ info:
 
 http:
   method: PUT
-  url: http://localhost:986/api/v1/detallerecetas
+  url: http://localhost:986/api/v1/detallerecetas/01A155C5-8163-7428-9DEF-DF6F06B11043
+  body:
+    type: json
+    data: |-
+      {
+        "cantidad": 40
+      }
   auth: inherit
 
 settings:
