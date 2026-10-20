@@ -323,3 +323,15 @@ constraint ck_consumo_venta_cantidad
     check (cantidad > 0 and cantidad <= 1000000)
 );
 go
+
+create table usuario (
+id_usuario uniqueidentifier primary key default newid(),
+usuario varchar(30) not null unique,
+clave varchar(100) not null,
+rol varchar(20) not null,
+activo bit not null,
+
+constraint ck_usuario_rol
+  check (rol in ('Administrador'))
+);
+go

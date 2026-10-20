@@ -21,6 +21,7 @@ import co.edu.co.pizzeriauco.dao.datos.entidad.ClaseMovimientoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.TipoMovimientoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.TipoProductoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.UnidadMedidaDAO;
+import co.edu.co.pizzeriauco.dao.datos.entidad.UsuarioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.VentaDAO;
 import co.edu.co.pizzeriauco.dao.factoria.enums.FactoriaEnum;
 import co.edu.co.pizzeriauco.dao.factoria.impl.SqlServerDAOFactory;
@@ -121,4 +122,6 @@ public abstract class DAOFactory {
     public abstract DetalleVentaDAO obtenerDetalleVentaDAO();
 
     public abstract ConsumoVentaDAO obtenerConsumoVentaDAO();
+
+    public abstract UsuarioDAO obtenerUsuarioDAO();
 }

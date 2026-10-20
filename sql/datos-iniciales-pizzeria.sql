@@ -36,9 +36,11 @@ insert into producto_interno (nombre, perecedero, vida_util, id_unidad_medida, a
 ('Queso',1, 7, (select id_unidad_medida from unidad_medida where unidad_medida = 'g'),  1),
 ('Albahaca',1, 8, (select id_unidad_medida from unidad_medida where unidad_medida = 'g'),  1);
 
-
 insert into producto (nombre, id_tipo_producto, id_tamano, producto_interno, precio, activo) values
     ('Margarita', (select id_tipo_producto from tipo_producto where nombre = 'Pizza'),
      (select id_tamano from tamano where tamano = 'Grande'),
-     0,25000, 1);
+     0, 25000, 1);
+
+insert into usuario (usuario, clave, rol, activo)
+values ('pizzeriaUser', '$2a$10$QpPc2NqXOL6a1rH6BS6ace4rbxzGXnUa53ReTEreSHnC5NF4cF34W', 'Administrador', 1);
 
