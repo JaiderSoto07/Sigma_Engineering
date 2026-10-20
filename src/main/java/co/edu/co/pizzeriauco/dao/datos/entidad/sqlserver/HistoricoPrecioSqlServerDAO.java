@@ -9,7 +9,6 @@ import co.edu.co.pizzeriauco.dao.datos.entidad.HistoricoPrecioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.HistoricoPrecioEntidad;
 import co.edu.co.pizzeriauco.entidad.ProductoEntidad;
-import co.edu.co.pizzeriauco.entidad.ProductoInternoEntidad;
 import co.edu.co.pizzeriauco.entidad.TamanoEntidad;
 import co.edu.co.pizzeriauco.entidad.TipoProductoEntidad;
 
@@ -56,8 +55,7 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
         var sentenciaSql =
                 """
                 select hp.id_historico_precio, hp.precio, hp.fecha_inicio, hp.fecha_fin,
-                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano,
-                p.id_producto_interno as id_producto_interno_asociado, p.precio as precio_producto, p.activo
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.precio as precio_producto, p.activo
                 from historico_precio as hp
                 inner join producto as p on hp.id_producto = p.id_producto
                 where hp.id_historico_precio = ?
@@ -78,8 +76,6 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
                                 .id(UUID.fromString(resultado.getString("id_tipo_producto"))).build())
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
-                        .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio_producto"))
                         .activo(resultado.getBoolean("activo"))
                         .build();
@@ -111,8 +107,7 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
         var sentenciaSql =
                 """
                 select hp.id_historico_precio, hp.precio, hp.fecha_inicio, hp.fecha_fin,
-                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano,
-                p.id_producto_interno as id_producto_interno_asociado, p.precio as precio_producto, p.activo
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.precio as precio_producto, p.activo
                 from historico_precio as hp
                 inner join producto as p on hp.id_producto = p.id_producto
                 """;
@@ -158,8 +153,6 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
                                 .id(UUID.fromString(resultado.getString("id_tipo_producto"))).build())
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
-                        .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio_producto"))
                         .activo(resultado.getBoolean("activo"))
                         .build();
@@ -190,8 +183,7 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
         var sentenciaSql =
                 """
                 select hp.id_historico_precio, hp.precio, hp.fecha_inicio, hp.fecha_fin,
-                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano,
-                p.id_producto_interno as id_producto_interno_asociado, p.precio as precio_producto, p.activo
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.precio as precio_producto, p.activo
                 from historico_precio as hp
                 inner join producto as p on hp.id_producto = p.id_producto
                 order by p.nombre asc, hp.fecha_inicio desc
@@ -209,8 +201,6 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
                                 .id(UUID.fromString(resultado.getString("id_tipo_producto"))).build())
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
-                        .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio_producto"))
                         .activo(resultado.getBoolean("activo"))
                         .build();

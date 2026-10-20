@@ -66,8 +66,7 @@ id_producto uniqueidentifier primary key default newid(),
 nombre varchar(40) not null,
 id_tipo_producto uniqueidentifier not null,
 id_tamano uniqueidentifier not null,
-id_producto_interno uniqueidentifier not null,
-producto_interno as (case when id_producto_interno = '00000000-0000-0000-0000-000000000000' then 0 else 1 end),
+producto_interno bit not null default 0,
 precio decimal(18,2) not null,
 activo bit not null default 1,
 
@@ -75,8 +74,6 @@ constraint fk_producto_id_tipo_producto
   foreign key (id_tipo_producto) references tipo_producto(id_tipo_producto),
 constraint fk_producto_id_tamano
   foreign key (id_tamano) references tamano(id_tamano),
-constraint fk_producto_id_producto_interno
-  foreign key (id_producto_interno) references producto_interno(id_producto_interno),
 constraint uk_producto_nombre_tamano
   unique (nombre, id_tamano),
 constraint ck_producto_precio

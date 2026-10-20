@@ -15,7 +15,6 @@ public class ProductoDominio {
     private TipoProductoDominio tipoProducto;
     private TamanoDominio tamano;
     private boolean productoInterno;
-    private ProductoInternoDominio productoInternoAsociado;
     private BigDecimal precio;
     private boolean activo;
 
@@ -24,7 +23,6 @@ public class ProductoDominio {
         this.nombre = builder.nombre;
         this.tipoProducto = builder.tipoProducto;
         this.tamano = builder.tamano;
-        this.productoInternoAsociado = builder.productoInternoAsociado;
         this.productoInterno = builder.productoInterno;
         this.precio = builder.precio;
         this.activo = builder.activo;
@@ -50,10 +48,6 @@ public class ProductoDominio {
         return productoInterno;
     }
 
-    public ProductoInternoDominio getProductoInternoAsociado() {
-        return productoInternoAsociado;
-    }
-
     public BigDecimal getPrecio() {
         return precio;
     }
@@ -69,7 +63,6 @@ public class ProductoDominio {
         private TipoProductoDominio tipoProducto;
         private TamanoDominio tamano;
         private boolean productoInterno;
-        private ProductoInternoDominio productoInternoAsociado;
         private BigDecimal precio;
         private boolean activo;
 
@@ -79,7 +72,6 @@ public class ProductoDominio {
             tipoProducto = new TipoProductoDominio.Builder().build();
             tamano = new TamanoDominio.Builder().build();
             productoInterno = false;
-            productoInternoAsociado = new ProductoInternoDominio.Builder().build();
             precio = BigDecimal.ZERO;
             activo = true;
         }
@@ -119,14 +111,6 @@ public class ProductoDominio {
             return this;
         }
 
-        public Builder productoInternoAsociado(ProductoInternoDominio productoInternoAsociado) {
-            this.productoInternoAsociado =
-                    UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
-                            productoInternoAsociado,
-                            new ProductoInternoDominio.Builder().build()
-                    );
-            return this;
-        }
 
         public Builder precio(BigDecimal precio) {
             this.precio = UtilNumero.obtenerValorDefectoSiEsNuloONegativo(precio, BigDecimal.ZERO);

@@ -15,7 +15,6 @@ public class ProductoEntidad {
     private TipoProductoEntidad tipoProducto;
     private TamanoEntidad tamano;
     private boolean productoInterno;
-    private ProductoInternoEntidad productoInternoAsociado;
     private BigDecimal precio;
     private boolean activo;
 
@@ -24,7 +23,6 @@ public class ProductoEntidad {
         this.nombre = builder.nombre;
         this.tipoProducto = builder.tipoProducto;
         this.tamano = builder.tamano;
-        this.productoInternoAsociado = builder.productoInternoAsociado;
         this.productoInterno = builder.productoInterno;
         this.precio = builder.precio;
         this.activo = builder.activo;
@@ -50,9 +48,6 @@ public class ProductoEntidad {
         return productoInterno;
     }
 
-    public ProductoInternoEntidad getProductoInternoAsociado() {
-        return productoInternoAsociado;
-    }
 
     public BigDecimal getPrecio() {
         return precio;
@@ -69,7 +64,6 @@ public class ProductoEntidad {
         private TipoProductoEntidad tipoProducto;
         private TamanoEntidad tamano;
         private boolean productoInterno;
-        private ProductoInternoEntidad productoInternoAsociado;
         private BigDecimal precio;
         private boolean activo;
 
@@ -79,7 +73,6 @@ public class ProductoEntidad {
             tipoProducto = new TipoProductoEntidad.Builder().build();
             tamano = new TamanoEntidad.Builder().build();
             productoInterno = false;
-            productoInternoAsociado = new ProductoInternoEntidad.Builder().build();
             precio = BigDecimal.ZERO;
             activo = true;
         }
@@ -110,13 +103,6 @@ public class ProductoEntidad {
 
         public Builder productoInterno(boolean productoInterno) {
             this.productoInterno = productoInterno;
-            return this;
-        }
-
-        public Builder productoInternoAsociado(ProductoInternoEntidad productoInternoAsociado) {
-            this.productoInternoAsociado = UtilObjeto.obtenerValorDefectoSiValorOriginalEsNulo(
-                            productoInternoAsociado,
-                            new ProductoInternoEntidad.Builder().build());
             return this;
         }
 

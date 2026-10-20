@@ -56,7 +56,7 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
         var sentenciaSql =
                 """
                 select dr.id_detalle_receta, dr.cantidad,
-                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo as activo_producto,
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.precio, p.activo as activo_producto,
                 pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo as activo_producto_interno,
                 pi.id_unidad_medida as id_unidad_medida_producto_interno,
                 um.id_unidad_medida, um.unidad_medida, um.tipo_medida
@@ -79,8 +79,6 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
                                 .id(UUID.fromString(resultado.getString("id_tipo_producto"))).build())
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
-                        .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo_producto"))
                         .build();
@@ -125,7 +123,7 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
         var sentenciaSql =
                 """
                 select dr.id_detalle_receta, dr.cantidad,
-                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo as activo_producto,
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.precio, p.activo as activo_producto,
                 pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo as activo_producto_interno,
                 pi.id_unidad_medida as id_unidad_medida_producto_interno,
                 um.id_unidad_medida, um.unidad_medida, um.tipo_medida
@@ -182,8 +180,6 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
                                 .id(UUID.fromString(resultado.getString("id_tipo_producto"))).build())
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
-                        .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo_producto"))
                         .build();
@@ -228,7 +224,7 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
         var sentenciaSql =
                 """
                 select dr.id_detalle_receta, dr.cantidad,
-                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo as activo_producto,
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.precio, p.activo as activo_producto,
                 pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo as activo_producto_interno,
                 pi.id_unidad_medida as id_unidad_medida_producto_interno,
                 um.id_unidad_medida, um.unidad_medida, um.tipo_medida
@@ -252,8 +248,6 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
                                 .id(UUID.fromString(resultado.getString("id_tipo_producto"))).build())
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
-                        .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo_producto"))
                         .build();
@@ -342,7 +336,7 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
         var sentenciaSql =
                 """
                 select dr.id_detalle_receta, dr.cantidad,
-                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo as activo_producto,
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.precio, p.activo as activo_producto,
                 pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo as activo_producto_interno,
                 pi.id_unidad_medida as id_unidad_medida_producto_interno,
                 um.id_unidad_medida, um.unidad_medida, um.tipo_medida
@@ -367,8 +361,6 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
                                 .id(UUID.fromString(resultado.getString("id_tipo_producto"))).build())
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
-                        .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo_producto"))
                         .build();
@@ -411,7 +403,7 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
         var sentenciaSql =
                 """
                 select dr.id_detalle_receta, dr.cantidad,
-                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo as activo_producto,
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.precio, p.activo as activo_producto,
                 pi.id_producto_interno, pi.nombre as nombre_producto_interno, pi.perecedero, pi.vida_util, pi.activo as activo_producto_interno,
                 pi.id_unidad_medida as id_unidad_medida_producto_interno,
                 um.id_unidad_medida, um.unidad_medida, um.tipo_medida
@@ -436,8 +428,6 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
                                 .id(UUID.fromString(resultado.getString("id_tipo_producto"))).build())
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
-                        .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo_producto"))
                         .build();

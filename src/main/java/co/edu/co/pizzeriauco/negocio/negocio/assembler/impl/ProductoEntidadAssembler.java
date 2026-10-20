@@ -30,7 +30,6 @@ public final class ProductoEntidadAssembler implements EntidadAssembler<Producto
                 .tipoProducto(TipoProductoEntidadAssembler.getInstance().convertirAEntidad(dominioSeguro.getTipoProducto()))
                 .tamano(TamanoEntidadAssembler.getInstance().convertirAEntidad(dominioSeguro.getTamano()))
                 .productoInterno(dominioSeguro.isProductoInterno())
-                .productoInternoAsociado(ProductoInternoEntidadAssembler.getInstance().convertirAEntidad(dominioSeguro.getProductoInternoAsociado()))
                 .precio(dominioSeguro.getPrecio())
                 .activo(dominioSeguro.isActivo())
                 .build();
@@ -45,7 +44,6 @@ public final class ProductoEntidadAssembler implements EntidadAssembler<Producto
                 .tipoProducto(TipoProductoEntidadAssembler.getInstance().convertirADominio(entidadSegura.getTipoProducto()))
                 .tamano(TamanoEntidadAssembler.getInstance().convertirADominio(entidadSegura.getTamano()))
                 .productoInterno(entidadSegura.isProductoInterno())
-                .productoInternoAsociado(ProductoInternoEntidadAssembler.getInstance().convertirADominio(entidadSegura.getProductoInternoAsociado()))
                 .precio(entidadSegura.getPrecio())
                 .activo(entidadSegura.isActivo())
                 .build();

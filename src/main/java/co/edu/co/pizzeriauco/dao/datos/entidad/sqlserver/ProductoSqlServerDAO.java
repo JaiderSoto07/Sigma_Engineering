@@ -27,7 +27,7 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
     public void crear(ProductoEntidad entidad) {
         var sentenciaSql =
                 """
-                insert into producto(id_producto, nombre, id_tipo_producto, id_tamano, id_producto_interno, precio, activo)
+                insert into producto(id_producto, nombre, id_tipo_producto, id_tamano, producto_interno, precio, activo)
                 values(?, ?, ?, ?, ?, ?, ?)
                 """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
@@ -35,7 +35,7 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
             sentencia.setString(2, entidad.getNombre());
             sentencia.setObject(3, entidad.getTipoProducto().getId());
             sentencia.setObject(4, entidad.getTamano().getId());
-            sentencia.setObject(5, entidad.getProductoInternoAsociado().getId());
+            sentencia.setBoolean(5, entidad.isProductoInterno());
             sentencia.setBigDecimal(6, entidad.getPrecio());
             sentencia.setBoolean(7, entidad.isActivo());
             sentencia.executeUpdate();
@@ -54,7 +54,7 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
     public ProductoEntidad consultarPorId(UUID id) {
         var sentenciaSql =
                 """
-                select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.producto_interno, p.precio, p.activo,
+                select p.id_producto, p.nombre as nombre_producto, p.producto_interno, p.precio, p.activo,
                 tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano
                 from producto as p
                 inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto
@@ -75,9 +75,6 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
                         .id(UUID.fromString(resultado.getString("id_tamano")))
                         .tamano(resultado.getString("tamano"))
                         .build();
-                var productoInternoAsociado = new ProductoInternoEntidad.Builder()
-                        .id(UUID.fromString(resultado.getString("id_producto_interno")))
-                        .build();
 
                 productoEncontrado = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
@@ -85,7 +82,6 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
                         .tipoProducto(tipoProducto)
                         .tamano(tamano)
                         .productoInterno(resultado.getBoolean("producto_interno"))
-                        .productoInternoAsociado(productoInternoAsociado)
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo"))
                         .build();
@@ -109,7 +105,7 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
         var cont = 0;
         var sentenciaSql =
                 """
-                select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.producto_interno, p.precio, p.activo,
+                select p.id_producto, p.nombre as nombre_producto, p.producto_interno, p.precio, p.activo,
                 tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano
                 from producto as p
                 inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto
@@ -159,7 +155,6 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
             }
 
             var resultado = sentencia.executeQuery();
-            // por cada fila que llego, se arma un producto y se agrega a la lista
             while (resultado.next()) {
                 //primero se arman los padres (tipo de producto, tamano e insumo asociado) para luego asignarlos al producto
                 var tipoProducto = new TipoProductoEntidad.Builder()
@@ -170,16 +165,13 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
                         .id(UUID.fromString(resultado.getString("id_tamano")))
                         .tamano(resultado.getString("tamano"))
                         .build();
-                var productoInternoAsociado = new ProductoInternoEntidad.Builder()
-                        .id(UUID.fromString(resultado.getString("id_producto_interno")))
-                        .build();
+
                 var producto = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
                         .nombre(resultado.getString("nombre_producto"))
                         .tipoProducto(tipoProducto)
                         .tamano(tamano)
                         .productoInterno(resultado.getBoolean("producto_interno"))
-                        .productoInternoAsociado(productoInternoAsociado)
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo"))
                         .build();
@@ -202,7 +194,7 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
     public List<ProductoEntidad> consultarTodos() {
         var sentenciaSql =
                 """
-                select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.producto_interno, p.precio, p.activo,
+                select p.id_producto, p.nombre as nombre_producto, p.producto_interno, p.precio, p.activo,
                 tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano
                 from producto as p
                 inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto
@@ -224,16 +216,13 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
                         .id(UUID.fromString(resultado.getString("id_tamano")))
                         .tamano(resultado.getString("tamano"))
                         .build();
-                var productoInternoAsociado = new ProductoInternoEntidad.Builder()
-                        .id(UUID.fromString(resultado.getString("id_producto_interno")))
-                        .build();
+
                 var producto = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
                         .nombre(resultado.getString("nombre_producto"))
                         .tipoProducto(tipoProducto)
                         .tamano(tamano)
                         .productoInterno(resultado.getBoolean("producto_interno"))
-                        .productoInternoAsociado(productoInternoAsociado)
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo"))
                         .build();
@@ -256,7 +245,7 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
 
         var sentenciaSql =
                 """
-                select p.id_producto, p.nombre as nombre_producto, p.id_producto_interno, p.producto_interno, p.precio, p.activo,
+                select p.id_producto, p.nombre as nombre_producto, p.producto_interno, p.precio, p.activo,
                 tp.id_tipo_producto, tp.nombre as nombre_tipo_producto, t.id_tamano, t.tamano
                 from producto as p
                 inner join tipo_producto as tp on p.id_tipo_producto = tp.id_tipo_producto
@@ -278,16 +267,12 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
                         .id(UUID.fromString(resultado.getString("id_tamano")))
                         .tamano(resultado.getString("tamano"))
                         .build();
-                var productoInternoAsociado = new ProductoInternoEntidad.Builder()
-                        .id(UUID.fromString(resultado.getString("id_producto_interno")))
-                        .build();
                 var producto = new ProductoEntidad.Builder()
                         .id(UUID.fromString(resultado.getString("id_producto")))
                         .nombre(resultado.getString("nombre_producto"))
                         .tipoProducto(tipoProducto)
                         .tamano(tamano)
                         .productoInterno(resultado.getBoolean("producto_interno"))
-                        .productoInternoAsociado(productoInternoAsociado)
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo"))
                         .build();
@@ -311,13 +296,13 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
         var sentenciaSql =
                 """
                 update producto set nombre = ?, id_tipo_producto = ?, id_tamano = ?,
-                id_producto_interno = ?, precio = ?, activo = ? where id_producto = ?
+                producto_interno = ?, precio = ?, activo = ? where id_producto = ?
                 """;
         try (var sentencia = getConexion().prepareStatement(sentenciaSql)) {
             sentencia.setString(1, entidad.getNombre());
             sentencia.setObject(2, entidad.getTipoProducto().getId());
             sentencia.setObject(3, entidad.getTamano().getId());
-            sentencia.setObject(4, entidad.getProductoInternoAsociado().getId());
+            sentencia.setBoolean(4, entidad.isProductoInterno());
             sentencia.setBigDecimal(5, entidad.getPrecio());
             sentencia.setBoolean(6, entidad.isActivo());
             sentencia.setObject(7, id);

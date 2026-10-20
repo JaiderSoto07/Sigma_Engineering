@@ -28,7 +28,6 @@ public final class ProductoDtoAssembler implements DTOAssembler<ProductoDominio,
         dto.setTipoProducto(TipoProductoDtoAssembler.getInstance().convertirADTO(dominioSeguro.getTipoProducto()));
         dto.setTamano(TamanoDtoAssembler.getInstance().convertirADTO(dominioSeguro.getTamano()));
         dto.setProductoInterno(dominioSeguro.isProductoInterno());
-        dto.setProductoInternoAsociado(ProductoInternoDtoAssembler.getInstance().convertirADTO(dominioSeguro.getProductoInternoAsociado()));
         dto.setPrecio(dominioSeguro.getPrecio());
         dto.setActivo(dominioSeguro.isActivo());
         return dto;
@@ -43,7 +42,6 @@ public final class ProductoDtoAssembler implements DTOAssembler<ProductoDominio,
                 .tipoProducto(TipoProductoDtoAssembler.getInstance().convertirADominio(dtoSeguro.getTipoProducto()))
                 .tamano(TamanoDtoAssembler.getInstance().convertirADominio(dtoSeguro.getTamano()))
                 .productoInterno(dtoSeguro.isProductoInterno())
-                .productoInternoAsociado(ProductoInternoDtoAssembler.getInstance().convertirADominio(dtoSeguro.getProductoInternoAsociado()))
                 .precio(dtoSeguro.getPrecio())
                 .activo(dtoSeguro.isActivo())
                 .build();

@@ -8,7 +8,6 @@ import co.edu.co.pizzeriauco.dao.datos.entidad.DetalleVentaDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.SqlDAO;
 import co.edu.co.pizzeriauco.entidad.DetalleVentaEntidad;
 import co.edu.co.pizzeriauco.entidad.ProductoEntidad;
-import co.edu.co.pizzeriauco.entidad.ProductoInternoEntidad;
 import co.edu.co.pizzeriauco.entidad.TamanoEntidad;
 import co.edu.co.pizzeriauco.entidad.TipoProductoEntidad;
 import co.edu.co.pizzeriauco.entidad.VentaEntidad;
@@ -58,8 +57,7 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
                 """
                 select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, dv.subtotal,
                 v.id_venta, v.fecha, v.hora, v.factura, v.cliente, v.total,
-                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano,
-                p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.precio, p.activo
                 from detalle_venta as dv
                 inner join venta as v on dv.id_venta = v.id_venta
                 inner join producto as p on dv.id_producto = p.id_producto
@@ -86,8 +84,6 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
                                 .id(UUID.fromString(resultado.getString("id_tipo_producto"))).build())
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
-                        .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo"))
                         .build();
@@ -121,8 +117,7 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
                 """
                 select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, dv.subtotal,
                 v.id_venta, v.fecha, v.hora, v.factura, v.cliente, v.total,
-                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano,
-                p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.precio, p.activo
                 from detalle_venta as dv
                 inner join venta as v on dv.id_venta = v.id_venta
                 inner join producto as p on dv.id_producto = p.id_producto
@@ -178,8 +173,6 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
                                 .id(UUID.fromString(resultado.getString("id_tipo_producto"))).build())
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
-                        .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo"))
                         .build();
@@ -212,8 +205,7 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
                 """
                 select dv.id_detalle_venta, dv.cantidad, dv.precio_producto, dv.subtotal,
                 v.id_venta, v.fecha, v.hora, v.factura, v.cliente, v.total,
-                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano,
-                p.id_producto_interno as id_producto_interno_asociado, p.precio, p.activo
+                p.id_producto, p.nombre as nombre_producto, p.id_tipo_producto, p.id_tamano, p.precio, p.activo
                 from detalle_venta as dv
                 inner join venta as v on dv.id_venta = v.id_venta
                 inner join producto as p on dv.id_producto = p.id_producto
@@ -240,8 +232,6 @@ public class DetalleVentaSqlServerDAO extends SqlDAO implements DetalleVentaDAO 
                                 .id(UUID.fromString(resultado.getString("id_tipo_producto"))).build())
                         .tamano(new TamanoEntidad.Builder()
                                 .id(UUID.fromString(resultado.getString("id_tamano"))).build())
-                        .productoInternoAsociado(new ProductoInternoEntidad.Builder()
-                                .id(UUID.fromString(resultado.getString("id_producto_interno_asociado"))).build())
                         .precio(resultado.getBigDecimal("precio"))
                         .activo(resultado.getBoolean("activo"))
                         .build();

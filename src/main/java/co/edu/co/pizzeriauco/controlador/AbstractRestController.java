@@ -11,23 +11,29 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestControllerAdvice
 public  abstract class AbstractRestController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractRestController.class);
 
     @ExceptionHandler(PizzeriaExcepcion.class)
     public ResponseEntity<RespuestaError<String>> controlarPizzeriaExcepcion(PizzeriaExcepcion excepcion){
+        LOGGER.warn("Capa: {} - Mensaje tecnico: {}", excepcion.getCapa(), excepcion.getMensajeTecnico(), excepcion.getExcepcionRaiz());
         var respuesta = RespuestaError.crear(excepcion.getMensajeUsuario());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(respuesta);
     }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<RespuestaError<String>> controlarExcepcion(Exception excepcion){
+        LOGGER.error("Se presento un problema inesperado en el controlador", excepcion);
         var mensajeRespuesta= CatalogoMensajes.AbstractRestController.USUARIO_ERROR_PROBLEMA_INESPERADO_EN_CONTROLADOR;
         var respuesta = RespuestaError.crear(mensajeRespuesta);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
     }
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<RespuestaError<String>> controlarNoResourceFoundException(NoResourceFoundException exception){
+        LOGGER.info("Recurso no encontrado: {} por el metodo: {}", exception.getResourcePath(), exception.getHttpMethod());
         var mensajeRespuesta= UtilTexto.getUtilTexto().concatenar("Este recurso no existe :  "  ,exception.getResourcePath() , "  por el metodo: ", exception.getHttpMethod() );
         var respuesta = RespuestaError.crear(mensajeRespuesta);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);

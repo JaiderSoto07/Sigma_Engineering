@@ -17,9 +17,6 @@ insert into categoria_origen (nombre) values
 ('Venta'),
 ('Cambio');
 
-insert into producto_interno (id_producto_interno, nombre, perecedero, vida_util, id_unidad_medida, activo)
-values ('00000000-0000-0000-0000-000000000000', 'Sin insumo', 0, 0,
-        (select id_unidad_medida from unidad_medida where unidad_medida = 'und'), 0);
 
 insert into tipo_producto (nombre) values
 ('Pizza'),
@@ -40,9 +37,8 @@ insert into producto_interno (nombre, perecedero, vida_util, id_unidad_medida, a
 ('Albahaca',1, 8, (select id_unidad_medida from unidad_medida where unidad_medida = 'g'),  1);
 
 
-insert into producto (nombre, id_tipo_producto, id_tamano, id_producto_interno, precio, activo) values
-    ('Margarita',
-     (select id_tipo_producto from tipo_producto where nombre = 'Pizza'),
+insert into producto (nombre, id_tipo_producto, id_tamano, producto_interno, precio, activo) values
+    ('Margarita', (select id_tipo_producto from tipo_producto where nombre = 'Pizza'),
      (select id_tamano from tamano where tamano = 'Grande'),
-     (select id_producto_interno from producto_interno where nombre = 'Sin insumo'),
-     25000, 1);
+     0,25000, 1);
+
