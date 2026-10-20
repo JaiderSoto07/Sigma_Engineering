@@ -488,5 +488,42 @@ public class CatalogoMensajes {
         public static final String USUARIO_ERROR_PROBLEMA_INESPERADO_EN_CONTROLADOR = "Se ha presentado un problema inesperado tratando de llevar a cabo la operacion deseada.Por favor intente de nuevo y si el problema persiste contacte al administrador y entreguele el codigo que se muestra a continuacion ";
     }
 
+    public static class AutenticacionNegocioImpl {
+
+        private AutenticacionNegocioImpl() {
+        }
+
+        public static final String DATOS_CREDENCIALES_OBLIGATORIOS = "No es posible iniciar sesion porque no se recibieron el usuario y la contrasena. Por favor diligencie los datos e intente de nuevo";
+        public static final String USUARIO_OBLIGATORIO = "El usuario es obligatorio. Por favor ingrese su usuario e intente de nuevo";
+        public static final String USUARIO_LONGITUD_NO_VALIDA = "El usuario debe tener entre 1 y 30 caracteres. Por favor verifique el usuario e intente de nuevo";
+        public static final String CLAVE_OBLIGATORIA = "La contrasena es obligatoria. Por favor ingrese su contrasena e intente de nuevo";
+        public static final String CLAVE_LONGITUD_NO_VALIDA = "La contrasena no puede tener mas de 72 caracteres. Por favor verifique la contrasena e intente de nuevo";
+        public static final String CREDENCIALES_NO_VALIDAS = "Usuario o contrasena incorrectos. Por favor verifique los datos e intente de nuevo";
+
+        public static final String USUARIO_SIN_PERMISO_PARA_INGRESAR = "No es posible iniciar sesion porque el usuario no tiene permiso para ingresar a la aplicacion. Por favor contacte al administrador de la aplicacion";
+    }
+
+    public static class AutenticacionFachadaImpl {
+
+        private AutenticacionFachadaImpl() {
+        }
+
+        public static final String USUARIO_ERROR_PROBLEMA_INESPERADO_INICIANDO_SESION = "Se ha presentado un problema inesperado tratando de iniciar sesion. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+    }
+
+    public static class UsuarioSqlServerDAO {
+
+        private UsuarioSqlServerDAO() {
+        }
+
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_USUARIO_POR_ID = "Se ha presentado un problema tratando de consultar la informacion del usuario deseado. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_USUARIO_POR_ID = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion del usuario deseado. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_USUARIO_POR_FILTRO = "Se ha presentado un problema tratando de consultar la informacion de los usuarios. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_USUARIO_POR_FILTRO = "Se ha presentado un problema NO CONTROLADO tratando de consultar la informacion de los usuarios. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_CONSULTANDO_TODOS_LOS_USUARIOS = "Se ha presentado un problema tratando de consultar todos los usuarios. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+        public static final String USUARIO_ERROR_PROBLEMA_NO_CONTROLADO_CONSULTANDO_TODOS_LOS_USUARIOS = "Se ha presentado un problema NO CONTROLADO tratando de consultar todos los usuarios. Por favor intente de nuevo y si el problema persiste contacte al administrador de la aplicacion y reporte la novedad";
+    }
+
+
 
 }

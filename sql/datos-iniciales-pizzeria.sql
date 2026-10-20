@@ -46,3 +46,7 @@ insert into producto (nombre, id_tipo_producto, id_tamano, id_producto_interno, 
      (select id_tamano from tamano where tamano = 'Grande'),
      (select id_producto_interno from producto_interno where nombre = 'Sin insumo'),
      25000, 1);
+
+insert into usuario (usuario, clave, rol, activo)
+values ('pizzeriaUser', '$2a$10$QpPc2NqXOL6a1rH6BS6ace4rbxzGXnUa53ReTEreSHnC5NF4cF34W', 'Administrador', 1);
+
