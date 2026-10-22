@@ -5,7 +5,6 @@ import co.edu.co.pizzeriauco.dominio.DetalleRecetaDominio;
 import co.edu.co.pizzeriauco.dto.DetalleRecetaDto;
 import co.edu.co.pizzeriauco.negocio.fachada.DetalleRecetaFachada;
 import co.edu.co.pizzeriauco.negocio.fachada.assembler.impl.DetalleRecetaDtoAssembler;
-import co.edu.co.pizzeriauco.negocio.negocio.DetalleRecetaNegocio;
 import co.edu.co.pizzeriauco.negocio.negocio.assembler.impl.DetalleRecetaEntidadAssembler;
 import co.edu.co.pizzeriauco.negocio.negocio.impl.DetalleRecetaNegocioImpl;
 import co.edu.co.pizzeriauco.transversal.catalogo.CatalogoMensajes;
@@ -18,16 +17,10 @@ import java.util.UUID;
 
 public class DetalleRecetaFachadaImpl implements DetalleRecetaFachada {
 
-    private DAOFactory daoFactory;
-    private DetalleRecetaNegocio detalleRecetaNegocio;
-
-    public DetalleRecetaFachadaImpl() {
-        daoFactory = DAOFactory.obtenerFactoria();
-        detalleRecetaNegocio = new DetalleRecetaNegocioImpl(daoFactory);
-    }
-
     @Override
     public void registrarInformacionNuevoDetalleReceta(DetalleRecetaDto datos) {
+        var daoFactory = DAOFactory.obtenerFactoria();
+        var detalleRecetaNegocio = new DetalleRecetaNegocioImpl(daoFactory);
 
         daoFactory.iniciarTransaccion();
 
@@ -51,6 +44,9 @@ public class DetalleRecetaFachadaImpl implements DetalleRecetaFachada {
 
     @Override
     public void modificarCantidadIngrediente(UUID id, DetalleRecetaDto datos) {
+        var daoFactory = DAOFactory.obtenerFactoria();
+        var detalleRecetaNegocio = new DetalleRecetaNegocioImpl(daoFactory);
+
         daoFactory.iniciarTransaccion();
         try {
             var detalleRecetaDominio = DetalleRecetaDtoAssembler.getInstance().convertirADominio(datos);
@@ -72,6 +68,9 @@ public class DetalleRecetaFachadaImpl implements DetalleRecetaFachada {
 
     @Override
     public void retirarIngredienteDeReceta(UUID id) {
+        var daoFactory = DAOFactory.obtenerFactoria();
+        var detalleRecetaNegocio = new DetalleRecetaNegocioImpl(daoFactory);
+
         daoFactory.iniciarTransaccion();
         try {
             detalleRecetaNegocio.retirarIngredienteDeReceta(id);
@@ -94,6 +93,9 @@ public class DetalleRecetaFachadaImpl implements DetalleRecetaFachada {
 
     @Override
     public List<DetalleRecetaDto> consultarPorFiltro(DetalleRecetaDto filtro) {
+        var daoFactory = DAOFactory.obtenerFactoria();
+        var detalleRecetaNegocio = new DetalleRecetaNegocioImpl(daoFactory);
+
         try {
             var filtroDomino = DetalleRecetaDtoAssembler.getInstance().convertirADominio(filtro);
             var detallesEncontrados = detalleRecetaNegocio.consultarPorFiltro(filtroDomino);
@@ -110,6 +112,9 @@ public class DetalleRecetaFachadaImpl implements DetalleRecetaFachada {
 
     @Override
     public List<DetalleRecetaDto> consultarRecetasDeProductosActivos() {
+        var daoFactory = DAOFactory.obtenerFactoria();
+        var detalleRecetaNegocio = new DetalleRecetaNegocioImpl(daoFactory);
+
         try {
             //aqui los tengo en dominio los quiero convertir a dto
             var detallesEncontrados = detalleRecetaNegocio.consultarRecetasDeProductosActivos();
@@ -126,6 +131,9 @@ public class DetalleRecetaFachadaImpl implements DetalleRecetaFachada {
 
     @Override
     public List<DetalleRecetaDto> consultarRecetasDeProductosInactivos() {
+        var daoFactory = DAOFactory.obtenerFactoria();
+        var detalleRecetaNegocio = new DetalleRecetaNegocioImpl(daoFactory);
+
         try {
             //aqui los tengo en dominio los quiero convertir a dto
             var detallesEncontrados = detalleRecetaNegocio.consultarRecetasDeProductosInactivos();

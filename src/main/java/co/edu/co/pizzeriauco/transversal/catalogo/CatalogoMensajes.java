@@ -486,6 +486,7 @@ public class CatalogoMensajes {
         private AbstractRestController() {
         }
         public static final String USUARIO_ERROR_PROBLEMA_INESPERADO_EN_CONTROLADOR = "Se ha presentado un problema inesperado tratando de llevar a cabo la operacion deseada.Por favor intente de nuevo y si el problema persiste contacte al administrador y entreguele el codigo que se muestra a continuacion ";
+        public static final String USUARIO_ERROR_RECURSO_NO_EXISTE = "Este recurso no existe: ";
     }
 
     public static class AutenticacionNegocioImpl {

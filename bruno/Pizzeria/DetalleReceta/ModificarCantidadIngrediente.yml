@@ -5,7 +5,7 @@ info:
 
 http:
   method: PUT
-  url: http://localhost:986/api/v1/detallerecetas/01A155C5-8163-7428-9DEF-DF6F06B11043
+  url: http://localhost:986/api/v1/detallerecetas/http://localhost:986/api/v1/detallerecetas/
   body:
     type: json
     data: |-

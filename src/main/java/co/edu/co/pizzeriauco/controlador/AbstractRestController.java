@@ -2,11 +2,9 @@ package co.edu.co.pizzeriauco.controlador;
 
 import co.edu.co.pizzeriauco.controlador.respuesta.RespuestaError;
 import co.edu.co.pizzeriauco.transversal.catalogo.CatalogoMensajes;
-import co.edu.co.pizzeriauco.transversal.excepciones.PizzeriaDatosExcepcion;
 import co.edu.co.pizzeriauco.transversal.excepciones.PizzeriaExcepcion;
 import co.edu.co.pizzeriauco.transversal.utilitario.UtilTexto;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -34,7 +32,7 @@ public  abstract class AbstractRestController {
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<RespuestaError<String>> controlarNoResourceFoundException(NoResourceFoundException exception){
         LOGGER.info("Recurso no encontrado: {} por el metodo: {}", exception.getResourcePath(), exception.getHttpMethod());
-        var mensajeRespuesta= UtilTexto.getUtilTexto().concatenar("Este recurso no existe :  "  ,exception.getResourcePath() , "  por el metodo: ", exception.getHttpMethod() );
+        var mensajeRespuesta= UtilTexto.getUtilTexto().concatenar(CatalogoMensajes.AbstractRestController.USUARIO_ERROR_RECURSO_NO_EXISTE, exception.getResourcePath(), " por el metodo: ", exception.getHttpMethod());
         var respuesta = RespuestaError.crear(mensajeRespuesta);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
     }

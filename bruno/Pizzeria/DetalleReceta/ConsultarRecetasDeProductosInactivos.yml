@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:986/api/v1/detallerecetas
+  url: http://localhost:986/api/v1/detallerecetas/inactivos
   auth: inherit
 
 settings:

@@ -6,7 +6,6 @@ import co.edu.co.pizzeriauco.dto.UsuarioDto;
 import co.edu.co.pizzeriauco.negocio.fachada.AutenticacionFachada;
 import co.edu.co.pizzeriauco.negocio.fachada.assembler.impl.CredencialesDtoAssembler;
 import co.edu.co.pizzeriauco.negocio.fachada.assembler.impl.UsuarioDtoAssembler;
-import co.edu.co.pizzeriauco.negocio.negocio.AutenticacionNegocio;
 import co.edu.co.pizzeriauco.negocio.negocio.impl.AutenticacionNegocioImpl;
 import co.edu.co.pizzeriauco.transversal.catalogo.CatalogoMensajes;
 import co.edu.co.pizzeriauco.transversal.excepciones.PizzeriaExcepcion;
@@ -14,16 +13,11 @@ import co.edu.co.pizzeriauco.transversal.excepciones.PizzeriaFachadaExcepcion;
 
 public class AutenticacionFachadaImpl implements AutenticacionFachada {
 
-    private DAOFactory daoFactory;
-    private AutenticacionNegocio autenticacionNegocio;
-
-    public AutenticacionFachadaImpl() {
-        daoFactory = DAOFactory.obtenerFactoria();
-        autenticacionNegocio = new AutenticacionNegocioImpl(daoFactory);
-    }
-
     @Override
     public UsuarioDto iniciarSesion(CredencialesDto credenciales) {
+        var daoFactory = DAOFactory.obtenerFactoria();
+        var autenticacionNegocio = new AutenticacionNegocioImpl(daoFactory);
+
         try {
             var credencialesDominio = CredencialesDtoAssembler.getInstance().convertirADominio(credenciales);
             var usuarioAutenticado = autenticacionNegocio.iniciarSesion(credencialesDominio);

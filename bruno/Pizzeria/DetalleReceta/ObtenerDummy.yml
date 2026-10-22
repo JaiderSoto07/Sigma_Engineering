@@ -1,0 +1,16 @@
+info:
+  name: ObtenerDummy
+  type: http
+  seq: 7
+
+http:
+  method: GET
+  url: http://localhost:986/api/v1/detallerecetas/dummy
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

@@ -1,0 +1,23 @@
+info:
+  name: IniciarSesion
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:986/api/v1/autenticacion
+  body:
+    type: json
+    data: |-
+      {
+        "usuario": "pizzeriaUser",
+        "clave": ""
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
