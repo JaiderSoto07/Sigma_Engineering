@@ -41,9 +41,6 @@ insert into producto (nombre, id_tipo_producto, id_tamano, producto_interno, pre
      (select id_tamano from tamano where tamano = 'Grande'),
      0, 25000, 1);
 
-insert into usuario (usuario, clave, rol, activo)
-values ('pizzeriaUser', '$2a$10$QpPc2NqXOL6a1rH6BS6ace4rbxzGXnUa53ReTEreSHnC5NF4cF34W', 'Administrador', 1);
-
 -- Productos internos, productos y receta de la Peperoni agregados desde la hoja M- del Excel (2026-10-22).
 -- Si tu base ya tiene los datos de arriba, puedes correr solo este bloque.
 

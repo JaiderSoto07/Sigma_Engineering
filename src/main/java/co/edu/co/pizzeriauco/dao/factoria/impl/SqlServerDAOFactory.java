@@ -22,7 +22,6 @@ import co.edu.co.pizzeriauco.dao.datos.entidad.ClaseMovimientoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.TipoMovimientoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.TipoProductoDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.UnidadMedidaDAO;
-import co.edu.co.pizzeriauco.dao.datos.entidad.UsuarioDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.VentaDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.CambioSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.CompraSqlServerDAO;
@@ -44,7 +43,6 @@ import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.ClaseMovimientoSqlServe
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.TipoMovimientoSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.TipoProductoSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.UnidadMedidaSqlServerDAO;
-import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.UsuarioSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.datos.entidad.sqlserver.VentaSqlServerDAO;
 import co.edu.co.pizzeriauco.dao.factoria.DAOFactory;
 
@@ -193,10 +191,5 @@ public class SqlServerDAOFactory extends DAOFactory {
     @Override
     public ConsumoVentaDAO obtenerConsumoVentaDAO() {
         return new ConsumoVentaSqlServerDAO(getConexion());
-    }
-
-    @Override
-    public UsuarioDAO obtenerUsuarioDAO() {
-        return new UsuarioSqlServerDAO(getConexion());
     }
 }

@@ -33,3 +33,5 @@ bin/
 ### IntelliJ IDEA ###
 .idea/
 *.iml
+
+src/main/resources/oauth.properties

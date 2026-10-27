@@ -13,6 +13,10 @@ config:
         username: ""
         password: ""
       bypassProxy: ""
+request:
+  headers:
+    - name: Cookie
+      value: JSESSIONID={{sesion}}
 bundled: false
 extensions:
   bruno:
