@@ -61,7 +61,7 @@ public class CategoriaOrigenSqlServerDAO extends SqlDAO implements CategoriaOrig
         var parametros = new ArrayList<Object>();
         //solo se filtra por los datos que vengan diferentes al valor por defecto
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " id_categoria_origen = ? ");
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " where ", " id_categoria_origen = ? ");
             parametros.add(filtro.getId());
             cont = cont + 1;
         }

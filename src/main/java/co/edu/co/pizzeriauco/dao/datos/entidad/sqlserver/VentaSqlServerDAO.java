@@ -91,7 +91,7 @@ public class VentaSqlServerDAO extends SqlDAO implements VentaDAO {
                 """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " id_venta = ? ");
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " where ", " id_venta = ? ");
             parametros.add(filtro.getId());
             cont = cont + 1;
         }

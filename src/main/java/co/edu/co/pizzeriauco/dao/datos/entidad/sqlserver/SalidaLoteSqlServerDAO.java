@@ -112,7 +112,7 @@ public class SalidaLoteSqlServerDAO extends SqlDAO implements SalidaLoteDAO {
         var parametros = new ArrayList<Object>();
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " sl.id_salida_lote = ? ");
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " where ", " sl.id_salida_lote = ? ");
             parametros.add(filtro.getId());
             cont = cont + 1;
         }

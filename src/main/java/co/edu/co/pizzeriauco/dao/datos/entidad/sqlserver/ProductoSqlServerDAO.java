@@ -114,7 +114,7 @@ public class ProductoSqlServerDAO extends SqlDAO implements ProductoDAO {
         var parametros = new ArrayList<Object>();
         //estos los del producto
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " p.id_producto = ? ");
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " where ", " p.id_producto = ? ");
             parametros.add(filtro.getId());
             cont = cont + 1;
         }

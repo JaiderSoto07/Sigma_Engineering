@@ -60,7 +60,7 @@ public class ClaseMovimientoSqlServerDAO extends SqlDAO implements ClaseMovimien
         var parametros = new ArrayList<Object>();
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " id_clase_movimiento = ? ");
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " where ", " id_clase_movimiento = ? ");
             parametros.add(filtro.getId());
             cont = cont + 1;
         }

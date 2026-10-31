@@ -19,28 +19,29 @@ public class SeguridadConfiguracion {
     @Bean
     public SecurityFilterChain filtroSeguridad(HttpSecurity http) throws Exception {
         http
-                //todo exige sesion, menos /error para que un error real no se vea como 401
+
                 .authorizeHttpRequests(peticiones -> peticiones
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())
 
-                //login con Google: al terminar vuelve al frontend
+
                 .oauth2Login(login -> login
                         .defaultSuccessUrl(URL_FRONTEND + "/", true)
                         .failureUrl(URL_FRONTEND + "/login?error"))
 
-                //la API sin sesion responde 401 en vez de redirigir a Google (el fetch no puede seguir esa redireccion)
+
                 .exceptionHandling(errores -> errores
                         .defaultAuthenticationEntryPointFor(
                                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
                                 PathPatternRequestMatcher.withDefaults().matcher("/api/**")))
 
-                //cerrar sesion bajo /api para que pase por el proxy de Vite; responde 200 sin redirigir
+
                 .logout(salida -> salida
                         .logoutUrl("/api/v1/autenticacion/salir")
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()))
 
                 .csrf(csrf -> csrf.disable());
+        //se desactiva CSRF porque la API solo recibe JSON, no tiene CORS habilitado y la cookie de sesion es SameSite=Lax
 
         return http.build();
     }

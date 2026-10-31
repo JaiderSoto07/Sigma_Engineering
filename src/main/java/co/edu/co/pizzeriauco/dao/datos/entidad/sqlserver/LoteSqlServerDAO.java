@@ -131,7 +131,7 @@ public class LoteSqlServerDAO extends SqlDAO implements LoteDAO {
         var parametros = new ArrayList<Object>();
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " l.id_lote = ? ");
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " where ", " l.id_lote = ? ");
             parametros.add(filtro.getId());
             cont = cont + 1;
         }

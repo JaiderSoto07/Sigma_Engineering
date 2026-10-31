@@ -81,7 +81,7 @@ public class TamanoSqlServerDAO extends SqlDAO implements TamanoDAO {
                 """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " id_tamano = ? ");
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " where ", " id_tamano = ? ");
             parametros.add(filtro.getId());
             cont = cont + 1;
         }

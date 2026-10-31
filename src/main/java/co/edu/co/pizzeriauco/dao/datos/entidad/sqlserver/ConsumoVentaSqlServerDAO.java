@@ -147,7 +147,7 @@ public class ConsumoVentaSqlServerDAO extends SqlDAO implements ConsumoVentaDAO 
         var parametros = new ArrayList<Object>();
         //este el del consumo
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " cv.id_consumo_venta = ? ");
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " where ", " cv.id_consumo_venta = ? ");
             parametros.add(filtro.getId());
             cont = cont + 1;
         }

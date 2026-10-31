@@ -113,7 +113,7 @@ public class HistoricoPrecioSqlServerDAO extends SqlDAO implements HistoricoPrec
                 """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " hp.id_historico_precio = ? ");
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " where ", " hp.id_historico_precio = ? ");
             parametros.add(filtro.getId());
             cont = cont + 1;
         }

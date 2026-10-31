@@ -93,7 +93,7 @@ public class TipoMovimientoSqlServerDAO extends SqlDAO implements TipoMovimiento
                 """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " tm.id_tipo_movimiento = ? ");
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " where ", " tm.id_tipo_movimiento = ? ");
             parametros.add(filtro.getId());
             cont = cont + 1;
         }

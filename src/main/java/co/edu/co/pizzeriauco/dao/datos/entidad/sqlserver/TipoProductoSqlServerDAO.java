@@ -80,7 +80,7 @@ public class TipoProductoSqlServerDAO extends SqlDAO implements TipoProductoDAO 
                 """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " id_tipo_producto = ? ");
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " where ", " id_tipo_producto = ? ");
             parametros.add(filtro.getId());
             cont = cont + 1;
         }

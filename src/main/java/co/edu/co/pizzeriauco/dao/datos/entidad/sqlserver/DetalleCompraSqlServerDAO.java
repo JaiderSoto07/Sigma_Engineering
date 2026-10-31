@@ -149,7 +149,7 @@ public class DetalleCompraSqlServerDAO extends SqlDAO implements DetalleCompraDA
                 """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " dc.id_detalle_compra = ? ");
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " where ", " dc.id_detalle_compra = ? ");
             parametros.add(filtro.getId());
             cont = cont + 1;
         }

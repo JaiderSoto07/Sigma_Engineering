@@ -138,7 +138,7 @@ public class MovimientoInventarioSqlServerDAO extends SqlDAO implements Movimien
         var parametros = new ArrayList<Object>();
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " mi.id_movimiento_inventario = ? ");
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " where ", " mi.id_movimiento_inventario = ? ");
             parametros.add(filtro.getId());
             cont = cont + 1;
         }

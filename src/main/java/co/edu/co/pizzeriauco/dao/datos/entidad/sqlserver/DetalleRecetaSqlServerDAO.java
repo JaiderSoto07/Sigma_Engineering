@@ -134,7 +134,7 @@ public class DetalleRecetaSqlServerDAO extends SqlDAO implements DetalleRecetaDA
                 """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " dr.id_detalle_receta = ? ");
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " where ", " dr.id_detalle_receta = ? ");
             parametros.add(filtro.getId());
             cont = cont + 1;
         }

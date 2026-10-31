@@ -101,7 +101,7 @@ public class CompraSqlServerDAO extends SqlDAO implements CompraDAO {
                 """;
         var parametros = new ArrayList<Object>();
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " c.id_compra = ? ");
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " where ", " c.id_compra = ? ");
             parametros.add(filtro.getId());
             cont = cont + 1;
         }

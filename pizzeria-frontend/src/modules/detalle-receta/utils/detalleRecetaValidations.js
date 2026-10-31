@@ -15,7 +15,7 @@ const FORMATO_NUMERO = /^(\d{1,3}(\.\d{3})+|\d+)(,\d+)?$/
 export function parseCantidad(valor) {
   if (typeof valor === 'number') return valor
   const texto = String(valor ?? '').trim()
-  if (!FORMATO_NUMERO.test(texto)) return NaN
+  if (!FORMATO_NUMERO.test(texto)) return Number.NaN
   return Number(texto.replaceAll('.', '').replace(',', '.'))
 }
 

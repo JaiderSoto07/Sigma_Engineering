@@ -119,7 +119,7 @@ public class InventarioSqlServerDAO extends SqlDAO implements InventarioDAO {
         var parametros = new ArrayList<Object>();
 
         if (!UtilId.VALOR_DEFECTO.equals(filtro.getId())) {
-            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, (cont == 0 ? " where " : " and "), " i.id_inventario = ? ");
+            sentenciaSql = UtilTexto.getUtilTexto().concatenar(sentenciaSql, " where ", " i.id_inventario = ? ");
             parametros.add(filtro.getId());
             cont = cont + 1;
         }

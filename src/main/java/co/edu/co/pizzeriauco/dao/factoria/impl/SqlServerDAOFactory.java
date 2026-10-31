@@ -48,24 +48,44 @@ import co.edu.co.pizzeriauco.dao.factoria.DAOFactory;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class SqlServerDAOFactory extends DAOFactory {
 
     private static final String URL =
             "jdbc:sqlserver://localhost:1433;databaseName=Pizzeria;encrypt=true;trustServerCertificate=true";
-    private static final String USUARIO = "pizzeriaUser";
-    private static final String CLAVE = "Pizza2026*";
+    private static final Logger LOGGER = LoggerFactory.getLogger(SqlServerDAOFactory.class);
+    private static final String ARCHIVO_CONFIGURACION = "basedatos.properties";
 
+    private static final Properties CREDENCIALES = cargarCredenciales();
     private static final HikariDataSource POOL = crearPool();
+
+    //el usuario y la clave se leen de basedatos.properties para no dejarlos escritos en el codigo
+    private static Properties cargarCredenciales() {
+        var credenciales = new Properties();
+        try (var archivo = SqlServerDAOFactory.class.getClassLoader().getResourceAsStream(ARCHIVO_CONFIGURACION)) {
+            if (archivo != null) {
+                credenciales.load(archivo);
+            } else {
+                LOGGER.error("No se encontro el archivo {} en src/main/resources", ARCHIVO_CONFIGURACION);
+            }
+        } catch (IOException exception) {
+            LOGGER.error("No fue posible leer el archivo {}", ARCHIVO_CONFIGURACION, exception);
+        }
+        return credenciales;
+    }
 
     private static HikariDataSource crearPool() {
         HikariConfig configuracion = new HikariConfig();
         configuracion.setJdbcUrl(URL);
-        configuracion.setUsername(USUARIO);
-        configuracion.setPassword(CLAVE);
+        configuracion.setUsername(CREDENCIALES.getProperty("basedatos.usuario"));
+        configuracion.setPassword(CREDENCIALES.getProperty("basedatos.clave"));
         configuracion.setMaximumPoolSize(10);
         //si SQL Server no está disponible, no falla al crear el pool sino al pedir la conexión (dentro del try)
         configuracion.setInitializationFailTimeout(-1);
