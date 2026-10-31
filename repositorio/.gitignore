@@ -1,0 +1,6 @@
+# Archivos temporales de Excel / draw.io
+~$*
+*.tmp
+.$*.bkp
+.DS_Store
+Thumbs.db
